@@ -83,6 +83,8 @@
   #mapa.arrastrando { cursor:grabbing; }
   #mapa path, #mapa circle { fill:#dfe3e8; stroke:#fff; stroke-width:.5; vector-effect:non-scaling-stroke; }
   #mapa path:hover, #mapa circle:hover { stroke:#1c2430; stroke-width:1.3; }
+  #mapa .fuera { fill:#f3f4f6!important; opacity:.5; pointer-events:none; }
+  .pt { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
   #mapa .sel { stroke:#111; stroke-width:1.8; }
   #mapa circle { stroke:#566; stroke-width:.8; }
   .zoom { position:absolute; top:8px; right:8px; display:flex; flex-direction:column; gap:4px; }
@@ -136,7 +138,7 @@
   <!-- 2. PAÍSES -->
   <section class="card">
     <h2><span class="num">2</span> Elige los países <span id="contPaises" style="font-weight:400;color:var(--gris);font-size:.85rem"></span></h2>
-    <p class="nota" style="margin-top:0">El mapa siempre pinta todos los países con dato. Esta selección sirve para comparar en el gráfico y la tabla (también puedes hacer clic en un país del mapa).</p>
+    <p class="nota" style="margin-top:0">Si eliges un <b>continente</b>, el mapa, el gráfico y la tabla se limitan a él. También puedes marcar países concretos (o hacer clic en ellos en el mapa) para compararlos; la pestaña <b>Continentes</b> compara los continentes entre sí.</p>
     <div class="fila">
       <div><label class="t" for="fCont">Continente</label><select id="fCont"><option value="">Todos</option></select></div>
       <div><label class="t" for="fIngreso">Nivel de ingreso</label><select id="fIngreso"><option value="">Todos</option></select></div>
@@ -175,6 +177,7 @@
       <button data-tab="mapa" class="on">🗺 Mapa</button>
       <button data-tab="grafico">📈 Gráfico</button>
       <button data-tab="tabla">📋 Tabla</button>
+      <button data-tab="continentes">🌐 Continentes</button>
       <span style="flex:1"></span>
       <button id="btnCSV" class="sec">⬇ Descargar CSV</button>
     </div>
@@ -219,6 +222,22 @@
             <th data-k="var" class="n">Variación en el periodo</th><th data-k="puesto" class="n" title="1 = valor más alto">Puesto</th>
           </tr></thead>
           <tbody id="tabla"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-continentes" hidden>
+      <div class="ctrl">
+        <div><label class="t" for="contModo">Cómo se resume cada continente</label>
+          <select id="contModo"><option value="mediana">Mediana (país típico)</option><option value="media">Media simple</option><option value="suma">Suma (solo totales)</option></select></div>
+        <div><label class="t" for="contVista">Vista</label>
+          <select id="contVista"><option value="barras">Comparar hoy (barras)</option><option value="linea">Evolución en el tiempo (líneas)</option></select></div>
+      </div>
+      <div class="canvas-box" style="height:380px"><canvas id="graficoCont"></canvas></div>
+      <p class="nota" id="contNota"></p>
+      <div class="tabla-box">
+        <table>
+          <thead><tr><th>Continente</th><th class="n">Países con dato</th><th class="n">Mediana</th><th class="n">Media</th><th class="n">Mínimo</th><th class="n">Máximo</th><th class="n">Suma</th></tr></thead>
+          <tbody id="tablaCont"></tbody>
         </table>
       </div>
     </div>
@@ -491,6 +510,21 @@ async function wbAll(path, params) {
   }
   return {meta: first[0], rows};
 }
+let imfModo = "", imfCopia = "";
+// El FMI a veces no acepta consultas desde páginas web (CORS). Primero se intenta en vivo;
+// si falla, se usa la copia que el propio sitio guarda en datos/imf/ (la actualiza GitHub cada día).
+async function imfGet(ruta) {
+  try { const j = await fetchJSON(`${IMF}/${ruta}`, 15000); imfModo = "vivo"; return j; }
+  catch (e1) {
+    try {
+      const j = await fetchJSON(`datos/imf/${ruta.replace(/[^\w.-]/g, "_")}.json`, 20000);
+      imfModo = "copia"; if (j.generado) imfCopia = j.generado;
+      return j.datos || j;
+    } catch (e2) {
+      throw new Error("El FMI no permite consultas directas desde el navegador y este indicador no está en la copia local del sitio (datos/imf/).");
+    }
+  }
+}
 function explicarError(e, fuente) {
   const m = String((e && e.message) || e);
   if (e && e.name === "AbortError") return `${fuente} tardó demasiado en responder. Intenta de nuevo en unos minutos.`;
@@ -574,7 +608,7 @@ const ADAPT = {
   },
 
   async imf(o, d, h) {
-    const j = await fetchJSON(`${IMF}/${encodeURIComponent(o.id)}`);
+    const j = await imfGet(encodeURIComponent(o.id));
     const vals = j.values && j.values[o.id];
     if (!vals) throw new Error("El FMI no devolvió datos para este indicador.");
     const sc = o.scale || 1, series = new Map();
@@ -587,7 +621,7 @@ const ADAPT = {
         agregar(series, iso, yy, vv * sc, yy >= ANIO ? "proy" : "");
       });
     });
-    return {series, link: "https://www.imf.org/external/datamapper/" + encodeURIComponent(o.id) + "@WEO"};
+    return {series, updated: imfModo === "copia" && imfCopia ? "copia del sitio del " + imfCopia.slice(0, 10) : "", link: "https://www.imf.org/external/datamapper/" + encodeURIComponent(o.id) + "@WEO"};
   },
 
   async cepal(o, d, h) {
@@ -654,11 +688,18 @@ function filtrarPaises() {
 }
 function syncChecks() {
   $("listaPaises").querySelectorAll("input").forEach(c => { c.checked = sel.has(c.value); });
-  $("contPaises").textContent = sel.size ? `· ${sel.size} seleccionados` : "· ninguno (se muestran todos)";
+  $("contPaises").textContent = sel.size ? `· ${sel.size} seleccionados` : contSel() ? `· ninguno (se muestra todo ${CONT_NOMBRE[contSel()]})` : "· ninguno (se muestran todos)";
 }
 function onSelChange() {
   syncChecks(); marcarSel();
-  if (D) { renderStats(); renderLectura(); if (tabActiva === "grafico") dibujarGrafico(); if (tabActiva === "tabla") renderTabla(); renderSinDato(); }
+  if (D) { renderStats(); renderLectura(); if (tabActiva === "grafico") dibujarGrafico(); if (tabActiva === "tabla") renderTabla(); if (tabActiva === "continentes") dibujarContinentes(); renderSinDato(); }
+}
+function onContChange() {           // el continente elegido manda sobre toda la vista
+  sel.clear(); filtrarPaises(); syncChecks(); marcarSel();
+  if (!D) return;
+  renderStats(); renderLectura(); renderSinDato();
+  if (tabActiva === "mapa") { pintarMapa(); zoomContinente(contSel()); }
+  else if (tabActiva === "grafico") dibujarGrafico(); else if (tabActiva === "tabla") renderTabla(); else dibujarContinentes();
 }
 function toggleSel(iso) {
   const p = paisMap.get(iso); if (!p || p.agg) return;
@@ -672,7 +713,8 @@ function toggleSel(iso) {
 function renderTabsFuente() {
   $("tabsFuente").innerHTML = Object.entries(FUENTES).map(([k, f]) =>
     `<button data-src="${k}" class="${k === srcActual ? "on" : ""}">${esc(f.nombre)}<small>${esc(f.sub)}</small></button>`).join("");
-  $("descFuente").innerHTML = esc(FUENTES[srcActual].desc) + (errFuente[srcActual] ? ` <b style="color:var(--rojo)">⚠ Última prueba de conexión fallida.</b>` : "");
+  $("descFuente").innerHTML = esc(FUENTES[srcActual].desc) + (errFuente[srcActual] ? ` <b style="color:var(--rojo)">⚠ Última prueba de conexión fallida.</b>` : "") +
+    (srcActual === "imf" && imfModo === "copia" ? ` <b>Datos tomados de la copia del sitio${imfCopia ? " (actualizada el " + esc(imfCopia.slice(0, 10)) + ")" : ""}, porque el FMI no responde a consultas directas desde el navegador.</b>` : "");
 }
 function renderChips() {
   const cats = [...new Set(CATALOGO[srcActual].map(o => o.cat))];
@@ -798,7 +840,7 @@ async function cargarWBCatalogo() {
   if (srcActual === "wb") { renderCatalogo(); if (ind && ind.src === "wb") renderDetalle(); }
 }
 async function cargarIMF() {
-  const j = await fetchJSON(`${IMF}/indicators`);
+  const j = await imfGet("indicators");
   imfCat = j.indicators || {};
   CATALOGO.imf = CATALOGO.imf.filter(o => { if (!imfCat[o.id]) { console.warn("Indicador del FMI no encontrado:", o.id); return false; } return true; });
   CATALOGO.imf.forEach(o => { o.def = textoPlano(imfCat[o.id].description); o.org = imfCat[o.id].source || ""; });
@@ -856,7 +898,7 @@ function procesar(R, d, h) {
     const act = arr.filter(x => x.y <= ultimoReal);
     if (!act.length) return;
     const ult = act[act.length - 1], prim = act[0];
-    filas.push({iso, nombre: p.nombre, agg: p.agg, cont: p.agg ? "Agregado" : (CONT_NOMBRE[p.cont] || "Otros"), ult, prim,
+    filas.push({iso, nombre: p.nombre, agg: p.agg, cc: p.agg ? "" : p.cont, cont: p.agg ? "Agregado" : (CONT_NOMBRE[p.cont] || "Otros"), ult, prim,
                 var: (prim.y !== ult.y && prim.v !== 0) ? (ult.v - prim.v) / Math.abs(prim.v) * 100 : null});
   });
   const ord = filas.filter(r => !r.agg).sort((a, b) => b.ult.v - a.ult.v);
@@ -880,7 +922,11 @@ function procesar(R, d, h) {
 // ============================================================
 //  RESULTADOS
 // ============================================================
-function vista() { return sel.size ? filas.filter(r => sel.has(r.iso)) : filas.filter(r => !r.agg); }
+const CONT_ORDER = ["AF", "AS", "EU", "NA", "SA", "OC"];
+const CONT_COLOR = {AF: "#d97706", AS: "#dc2626", EU: "#2563eb", NA: "#059669", SA: "#7c3aed", OC: "#0891b2"};
+const CONT_RECT = {AF: [-20, 52, -37, 38], EU: [-25, 45, 34, 72], AS: [25, 150, -11, 78], NA: [-170, -52, 5, 84], SA: [-85, -33, -57, 14], OC: [110, 180, -50, 0]};
+const contSel = () => $("fCont").value;
+function vista() { const c = contSel(); return sel.size ? filas.filter(r => sel.has(r.iso)) : filas.filter(r => !r.agg && (!c || r.cc === c)); }
 function renderTodo() {
   $("tituloRes").textContent = ind.name;
   $("subRes").textContent = `${ind.unit ? "Unidad: " + ind.unit + " · " : ""}${FUENTES[ind.src].nombre} · ${D.d}–${D.h}`;
@@ -893,9 +939,9 @@ function renderTodo() {
 function activarTab(t) {
   tabActiva = t;
   document.querySelectorAll(".tabsR button[data-tab]").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
-  ["mapa", "grafico", "tabla"].forEach(x => { $("tab-" + x).hidden = x !== t; });
+  ["mapa", "grafico", "tabla", "continentes"].forEach(x => { $("tab-" + x).hidden = x !== t; });
   if (!D) return;
-  if (t === "mapa") pintarMapa(); else if (t === "grafico") dibujarGrafico(); else renderTabla();
+  if (t === "mapa") { pintarMapa(); zoomContinente(contSel()); } else if (t === "grafico") dibujarGrafico(); else if (t === "tabla") renderTabla(); else dibujarContinentes();
 }
 function estad(rows) {
   const v = rows.map(r => r.ult.v).sort((a, b) => a - b), n = v.length;
@@ -994,6 +1040,60 @@ function dibujarGrafico() {
   }
 }
 
+
+// ---------- CONTINENTES ----------
+let graficoCont = null;
+function agregarCont(vals, modo) {
+  const v = vals.slice().sort((x, y) => x - y), n = v.length; if (!n) return null;
+  if (modo === "suma") return v.reduce((s, x) => s + x, 0);
+  if (modo === "media") return v.reduce((s, x) => s + x, 0) / n;
+  return n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2;
+}
+function dibujarContinentes() {
+  if (!D) return;
+  const puedeSuma = ind.k === "big", selModo = $("contModo");
+  selModo.querySelector('option[value="suma"]').disabled = !puedeSuma;
+  if (!puedeSuma && selModo.value === "suma") selModo.value = "mediana";
+  const modo = selModo.value, vista = $("contVista").value, nombreModo = {mediana: "Mediana", media: "Media", suma: "Suma"}[modo];
+  // datos por continente (último dato de cada país)
+  const G = {}; CONT_ORDER.forEach(c => { G[c] = []; });
+  filas.forEach(r => { if (!r.agg && G[r.cc]) G[r.cc].push(r); });
+  const activos = CONT_ORDER.filter(c => G[c].length);
+  // tabla resumen
+  const f = v => fmtVal(v, ind);
+  $("tablaCont").innerHTML = activos.map(c => {
+    const rs = G[c], e = estad(rs), tot = rs.reduce((s, r) => s + r.ult.v, 0);
+    return `<tr><td><i class="pt" style="background:${CONT_COLOR[c]}"></i>${esc(CONT_NOMBRE[c])}</td><td class="n">${e.n}</td><td class="n">${esc(f(e.mediana))}</td><td class="n">${esc(f(e.media))}</td>
+      <td class="n">${esc(f(e.min.ult.v))}<br><small>${esc(e.min.nombre)}</small></td><td class="n">${esc(f(e.max.ult.v))}<br><small>${esc(e.max.nombre)}</small></td>
+      <td class="n">${puedeSuma ? esc(f(tot)) : "—"}</td></tr>`;
+  }).join("");
+  const aviso = $("contNota");
+  aviso.textContent = "La media simple trata igual a un país pequeño que a uno enorme; la mediana representa mejor al país típico del continente. " +
+    (puedeSuma ? "La suma solo tiene sentido para totales (PIB, población…). " : "") + "Las comparaciones usan el último dato de cada país, que puede ser de años distintos.";
+  if (typeof Chart === "undefined") { aviso.textContent = "No se cargó la librería de gráficos; la tabla sí funciona."; return; }
+  if (graficoCont) graficoCont.destroy();
+  const eje = {title: {display: !!ind.unit, text: ind.unit || ""}, ticks: {callback: v => fmtVal(v, ind)}};
+  if (vista === "barras") {
+    const datos = activos.map(c => ({c, v: agregarCont(G[c].map(r => r.ult.v), modo), n: G[c].length})).sort((a, b) => b.v - a.v);
+    graficoCont = new Chart($("graficoCont"), {type: "bar",
+      data: {labels: datos.map(d => `${CONT_NOMBRE[d.c]} (${d.n} países)`), datasets: [{data: datos.map(d => d.v), backgroundColor: datos.map(d => CONT_COLOR[d.c])}]},
+      options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, title: {display: true, text: `${nombreModo} por continente · ${ind.name}`}, tooltip: {callbacks: {label: c => f(c.parsed.y)}}}, scales: {y: eje}}});
+  } else {
+    const labels = []; for (let y = D.d; y <= D.h; y++) labels.push(y);
+    const iProy = ind.src === "imf" ? labels.indexOf(ANIO) : -1;
+    const ds = activos.map(c => {
+      const iso = G[c].map(r => r.iso), min = modo === "suma" ? Math.ceil(iso.length * .8) : Math.min(3, iso.length);
+      return {label: CONT_NOMBRE[c], borderColor: CONT_COLOR[c], backgroundColor: CONT_COLOR[c], spanGaps: false, tension: .2, borderWidth: 2.2, pointRadius: 1.5,
+        data: labels.map(y => { const v = iso.map(i => { const o = D.idx.get(i).get(y); return o ? o.v : null; }).filter(x => x !== null); return v.length >= min ? agregarCont(v, modo) : null; }),
+        segment: iProy >= 0 ? {borderDash: x => x.p1DataIndex >= iProy ? [6, 4] : undefined} : undefined};
+    });
+    aviso.textContent += " En la línea del tiempo solo se calcula un año cuando hay datos de al menos " + (modo === "suma" ? "el 80 % de los países del continente" : "3 países del continente") + ", para no comparar cosas incomparables.";
+    graficoCont = new Chart($("graficoCont"), {type: "line", data: {labels, datasets: ds},
+      options: {responsive: true, maintainAspectRatio: false, interaction: {mode: "nearest", intersect: false},
+        plugins: {title: {display: true, text: `${nombreModo} por continente · ${ind.name}`}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${f(c.parsed.y)}`}}}, scales: {y: eje}}});
+  }
+}
+
 // ============================================================
 //  MAPA
 // ============================================================
@@ -1018,7 +1118,21 @@ function initMapa() {
   svg.querySelectorAll("[data-iso]").forEach(el => { const iso = el.dataset.iso; if (!iso) return; if (!mapPaths.has(iso)) mapPaths.set(iso, []); mapPaths.get(iso).push(el); });
   eventosMapa(svg);
 }
-function marcarSel() { mapPaths.forEach((arr, iso) => arr.forEach(el => el.classList.toggle("sel", sel.has(iso)))); }
+function marcarSel() { const ver = sel.size <= 25; mapPaths.forEach((arr, iso) => arr.forEach(el => el.classList.toggle("sel", ver && sel.has(iso)))); }
+function zoomContinente(c) {
+  if (!vbBase) return;
+  const R = CONT_RECT[c];
+  if (!R) { vb = [...vbBase]; aplicarVB(); return; }
+  const pts = [proyectar(R[0], R[3]), proyectar(R[1], R[3]), proyectar(R[0], R[2]), proyectar(R[1], R[2]), proyectar(R[0], 0), proyectar(R[1], 0)];
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const ar = vbBase[2] / vbBase[3];
+  let w = (x1 - x0) * 1.08, h = (y1 - y0) * 1.08;
+  if (w / h < ar) w = h * ar; else h = w / ar;
+  w = Math.min(w, vbBase[2]); h = w / ar;
+  vb = [(x0 + x1) / 2 - w / 2, (y0 + y1) / 2 - h / 2, w, h];
+  limitarVB(); aplicarVB();
+}
 
 function makeScale(vals, modo, n = 7) {
   const s = vals.slice().sort((a, b) => a - b);
@@ -1044,11 +1158,11 @@ function pintarMapa() {
   const yr = $("mapaAnio").value, modo = $("mapaEscala").value;
   mapVals = new Map();
   filas.forEach(r => {
-    if (r.agg) return;
+    if (r.agg || (contSel() && r.cc !== contSel())) return;
     if (yr === "ultimo") mapVals.set(r.iso, r.ult);
     else { const o = D.idx.get(r.iso).get(+yr); if (o) mapVals.set(r.iso, o); }
   });
-  mapPaths.forEach(arr => arr.forEach(el => { el.style.fill = ""; }));
+  mapPaths.forEach((arr, iso) => { const p = paisMap.get(iso), fuera = !!contSel() && (!p || p.cont !== contSel()); arr.forEach(el => { el.style.fill = ""; el.classList.toggle("fuera", fuera); }); });
   const leyenda = $("leyenda");
   if (!mapVals.size) { leyenda.innerHTML = `<span>Sin datos para el año elegido.</span>`; $("notaMapa").textContent = ""; return; }
   const sc = makeScale([...mapVals.values()].map(p => p.v), modo), pal = paletaN(PALETAS[ind.tone], sc.n);
@@ -1058,7 +1172,7 @@ function pintarMapa() {
   leyenda.innerHTML = pal.slice(0, sc.n).map((c, i) => `<span><i style="background:${c}"></i>${esc(fmtVal(bordes[i], ind))} – ${esc(fmtVal(bordes[i + 1], ind))}</span>`).join("") +
     `<span><i style="background:#dfe3e8"></i>Sin datos</span>`;
   const proy = ind.src === "imf" && yr !== "ultimo" && +yr >= ANIO ? " (proyección del FMI)" : "";
-  $("notaMapa").textContent = `${mapVals.size} países con dato${yr === "ultimo" ? " · se muestra el último año disponible de cada país (puede variar entre países)" : " en " + yr + proy}. ` +
+  $("notaMapa").textContent = `${contSel() ? "Continente: " + CONT_NOMBRE[contSel()] + " · " : ""}${mapVals.size} países con dato${yr === "ultimo" ? " · se muestra el último año disponible de cada país (puede variar entre países)" : " en " + yr + proy}. ` +
     `Los círculos pequeños son países demasiado pequeños para verse. Clic en un país para añadirlo o quitarlo de la comparación; rueda del ratón o botones para acercar.`;
 }
 function aplicarVB() { $("mapa").setAttribute("viewBox", vb.map(n => +n.toFixed(2)).join(" ")); }
@@ -1136,7 +1250,9 @@ function eventos() {
   $("avzLista").addEventListener("change", () => {
     const it = avzItems.find(x => x.id === $("avzLista").value); if (it) elegirIndicador(indDesdeItem(it));
   });
-  ["fCont", "fIngreso", "verAgg"].forEach(id => $(id).addEventListener("change", filtrarPaises));
+  ["fIngreso", "verAgg"].forEach(id => $(id).addEventListener("change", filtrarPaises));
+  $("fCont").addEventListener("change", onContChange);
+  $("contModo").addEventListener("change", dibujarContinentes); $("contVista").addEventListener("change", dibujarContinentes);
   $("buscarPais").addEventListener("input", filtrarPaises);
   $("listaPaises").addEventListener("change", e => { if (e.target.checked) sel.add(e.target.value); else sel.delete(e.target.value); onSelChange(); });
   $("btnVisibles").addEventListener("click", () => { $("listaPaises").querySelectorAll("label:not([hidden]) input").forEach(c => sel.add(c.value)); onSelChange(); });
@@ -1148,7 +1264,7 @@ function eventos() {
   $("mapaAnio").addEventListener("change", pintarMapa); $("mapaEscala").addEventListener("change", pintarMapa);
   $("tipoGrafico").addEventListener("change", dibujarGrafico);
   $("btnCSV").addEventListener("click", descargarCSV);
-  document.querySelector("thead").addEventListener("click", e => {
+  document.querySelector("#tab-tabla thead").addEventListener("click", e => {
     const th = e.target.closest("th"); if (!th || !D) return;
     const k = th.dataset.k; orden = {k, asc: orden.k === k ? !orden.asc : (k === "nombre" || k === "cont" || k === "puesto")}; renderTabla();
   });

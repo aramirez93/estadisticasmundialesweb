@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estadísticas Mundiales</title>
+<meta name="description" content="Estadísticas de todos los países del mundo en tiempo real: PIB, población, salud, educación, trabajo y más, con mapa, gráficos y tablas. Fuentes: Banco Mundial, Eurostat, FMI y CEPAL.">
+<meta name="theme-color" content="#0b6e4f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root { --verde:#0b6e4f; --verde2:#e6f2ed; --fondo:#f4f6f8; --texto:#1c2430; --gris:#5a6675; --borde:#d9dee4; --rojo:#b3261e; --ambar:#9a6700; }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body { margin:0; font-family:system-ui,Segoe UI,Arial,sans-serif; background:var(--fondo); color:var(--texto); line-height:1.4; }
+  header { background:var(--verde); color:#fff; padding:14px 20px; }
+  header h1 { margin:0; font-size:1.3rem; }
+  header .ver { font-size:.75rem; background:rgba(255,255,255,.2); padding:2px 8px; border-radius:10px; vertical-align:middle; margin-left:6px; }
+  .estados { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:.8rem; }
+  .estados span { background:rgba(255,255,255,.14); padding:3px 10px; border-radius:12px; }
+  .estados .ok::before { content:"● "; color:#9df0c4; }
+  .estados .fail::before { content:"● "; color:#ffb4ab; }
+  .estados .wait::before { content:"○ "; color:#fff; }
+  main { max-width:1180px; margin:0 auto; padding:16px; display:grid; gap:16px; }
+  .card { background:#fff; border:1px solid var(--borde); border-radius:10px; padding:16px; }
+  .card h2 { margin:0 0 10px; font-size:1.05rem; display:flex; align-items:center; gap:8px; }
+  .num { background:var(--verde); color:#fff; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; flex:none; }
+  .fila { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  label.t { font-weight:600; font-size:.82rem; display:block; margin-bottom:4px; }
+  select, input[type=search], button { width:100%; padding:8px; border:1px solid var(--borde); border-radius:6px; font-size:.92rem; font-family:inherit; }
+  select[size] { padding:4px; }
+  button { background:var(--verde); color:#fff; border:none; cursor:pointer; font-weight:600; }
+  button:hover { filter:brightness(1.1); }
+  button:disabled { opacity:.5; cursor:wait; }
+  button.sec { background:#eef2f5; color:var(--texto); border:1px solid var(--borde); font-weight:500; }
+  .nota { font-size:.82rem; color:var(--gris); margin:6px 0; }
+  /* fuentes y catálogo */
+  .tabsF { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin-bottom:6px; }
+  .tabsF button { background:#eef2f5; color:var(--texto); border:2px solid transparent; text-align:left; padding:9px 12px; font-weight:600; }
+  .tabsF button small { display:block; font-weight:400; color:var(--gris); font-size:.74rem; }
+  .tabsF button.on { background:var(--verde2); border-color:var(--verde); color:var(--verde); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+  .chips button { width:auto; padding:5px 11px; border-radius:20px; font-size:.8rem; background:#eef2f5; color:var(--texto); border:1px solid var(--borde); font-weight:500; }
+  .chips button.on { background:var(--verde); color:#fff; border-color:var(--verde); }
+  .catalogo { display:grid; grid-template-columns:repeat(auto-fill,minmax(235px,1fr)); gap:8px; max-height:340px; overflow:auto; padding:2px; }
+  .ind { text-align:left; background:#fff; color:var(--texto); border:1px solid var(--borde); padding:9px 11px; font-weight:400; }
+  .ind b { display:block; font-size:.9rem; }
+  .ind .u { display:inline-block; background:var(--verde2); color:var(--verde); font-size:.7rem; padding:1px 7px; border-radius:9px; margin:3px 0; }
+  .ind .d { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:.76rem; color:var(--gris); }
+  .ind:hover { border-color:var(--verde); filter:none; }
+  .ind.on { border:2px solid var(--verde); background:var(--verde2); padding:8px 10px; }
+  details { margin-top:10px; }
+  summary { cursor:pointer; font-size:.88rem; font-weight:600; color:var(--verde); }
+  .detalle { margin-top:12px; background:#f8fafb; border:1px solid var(--borde); border-left:4px solid var(--verde); border-radius:6px; padding:10px 14px; font-size:.88rem; }
+  .detalle h3 { margin:0 0 4px; font-size:1rem; }
+  .detalle p { margin:5px 0; }
+  .pills span { display:inline-block; font-size:.72rem; background:var(--verde2); color:var(--verde); padding:2px 8px; border-radius:10px; margin:0 4px 4px 0; }
+  .alerta { margin-top:10px; background:#fdecea; border:1px solid #f5c2bd; color:#8a1c14; padding:9px 13px; border-radius:6px; font-size:.88rem; }
+  .def { white-space:pre-line; font-size:.82rem; color:var(--gris); max-height:200px; overflow:auto; }
+  /* países */
+  #listaPaises { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:2px 10px; max-height:220px; overflow:auto; border:1px solid var(--borde); border-radius:6px; padding:8px; margin-top:10px; }
+  #listaPaises label { font-size:.85rem; display:flex; gap:6px; align-items:center; cursor:pointer; }
+  .botones { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .botones button { width:auto; padding:7px 12px; }
+  #estado { font-size:.88rem; margin-top:10px; color:var(--gris); }
+  #estado.err { color:var(--rojo); font-weight:600; }
+  #estado.ok { color:var(--verde); }
+  /* resultados */
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:10px 0; }
+  .stat { background:var(--verde2); border-radius:8px; padding:9px 11px; }
+  .stat small { display:block; color:var(--gris); font-size:.74rem; }
+  .stat b { font-size:1.02rem; }
+  .stat span { font-size:.74rem; color:var(--gris); display:block; }
+  .lectura { background:#fffbe6; border:1px solid #f0e2a0; border-radius:8px; padding:9px 13px; font-size:.86rem; margin-bottom:12px; }
+  .lectura h4 { margin:0 0 4px; font-size:.85rem; }
+  .lectura ul { margin:0; padding-left:18px; }
+  .tabsR { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 12px; border-bottom:1px solid var(--borde); padding-bottom:8px; }
+  .tabsR button { width:auto; background:#eef2f5; color:var(--texto); font-weight:600; padding:7px 14px; }
+  .tabsR button.on { background:var(--verde); color:#fff; }
+  .ctrl { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-bottom:10px; }
+  .mapa-wrap { position:relative; }
+  #mapa { display:block; width:100%; height:auto; background:#e8f1f8; border-radius:8px; cursor:grab; touch-action:none; user-select:none; }
+  #mapa.arrastrando { cursor:grabbing; }
+  #mapa path, #mapa circle { fill:#dfe3e8; stroke:#fff; stroke-width:.5; vector-effect:non-scaling-stroke; }
+  #mapa path:hover, #mapa circle:hover { stroke:#1c2430; stroke-width:1.3; }
+  #mapa .fuera { fill:#f3f4f6!important; opacity:.5; pointer-events:none; }
+  .pt { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+  #mapa .sel { stroke:#111; stroke-width:1.8; }
+  #mapa circle { stroke:#566; stroke-width:.8; }
+  .zoom { position:absolute; top:8px; right:8px; display:flex; flex-direction:column; gap:4px; }
+  .zoom button { width:30px; height:30px; padding:0; font-size:1.1rem; background:#fff; color:var(--texto); border:1px solid var(--borde); }
+  .tip { position:absolute; pointer-events:none; background:#1c2430; color:#fff; padding:6px 10px; border-radius:6px; font-size:.8rem; display:none; z-index:5; max-width:260px; line-height:1.35; }
+  .tip small { color:#c8d0d9; }
+  .leyenda { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; font-size:.78rem; }
+  .leyenda span { display:inline-flex; align-items:center; gap:5px; }
+  .leyenda i { width:18px; height:12px; border-radius:2px; display:inline-block; border:1px solid rgba(0,0,0,.15); }
+  .canvas-box { position:relative; height:420px; }
+  .tabla-box { max-height:480px; overflow:auto; border:1px solid var(--borde); border-radius:6px; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  th, td { text-align:left; padding:7px 9px; border-bottom:1px solid var(--borde); }
+  th { background:#eef2f5; position:sticky; top:0; cursor:pointer; white-space:nowrap; }
+  td.n, th.n { text-align:right; }
+  .enlaces { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:6px 16px; font-size:.88rem; }
+  .enlaces a, .nota a, footer a { color:var(--verde); }
+  footer { text-align:center; font-size:.8rem; color:var(--gris); padding:20px; }
+  @media (max-width:600px) { main { padding:10px; } .canvas-box { height:340px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌍 Estadísticas Mundiales <span class="ver">v0.3</span></h1>
+  <div id="fuentesEstado" class="estados"></div>
+</header>
+
+<main>
+  <!-- 1. FUENTE E INDICADOR -->
+  <section class="card" id="paso1">
+    <h2><span class="num">1</span> Elige la fuente y la estadística</h2>
+    <div id="tabsFuente" class="tabsF"></div>
+    <p id="descFuente" class="nota"></p>
+    <label class="t" for="buscarCat">Buscar en el catálogo</label>
+    <input type="search" id="buscarCat" placeholder="ej. desempleo, natalidad, PIB, pobreza, internet…">
+    <div id="chipsCat" class="chips"></div>
+    <div id="catalogo" class="catalogo"></div>
+    <details id="avanzado">
+      <summary>Explorar el catálogo completo de esta fuente</summary>
+      <div class="fila" style="margin-top:10px">
+        <div id="avzDBbox"><label class="t" for="avzDB">Base de datos</label><select id="avzDB"></select></div>
+        <div><label class="t" for="avzBuscar">Buscar indicador</label><input type="search" id="avzBuscar" placeholder="escribe una palabra…"></div>
+      </div>
+      <div class="nota" id="avzCont"></div>
+      <select id="avzLista" size="8" aria-label="Catálogo completo"></select>
+    </details>
+    <div id="detalle" class="detalle" hidden></div>
+    <div id="alerta" class="alerta" role="alert" hidden></div>
+  </section>
+
+  <!-- 2. PAÍSES -->
+  <section class="card">
+    <h2><span class="num">2</span> Elige los países <span id="contPaises" style="font-weight:400;color:var(--gris);font-size:.85rem"></span></h2>
+    <p class="nota" style="margin-top:0">Si eliges un <b>continente</b>, el mapa, el gráfico y la tabla se limitan a él. También puedes marcar países concretos (o hacer clic en ellos en el mapa) para compararlos; la pestaña <b>Continentes</b> compara los continentes entre sí.</p>
+    <div class="fila">
+      <div><label class="t" for="fCont">Continente</label><select id="fCont"><option value="">Todos</option></select></div>
+      <div><label class="t" for="fIngreso">Nivel de ingreso</label><select id="fIngreso"><option value="">Todos</option></select></div>
+      <div><label class="t" for="buscarPais">Buscar país</label><input type="search" id="buscarPais" placeholder="ej. Colombia, Japón…"></div>
+    </div>
+    <label style="display:flex;gap:6px;align-items:center;font-size:.85rem;margin-top:10px">
+      <input type="checkbox" id="verAgg"> Incluir agregados (Mundo, regiones, grupos de ingreso)
+    </label>
+    <div id="listaPaises"></div>
+    <div class="botones">
+      <button class="sec" id="btnVisibles">Seleccionar visibles</button>
+      <button class="sec" id="btnLimpiar">Limpiar selección</button>
+      <button class="sec" id="btnMuestra">Muestra de 5 continentes</button>
+    </div>
+  </section>
+
+  <!-- 3. PERIODO -->
+  <section class="card">
+    <h2><span class="num">3</span> Periodo</h2>
+    <div class="fila">
+      <div><label class="t" for="desde">Desde</label><select id="desde"></select></div>
+      <div><label class="t" for="hasta">Hasta</label><select id="hasta"></select></div>
+      <div style="align-self:end"><button id="btnConsultar">Actualizar datos</button></div>
+    </div>
+    <div id="estado"></div>
+  </section>
+
+  <!-- RESULTADOS -->
+  <section class="card" id="resultados" hidden>
+    <h2 id="tituloRes"></h2>
+    <div class="nota" id="subRes" style="margin-top:0"></div>
+    <div class="stats" id="stats"></div>
+    <div class="lectura" id="lectura" hidden></div>
+
+    <div class="tabsR">
+      <button data-tab="mapa" class="on">🗺 Mapa</button>
+      <button data-tab="grafico">📈 Gráfico</button>
+      <button data-tab="tabla">📋 Tabla</button>
+      <button data-tab="continentes">🌐 Continentes</button>
+      <span style="flex:1"></span>
+      <button id="btnCSV" class="sec">⬇ Descargar CSV</button>
+    </div>
+
+    <div id="tab-mapa">
+      <div class="ctrl">
+        <div><label class="t" for="mapaAnio">Año que se muestra</label><select id="mapaAnio"></select></div>
+        <div><label class="t" for="mapaEscala">Cómo se reparten los colores</label>
+          <select id="mapaEscala">
+            <option value="cuantiles">Por grupos iguales de países (recomendado)</option>
+            <option value="lineal">Intervalos iguales de valor</option>
+            <option value="log">Escala logarítmica (valores muy desiguales)</option>
+          </select></div>
+      </div>
+      <div class="mapa-wrap">
+        <svg id="mapa" role="img" aria-label="Mapa mundial coloreado por indicador"></svg>
+        <div class="zoom"><button id="zMas" title="Acercar" aria-label="Acercar">+</button><button id="zMenos" title="Alejar" aria-label="Alejar">−</button><button id="zReset" title="Vista completa" aria-label="Vista completa">⌂</button></div>
+        <div class="tip" id="tip"></div>
+      </div>
+      <div class="leyenda" id="leyenda"></div>
+      <p class="nota" id="notaMapa"></p>
+    </div>
+
+    <div id="tab-grafico" hidden>
+      <div class="ctrl">
+        <div><label class="t" for="tipoGrafico">Tipo de gráfico</label>
+          <select id="tipoGrafico">
+            <option value="linea">Evolución en el tiempo (líneas)</option>
+            <option value="barras">Ranking del último dato (barras)</option>
+          </select></div>
+      </div>
+      <div class="canvas-box" id="cajaGrafico"><canvas id="grafico"></canvas></div>
+      <p class="nota" id="avisoGrafico"></p>
+    </div>
+
+    <div id="tab-tabla" hidden>
+      <div class="tabla-box">
+        <table>
+          <thead><tr>
+            <th data-k="nombre">País</th><th data-k="cont">Continente</th>
+            <th data-k="anio" class="n">Año</th><th data-k="valor" class="n">Valor</th>
+            <th data-k="var" class="n">Variación en el periodo</th><th data-k="puesto" class="n" title="1 = valor más alto">Puesto</th>
+          </tr></thead>
+          <tbody id="tabla"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-continentes" hidden>
+      <div class="ctrl">
+        <div><label class="t" for="contModo">Cómo se resume cada continente</label>
+          <select id="contModo"><option value="mediana">Mediana (país típico)</option><option value="media">Media simple</option><option value="suma">Suma (solo totales)</option></select></div>
+        <div><label class="t" for="contVista">Vista</label>
+          <select id="contVista"><option value="barras">Comparar hoy (barras)</option><option value="linea">Evolución en el tiempo (líneas)</option></select></div>
+      </div>
+      <div class="canvas-box" style="height:380px"><canvas id="graficoCont"></canvas></div>
+      <p class="nota" id="contNota"></p>
+      <div class="tabla-box">
+        <table>
+          <thead><tr><th>Continente</th><th class="n">Países con dato</th><th class="n">Mediana</th><th class="n">Media</th><th class="n">Mínimo</th><th class="n">Máximo</th><th class="n">Suma</th></tr></thead>
+          <tbody id="tablaCont"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="nota" id="sinDato"></p>
+    <p class="nota" id="fuenteLinea"></p>
+  </section>
+
+  <section class="card">
+    <h2>Oficinas nacionales de estadística y organismos internacionales</h2>
+    <p class="nota" style="margin-top:0">Fuentes primarias para profundizar o verificar los datos.</p>
+    <div class="enlaces" id="oficinas"></div>
+  </section>
+</main>
+
+<footer>
+  Fuentes: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a> ·
+  <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener">Eurostat</a> ·
+  <a href="https://www.imf.org/external/datamapper" target="_blank" rel="noopener">FMI (DataMapper)</a> ·
+  <a href="https://statistics.cepal.org" target="_blank" rel="noopener">CEPALSTAT</a>.
+  Cada país publica con distinto rezago; los años del último dato pueden diferir.
+</footer>
+
+<script>
+/*MAPDATA*/
+</script>
+<script>
+/*APP*/
+</script>
+</body>
+</html>
