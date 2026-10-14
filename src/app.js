@@ -111,7 +111,7 @@ let grafico = null, tabActiva = "mapa";
 Object.values(CATALOGO).flat().forEach(o => REG.set(o.key, o));
 
 function setEstado(msg, tipo) {
-  const e = $("estado"); e.textContent = msg; e.className = tipo || "";
+  const e = $("estado"); e.textContent = msg; e.className = tipo || ""; if (typeof actualizarFrase === "function") actualizarFrase();
   const a = $("alerta");
   if (a) { a.hidden = tipo !== "err"; a.textContent = tipo === "err" ? msg : ""; }
 }
@@ -254,15 +254,12 @@ function syncChecks() {
   $("contPaises").textContent = sel.size ? `· ${sel.size} seleccionados` : contSel() ? `· ninguno (se muestra todo ${CONT_NOMBRE[contSel()]})` : "· ninguno (se muestran todos)";
 }
 function onSelChange() {
-  syncChecks(); marcarSel();
-  if (D) { renderStats(); renderLectura(); if (tabActiva === "grafico") dibujarGrafico(); if (tabActiva === "tabla") renderTabla(); if (tabActiva === "continentes") dibujarContinentes(); renderSinDato(); }
+  syncChecks(); marcarSel(); actualizarFrase();
+  if (D) { renderResumen(); renderVista({}); }
 }
 function onContChange() {           // el continente elegido manda sobre toda la vista
-  sel.clear(); filtrarPaises(); syncChecks(); marcarSel();
-  if (!D) return;
-  renderStats(); renderLectura(); renderSinDato();
-  if (tabActiva === "mapa") { pintarMapa(); zoomContinente(contSel()); }
-  else if (tabActiva === "grafico") dibujarGrafico(); else if (tabActiva === "tabla") renderTabla(); else dibujarContinentes();
+  sel.clear(); filtrarPaises(); syncChecks(); marcarSel(); actualizarFrase();
+  if (D) { renderResumen(); renderVista({zoom: true}); }
 }
 function toggleSel(iso) {
   const p = paisMap.get(iso); if (!p || p.agg) return;
@@ -327,8 +324,8 @@ function elegirIndicador(o, consultarYa = true) {
   const cambioFuente = o.src !== srcActual;
   ind = o; srcActual = o.src;
   if (cambioFuente) { catFiltro = ""; $("buscarCat").value = ""; renderTabsFuente(); renderChips(); ajustarPeriodo(); resetAvanzado(); }
-  renderCatalogo(); renderDetalle();
-  if (consultarYa) consultar();
+  renderCatalogo(); renderDetalle(); actualizarFrase();
+  if (consultarYa) { cerrarHojas(); consultar(); }
 }
 function cambiarFuente(s) {
   if (s === srcActual) return;
@@ -490,22 +487,6 @@ const CONT_COLOR = {AF: "#d97706", AS: "#dc2626", EU: "#2563eb", NA: "#059669", 
 const CONT_RECT = {AF: [-20, 52, -37, 38], EU: [-25, 45, 34, 72], AS: [25, 150, -11, 78], NA: [-170, -52, 5, 84], SA: [-85, -33, -57, 14], OC: [110, 180, -50, 0]};
 const contSel = () => $("fCont").value;
 function vista() { const c = contSel(); return sel.size ? filas.filter(r => sel.has(r.iso)) : filas.filter(r => !r.agg && (!c || r.cc === c)); }
-function renderTodo() {
-  $("tituloRes").textContent = ind.name;
-  $("subRes").textContent = `${ind.unit ? "Unidad: " + ind.unit + " · " : ""}${FUENTES[ind.src].nombre} · ${D.d}–${D.h}`;
-  renderStats(); renderLectura(); renderSinDato();
-  const fl = D.link ? `<a href="${esc(D.link)}" target="_blank" rel="noopener">ver en la fuente</a>` : "";
-  $("fuenteLinea").innerHTML = `Fuente: ${esc(FUENTES[ind.src].nombre)}${ind.org ? " (" + esc(ind.org) + ")" : ""} · indicador ${esc(ind.id)} · consultado ${new Date().toLocaleString("es-CO")}${D.updated ? " · fuente actualizada: " + esc(D.updated) : ""} · ${fl}`;
-  activarTab(tabActiva);
-  marcarSel();
-}
-function activarTab(t) {
-  tabActiva = t;
-  document.querySelectorAll(".tabsR button[data-tab]").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
-  ["mapa", "grafico", "tabla", "continentes"].forEach(x => { $("tab-" + x).hidden = x !== t; });
-  if (!D) return;
-  if (t === "mapa") { pintarMapa(); zoomContinente(contSel()); } else if (t === "grafico") dibujarGrafico(); else if (t === "tabla") renderTabla(); else dibujarContinentes();
-}
 function estad(rows) {
   const v = rows.map(r => r.ult.v).sort((a, b) => a - b), n = v.length;
   const media = v.reduce((s, x) => s + x, 0) / n;
@@ -513,37 +494,6 @@ function estad(rows) {
   const sd = n > 1 ? Math.sqrt(v.reduce((s, x) => s + (x - media) ** 2, 0) / (n - 1)) : 0;
   const max = rows.reduce((a, b) => b.ult.v > a.ult.v ? b : a), min = rows.reduce((a, b) => b.ult.v < a.ult.v ? b : a);
   return {n, media, mediana, sd, max, min};
-}
-function renderStats() {
-  const rows = vista(); if (!rows.length) { $("stats").innerHTML = ""; return; }
-  const e = estad(rows), c = (t, v, s) => `<div class="stat"><small>${t}</small><b>${esc(v)}</b>${s ? `<span>${esc(s)}</span>` : ""}</div>`;
-  const glob = sel.size ? estad(filas.filter(r => !r.agg)) : null;
-  $("stats").innerHTML =
-    c("Países en esta vista", sel.size ? `${e.n} seleccionados` : `${e.n} con dato`) +
-    c("Media", fmtVal(e.media, ind)) + c("Mediana", fmtVal(e.mediana, ind)) +
-    c("Máximo", fmtVal(e.max.ult.v, ind), `${e.max.nombre} (${e.max.ult.y})`) +
-    c("Mínimo", fmtVal(e.min.ult.v, ind), `${e.min.nombre} (${e.min.ult.y})`) +
-    (glob ? c("Mediana de todos los países", fmtVal(glob.mediana, ind), `${glob.n} países`) : c("Desviación estándar", fmtVal(e.sd, ind)));
-}
-function renderLectura() {
-  const rows = vista().filter(r => r.ult), box = $("lectura");
-  if (rows.length < 2) { box.hidden = true; return; }
-  const e = estad(rows), L = [], f = v => fmtVal(v, ind);
-  L.push(`<b>${esc(e.max.nombre)}</b> tiene el valor más alto (${f(e.max.ult.v)}, ${e.max.ult.y}) y <b>${esc(e.min.nombre)}</b> el más bajo (${f(e.min.ult.v)}, ${e.min.ult.y}).` +
-         (e.min.ult.v > 0 && e.max.ult.v / e.min.ult.v >= 2 ? ` El primero es ${num(e.max.ult.v / e.min.ult.v, 1)} veces el segundo.` : ""));
-  if (e.mediana > 0 && e.media > e.mediana * 1.5) L.push(`La media (${f(e.media)}) está muy por encima de la mediana (${f(e.mediana)}): unos pocos países con valores altos elevan el promedio. La mediana describe mejor al país típico.`);
-  const cv = rows.filter(r => r.var !== null && isFinite(r.var));
-  if (cv.length >= 3) {
-    const sv = [...cv].sort((a, b) => b.var - a.var), s = r => (r.var > 0 ? "+" : "") + num(r.var, 1) + " %";
-    L.push(`Entre ${esc(String(D.d))} y el último dato, la mayor variación fue la de <b>${esc(sv[0].nombre)}</b> (${s(sv[0])}) y la menor la de <b>${esc(sv[sv.length - 1].nombre)}</b> (${s(sv[sv.length - 1])}).`);
-  }
-  if (sel.size && sel.size <= 40) {
-    const g = estad(filas.filter(r => !r.agg));
-    const arriba = rows.filter(r => !r.agg && r.ult.v > g.mediana).length;
-    L.push(`${arriba} de los ${rows.filter(r => !r.agg).length} países seleccionados están por encima de la mediana mundial (${f(g.mediana)}).`);
-  }
-  box.hidden = false;
-  box.innerHTML = `<h4>💡 Lectura rápida</h4><ul>${L.map(x => `<li>${x}</li>`).join("")}</ul>`;
 }
 function renderSinDato() {
   const faltan = [...sel].filter(i => !filas.some(r => r.iso === i)).map(i => (paisMap.get(i) || {nombre: i}).nombre);
@@ -563,98 +513,6 @@ function renderTabla() {
     <td class="n">${r.ult.y}${r.ult.f === "p" ? " (prov.)" : ""}</td><td class="n">${esc(fmtVal(r.ult.v, ind))}</td>
     <td class="n">${r.var === null ? "—" : (r.var > 0 ? "+" : "") + num(r.var, 1) + " %"}</td>
     <td class="n">${r.puesto ? r.puesto + " de " + D.nRank : "—"}</td></tr>`).join("");
-}
-
-// ---------- GRÁFICO ----------
-function dibujarGrafico() {
-  const aviso = $("avisoGrafico"); aviso.textContent = "";
-  if (typeof Chart === "undefined") { aviso.textContent = "No se cargó la librería de gráficos (Chart.js). Revisa tu conexión a internet y recarga; el mapa y la tabla sí funcionan."; return; }
-  if (grafico) grafico.destroy();
-  const tipo = $("tipoGrafico").value, rows = [...vista()].sort((a, b) => b.ult.v - a.ult.v);
-  const eje = {title: {display: !!ind.unit, text: ind.unit || ""}, ticks: {callback: v => fmtVal(v, ind)}};
-  if (tipo === "linea") {
-    $("cajaGrafico").style.height = "420px";
-    const top = rows.slice(0, 12);
-    if (rows.length > 12) aviso.textContent = `Se grafican los 12 países con mayor valor de ${rows.length}. Selecciona países (o haz clic en el mapa) para compararlos; la tabla incluye todos.`;
-    const labels = []; for (let y = D.d; y <= D.h; y++) labels.push(y);
-    const iProy = ind.src === "imf" ? labels.indexOf(ANIO) : -1;
-    grafico = new Chart($("grafico"), {
-      type: "line",
-      data: {labels, datasets: top.map((r, i) => ({
-        label: r.nombre, borderColor: LINEAS[i % LINEAS.length], backgroundColor: LINEAS[i % LINEAS.length],
-        data: labels.map(y => { const o = D.idx.get(r.iso).get(y); return o ? o.v : null; }),
-        spanGaps: true, tension: .2, borderWidth: 2, pointRadius: 1.5,
-        segment: iProy >= 0 ? {borderDash: c => c.p1DataIndex >= iProy ? [6, 4] : undefined} : undefined}))},
-      options: {responsive: true, maintainAspectRatio: false, interaction: {mode: "nearest", intersect: false},
-        plugins: {title: {display: true, text: ind.name}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${fmtVal(c.parsed.y, ind)}`}}},
-        scales: {y: eje}}
-    });
-  } else {
-    const top = rows.slice(0, 25);
-    if (rows.length > 25) aviso.textContent = `El ranking muestra los 25 países con mayor valor de ${rows.length}. La tabla incluye todos.`;
-    $("cajaGrafico").style.height = Math.max(300, top.length * 24 + 90) + "px";
-    grafico = new Chart($("grafico"), {
-      type: "bar",
-      data: {labels: top.map(r => `${r.nombre} (${r.ult.y})`), datasets: [{data: top.map(r => r.ult.v), backgroundColor: PALETAS[ind.tone][5]}]},
-      options: {indexAxis: "y", responsive: true, maintainAspectRatio: false,
-        plugins: {legend: {display: false}, title: {display: true, text: ind.name + " – último dato disponible"}, tooltip: {callbacks: {label: c => fmtVal(c.parsed.x, ind)}}},
-        scales: {x: eje}}
-    });
-  }
-}
-
-
-// ---------- CONTINENTES ----------
-let graficoCont = null;
-function agregarCont(vals, modo) {
-  const v = vals.slice().sort((x, y) => x - y), n = v.length; if (!n) return null;
-  if (modo === "suma") return v.reduce((s, x) => s + x, 0);
-  if (modo === "media") return v.reduce((s, x) => s + x, 0) / n;
-  return n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2;
-}
-function dibujarContinentes() {
-  if (!D) return;
-  const puedeSuma = ind.k === "big", selModo = $("contModo");
-  selModo.querySelector('option[value="suma"]').disabled = !puedeSuma;
-  if (!puedeSuma && selModo.value === "suma") selModo.value = "mediana";
-  const modo = selModo.value, vista = $("contVista").value, nombreModo = {mediana: "Mediana", media: "Media", suma: "Suma"}[modo];
-  // datos por continente (último dato de cada país)
-  const G = {}; CONT_ORDER.forEach(c => { G[c] = []; });
-  filas.forEach(r => { if (!r.agg && G[r.cc]) G[r.cc].push(r); });
-  const activos = CONT_ORDER.filter(c => G[c].length);
-  // tabla resumen
-  const f = v => fmtVal(v, ind);
-  $("tablaCont").innerHTML = activos.map(c => {
-    const rs = G[c], e = estad(rs), tot = rs.reduce((s, r) => s + r.ult.v, 0);
-    return `<tr><td><i class="pt" style="background:${CONT_COLOR[c]}"></i>${esc(CONT_NOMBRE[c])}</td><td class="n">${e.n}</td><td class="n">${esc(f(e.mediana))}</td><td class="n">${esc(f(e.media))}</td>
-      <td class="n">${esc(f(e.min.ult.v))}<br><small>${esc(e.min.nombre)}</small></td><td class="n">${esc(f(e.max.ult.v))}<br><small>${esc(e.max.nombre)}</small></td>
-      <td class="n">${puedeSuma ? esc(f(tot)) : "—"}</td></tr>`;
-  }).join("");
-  const aviso = $("contNota");
-  aviso.textContent = "La media simple trata igual a un país pequeño que a uno enorme; la mediana representa mejor al país típico del continente. " +
-    (puedeSuma ? "La suma solo tiene sentido para totales (PIB, población…). " : "") + "Las comparaciones usan el último dato de cada país, que puede ser de años distintos.";
-  if (typeof Chart === "undefined") { aviso.textContent = "No se cargó la librería de gráficos; la tabla sí funciona."; return; }
-  if (graficoCont) graficoCont.destroy();
-  const eje = {title: {display: !!ind.unit, text: ind.unit || ""}, ticks: {callback: v => fmtVal(v, ind)}};
-  if (vista === "barras") {
-    const datos = activos.map(c => ({c, v: agregarCont(G[c].map(r => r.ult.v), modo), n: G[c].length})).sort((a, b) => b.v - a.v);
-    graficoCont = new Chart($("graficoCont"), {type: "bar",
-      data: {labels: datos.map(d => `${CONT_NOMBRE[d.c]} (${d.n} países)`), datasets: [{data: datos.map(d => d.v), backgroundColor: datos.map(d => CONT_COLOR[d.c])}]},
-      options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}, title: {display: true, text: `${nombreModo} por continente · ${ind.name}`}, tooltip: {callbacks: {label: c => f(c.parsed.y)}}}, scales: {y: eje}}});
-  } else {
-    const labels = []; for (let y = D.d; y <= D.h; y++) labels.push(y);
-    const iProy = ind.src === "imf" ? labels.indexOf(ANIO) : -1;
-    const ds = activos.map(c => {
-      const iso = G[c].map(r => r.iso), min = modo === "suma" ? Math.ceil(iso.length * .8) : Math.min(3, iso.length);
-      return {label: CONT_NOMBRE[c], borderColor: CONT_COLOR[c], backgroundColor: CONT_COLOR[c], spanGaps: false, tension: .2, borderWidth: 2.2, pointRadius: 1.5,
-        data: labels.map(y => { const v = iso.map(i => { const o = D.idx.get(i).get(y); return o ? o.v : null; }).filter(x => x !== null); return v.length >= min ? agregarCont(v, modo) : null; }),
-        segment: iProy >= 0 ? {borderDash: x => x.p1DataIndex >= iProy ? [6, 4] : undefined} : undefined};
-    });
-    aviso.textContent += " En la línea del tiempo solo se calcula un año cuando hay datos de al menos " + (modo === "suma" ? "el 80 % de los países del continente" : "3 países del continente") + ", para no comparar cosas incomparables.";
-    graficoCont = new Chart($("graficoCont"), {type: "line", data: {labels, datasets: ds},
-      options: {responsive: true, maintainAspectRatio: false, interaction: {mode: "nearest", intersect: false},
-        plugins: {title: {display: true, text: `${nombreModo} por continente · ${ind.name}`}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${f(c.parsed.y)}`}}}, scales: {y: eje}}});
-  }
 }
 
 // ============================================================
@@ -736,7 +594,7 @@ function pintarMapa() {
     `<span><i style="background:#dfe3e8"></i>Sin datos</span>`;
   const proy = ind.src === "imf" && yr !== "ultimo" && +yr >= ANIO ? " (proyección del FMI)" : "";
   $("notaMapa").textContent = `${contSel() ? "Continente: " + CONT_NOMBRE[contSel()] + " · " : ""}${mapVals.size} países con dato${yr === "ultimo" ? " · se muestra el último año disponible de cada país (puede variar entre países)" : " en " + yr + proy}. ` +
-    `Los círculos pequeños son países demasiado pequeños para verse. Clic en un país para añadirlo o quitarlo de la comparación; rueda del ratón o botones para acercar.`;
+    `Los círculos son países muy pequeños. Toca un país para compararlo; con la rueda o los botones + y − te acercas.`;
 }
 function aplicarVB() { $("mapa").setAttribute("viewBox", vb.map(n => +n.toFixed(2)).join(" ")); }
 function limitarVB() { vb[0] = clamp(vb[0], vbBase[0], vbBase[0] + vbBase[2] - vb[2]); vb[1] = clamp(vb[1], vbBase[1], vbBase[1] + vbBase[3] - vb[3]); }
@@ -803,6 +661,7 @@ function descargarCSV() {
 //  EVENTOS E INICIO
 // ============================================================
 function eventos() {
+  eventosVistas();
   $("tabsFuente").addEventListener("click", e => { const b = e.target.closest("button[data-src]"); if (b) cambiarFuente(b.dataset.src); });
   $("chipsCat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; catFiltro = b.dataset.cat; renderChips(); renderCatalogo(); });
   $("buscarCat").addEventListener("input", renderCatalogo);
@@ -815,7 +674,7 @@ function eventos() {
   });
   ["fIngreso", "verAgg"].forEach(id => $(id).addEventListener("change", filtrarPaises));
   $("fCont").addEventListener("change", onContChange);
-  $("contModo").addEventListener("change", dibujarContinentes); $("contVista").addEventListener("change", dibujarContinentes);
+
   $("buscarPais").addEventListener("input", filtrarPaises);
   $("listaPaises").addEventListener("change", e => { if (e.target.checked) sel.add(e.target.value); else sel.delete(e.target.value); onSelChange(); });
   $("btnVisibles").addEventListener("click", () => { $("listaPaises").querySelectorAll("label:not([hidden]) input").forEach(c => sel.add(c.value)); onSelChange(); });
@@ -823,11 +682,9 @@ function eventos() {
   $("btnMuestra").addEventListener("click", () => { sel.clear(); MUESTRA.forEach(i => sel.add(i)); onSelChange(); });
   $("desde").addEventListener("change", consultar); $("hasta").addEventListener("change", consultar);
   $("btnConsultar").addEventListener("click", consultar);
-  document.querySelector(".tabsR").addEventListener("click", e => { const b = e.target.closest("button[data-tab]"); if (b) activarTab(b.dataset.tab); });
   $("mapaAnio").addEventListener("change", pintarMapa); $("mapaEscala").addEventListener("change", pintarMapa);
-  $("tipoGrafico").addEventListener("change", dibujarGrafico);
   $("btnCSV").addEventListener("click", descargarCSV);
-  document.querySelector("#tab-tabla thead").addEventListener("click", e => {
+  document.querySelector("#v-tabla thead").addEventListener("click", e => {
     const th = e.target.closest("th"); if (!th || !D) return;
     const k = th.dataset.k; orden = {k, asc: orden.k === k ? !orden.asc : (k === "nombre" || k === "cont" || k === "puesto")}; renderTabla();
   });
@@ -835,6 +692,7 @@ function eventos() {
 }
 
 async function init() {
+  aplicarTemaGuardado();
   $("oficinas").innerHTML = OFICINAS.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join("");
   renderEstados(); renderTabsFuente(); renderChips(); renderCatalogo(); ajustarPeriodo(); eventos();
   setEstado("Conectando con el Banco Mundial…");
@@ -842,8 +700,15 @@ async function init() {
   catch (e) { estadoFuente.wb = "fail"; errFuente.wb = explicarError(e, "el Banco Mundial"); renderEstados(); setEstado("No se pudo conectar con el Banco Mundial: " + explicarError(e, "el Banco Mundial") + " Abre este archivo en Chrome, Edge o Firefox con internet activo (no en una vista previa).", "err"); return; }
   estadoFuente.wb = "ok"; renderEstados();
   initMapa();
-  sel.clear(); MUESTRA.forEach(i => sel.add(i)); syncChecks();
+  const H = leerHash(); sel.clear();
+  if (H.p) H.p.split(",").forEach(i => { if (paisMap.has(i)) sel.add(i); });
+  if (H.c && [...$("fCont").options].some(o => o.value === H.c)) { $("fCont").value = H.c; filtrarPaises(); }
+  if (H.v && VISTAS.some(v => v.id === H.v)) VISTA = H.v;
+  syncChecks();
   pingFuentes();
-  elegirIndicador(REG.get("wb:NY.GDP.PCAP.CD"));
+  elegirIndicador((H.i && REG.get(H.i)) || REG.get("wb:NY.GDP.PCAP.CD"), false);
+  if (H.d && [...$("desde").options].some(o => o.value === H.d)) $("desde").value = H.d;
+  if (H.h && [...$("hasta").options].some(o => o.value === H.h)) $("hasta").value = H.h;
+  actualizarFrase(); consultar();
 }
 init();
