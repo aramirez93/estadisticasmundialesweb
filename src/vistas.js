@@ -86,12 +86,14 @@ function okChart() {
   if (typeof Chart === "undefined") { $("avisoVista").textContent = "No se cargó la librería de gráficos (Chart.js). Revisa tu conexión y recarga; el mapa y la tabla sí funcionan."; return false; }
   return true;
 }
-function nuevoGrafico(cfg, alto) {
-  if (graficoCv) { graficoCv.destroy(); graficoCv = null; }
-  $("cajaCv").style.height = alto + "px";
+let graficoP = null;
+function nuevoGrafico(cfg, alto, alt) {
+  const prev = alt ? graficoP : graficoCv; if (prev) prev.destroy();
+  if (alt) graficoP = null; else graficoCv = null;
+  $(alt ? "cajaP" : "cajaCv").style.height = alto + "px";
   Chart.defaults.color = css("--suave"); Chart.defaults.font.family = css("--sans"); Chart.defaults.font.size = 12; Chart.defaults.borderColor = css("--linea");
   cfg.options = Object.assign({responsive: true, maintainAspectRatio: false}, cfg.options || {});
-  graficoCv = new Chart($("cv"), cfg); return graficoCv;
+  const g = new Chart($(alt ? "cvP" : "cv"), cfg); if (alt) graficoP = g; else graficoCv = g; return g;
 }
 const MOVIL = () => innerWidth < 560;
 const corto = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
@@ -129,6 +131,7 @@ function actualizarFrase() {
   $("frasePais").textContent = sel.size ? (sel.size === 1 ? (paisMap.get([...sel][0]) || {nombre: "1 país"}).nombre : `${sel.size} países elegidos`) : c ? CONT_NOMBRE[c] : "todos los países";
   const d = $("desde").value, h = $("hasta").value;
   $("fraseTiempo").textContent = d && h ? `de ${d} a ${h}` : "de 2000 a hoy";
+  $("btnIrComparar").hidden = !(sel.size >= 1 && sel.size <= 4);
 }
 function renderResumen() {
   actualizarFrase();
@@ -435,19 +438,20 @@ function cerrarHojas() {
 function alternarTema() {
   const t = oscuro() ? "light" : "dark"; document.documentElement.dataset.theme = t;
   try { localStorage.setItem("tema", t); } catch (e) {}
-  if (D) renderVista({});
+  if (modo === "paises") { if (!$("paisRes").hidden) pintarPaises(); } else if (D) renderVista({});
 }
 function aplicarTemaGuardado() { try { const t = localStorage.getItem("tema"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {} }
 function guardarHash() {
   try {
-    const p = new URLSearchParams(); if (ind) p.set("i", ind.key); p.set("v", VISTA);
-    if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(","));
-    p.set("d", $("desde").value); p.set("h", $("hasta").value); history.replaceState(null, "", "#" + p.toString());
+    const p = new URLSearchParams();
+    if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); p.set("pi", PS.evoId); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
+    else { if (ind) p.set("i", ind.key); p.set("v", VISTA); if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(",")); p.set("d", $("desde").value); p.set("h", $("hasta").value); }
+    history.replaceState(null, "", "#" + p.toString());
   } catch (e) {}
 }
 function leerHash() { try { return Object.fromEntries(new URLSearchParams(location.hash.slice(1))); } catch (e) { return {}; } }
 async function copiarEnlace() {
-  guardarHash(); const m = $("msgEnlace");
+  guardarHash(); const m = $(modo === "paises" ? "msgEnlaceP" : "msgEnlace");
   try { await navigator.clipboard.writeText(location.href); m.textContent = "Enlace copiado."; } catch (e) { m.textContent = "Copia la dirección del navegador: ya incluye esta vista."; }
   setTimeout(() => { m.textContent = ""; }, 4000);
 }

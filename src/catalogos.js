@@ -55,7 +55,7 @@ const WB_ROWS = [
   ["EN.POP.DNST","Población","Densidad de población","hab. por km²","n0","","","neutral","Habitantes por kilómetro cuadrado de territorio."],
   ["SM.POP.NETM","Población","Migración neta (5 años)","personas","big","","","neutral","Inmigrantes menos emigrantes en un periodo de cinco años. Negativo = salen más personas de las que llegan."],
   // Salud
-  ["SP.DYN.LE00.IN","Salud","Esperanza de vida al nacer","años","n1","",""," años","good","Años que viviría en promedio un recién nacido si se mantienen las condiciones actuales de mortalidad."],
+  ["SP.DYN.LE00.IN","Salud","Esperanza de vida al nacer","años","n1",""," años","good","Años que viviría en promedio un recién nacido si se mantienen las condiciones actuales de mortalidad."],
   ["SP.DYN.IMRT.IN","Salud","Mortalidad infantil","por 1.000 nacidos vivos","n1","","","bad","Niños que mueren antes de cumplir un año por cada 1.000 nacidos vivos."],
   ["SH.XPD.CHEX.GD.ZS","Salud","Gasto en salud","% del PIB","n1",""," %","neutral","Gasto total (público y privado) en salud como proporción del PIB."],
   ["SH.MED.PHYS.ZS","Salud","Médicos","por 1.000 hab.","n2","","","good","Médicos disponibles por cada 1.000 habitantes."],

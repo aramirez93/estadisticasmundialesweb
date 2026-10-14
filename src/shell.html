@@ -134,6 +134,34 @@
   .repro b { font-family:var(--serif); font-size:1.2rem; min-width:3ch; }
   .enlaces { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:6px 16px; font-size:.88rem; }
 
+  /* modos y países */
+  .modos { display:flex; gap:4px; background:var(--sup); border:1px solid var(--linea); border-radius:99px; padding:3px; }
+  .modos button { background:none; border:none; border-radius:99px; padding:6px 14px; font-size:.86rem; font-weight:600; color:var(--suave); }
+  .modos button.on { background:var(--tinta); color:var(--sup); }
+  .add-fila { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:6px 0 4px; }
+  .add-fila select { width:240px; max-width:100%; }
+  .sug { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip-sug { background:none; border:1px solid var(--linea); border-radius:99px; padding:5px 12px; font-size:.82rem; color:var(--suave); }
+  .chip-sug:hover { color:var(--tinta); border-color:var(--suave); }
+  #estadoP { font-size:.84rem; color:var(--suave); min-height:1.3em; } #estadoP.err { color:var(--err); }
+  .pcards { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px; margin:14px 0; }
+  .pcard { position:relative; background:var(--sup); border:1px solid var(--linea); border-top:4px solid var(--c); border-radius:12px; padding:12px 14px; }
+  .pcard .pn { display:flex; align-items:center; gap:8px; margin-bottom:4px; padding-right:24px; } .pcard .pn b { font-family:var(--serif); font-size:1.2rem; font-weight:600; }
+  .pcard small { display:block; color:var(--suave); font-size:.78rem; }
+  .pcard .x { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--suave); width:26px; height:26px; border-radius:50%; }
+  .pcard .x:hover { background:var(--papel); color:var(--tinta); }
+  .flag { border-radius:3px; box-shadow:0 0 0 1px var(--linea); flex:none; }
+  .pinsights { margin:0 0 16px; padding-left:18px; font-size:.92rem; max-width:80ch; } .pinsights li { margin:5px 0; }
+  #pv-ind .tabla-box { max-height:none; }
+  .ptabla { min-width:520px; } .ptabla th { vertical-align:bottom; } .ptabla td { vertical-align:top; min-width:130px; }
+  .ptabla tbody th { position:static; background:none; }
+  .ptabla th.in { position:sticky; left:0; background:var(--sup); font-weight:500; font-size:.86rem; min-width:150px; z-index:1; }
+  .ptabla th.in small { display:block; color:var(--suave); font-weight:400; font-size:.74rem; }
+  .ptabla tr.grupo th { background:var(--papel); font-size:.78rem; color:var(--suave); position:static; }
+  .ptabla td b { font-weight:600; } .ptabla td small { display:block; color:var(--suave); font-size:.74rem; }
+  .ptabla td.mejor b { color:var(--ok); } .chk { color:var(--ok); font-weight:700; margin-left:5px; }
+  .ptabla td.mund, .ptabla td.vacio { color:var(--suave); } .spark { display:block; margin-top:3px; }
+
   /* hojas (paneles de elección) */
   .hoja { position:fixed; inset:0; z-index:50; display:grid; grid-template-columns:minmax(0,1fr); place-items:center; }
   .hoja-fondo { position:absolute; inset:0; background:rgba(8,14,24,.5); }
@@ -168,6 +196,8 @@
   footer a { color:var(--suave); }
 
   @media (max-width:640px) {
+    .pcards { grid-template-columns:repeat(2,1fr); } .ptabla th.in { min-width:104px; font-size:.8rem; } .ptabla td { min-width:118px; }
+    .top { padding:12px 14px 0; flex-wrap:wrap; } .modos { order:3; width:100%; } .modos button { flex:1; padding:7px 8px; }
     .top { padding:12px 14px 0; } main { padding:12px 14px 32px; } .estados .ok, .estados .wait { display:none; }
     .tiles { grid-template-columns:1fr; gap:8px; } .tile { display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:10px; } .tile small { grid-column:1; } .tile b { grid-column:2; grid-row:1 / span 2; text-align:right; } .tile span { grid-column:1; }
     .lienzo { padding:8px; border-radius:12px; } .canvas-box { height:360px; }
@@ -180,15 +210,16 @@
 <header class="top">
   <div class="marca">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c4.5 4 4.5 16 0 20M12 2c-4.5 4-4.5 16 0 20"/></svg>
-    Estadísticas Mundiales <span class="ver">v0.5</span>
+    Estadísticas Mundiales <span class="ver">v0.6</span>
   </div>
+  <nav class="modos" aria-label="Secciones"><button class="on" data-modo="explorar">Explorar datos</button><button data-modo="paises">Comparar países</button></nav>
   <div class="top-der">
     <div id="fuentesEstado" class="estados"></div>
     <button class="icono" id="btnTema" title="Cambiar entre tema claro y oscuro" aria-label="Cambiar tema">◐</button>
   </div>
 </header>
 
-<main>
+<main id="modo-explorar">
   <section>
     <h1 class="frase" id="frase">Mostrando
       <button class="slot" id="fraseInd" data-hoja="ind">una estadística</button>
@@ -256,6 +287,33 @@
   </section>
 </main>
 
+<main id="modo-paises" hidden>
+  <section>
+    <h1 class="frase" id="frasePaises">Elige uno o más países para ver su perfil o compararlos</h1>
+    <div class="add-fila"><select id="addPais" aria-label="Añadir un país"></select><span id="sugPaises" class="sug"></span></div>
+    <div id="estadoP" role="status"></div>
+  </section>
+  <section id="paisRes" hidden>
+    <div class="pcards" id="pCards"></div>
+    <h2 class="titular" id="pTitular"></h2>
+    <ul class="pinsights" id="pLineas"></ul>
+    <div class="lienzo">
+      <nav class="vistas" id="vistasP" aria-label="Forma de comparar"></nav>
+      <p class="ayuda" id="ayudaP"></p>
+      <div class="ctl-fila" id="ctrlP" hidden></div>
+      <div id="pv-graf"><div class="canvas-box" id="cajaP"><canvas id="cvP"></canvas></div></div>
+      <div id="pv-ind" hidden></div>
+      <p class="nota" id="avisoP"></p>
+    </div>
+    <div class="acciones">
+      <button class="btn sec" id="btnCSVP">Descargar CSV</button>
+      <button class="btn sec" id="btnEnlaceP">Copiar enlace a esta comparación</button>
+      <span class="nota" id="msgEnlaceP" style="margin:0"></span>
+    </div>
+    <p class="nota" id="fuenteP"></p>
+  </section>
+</main>
+
 <footer>
   <details class="mas"><summary>Oficinas nacionales de estadística y organismos internacionales</summary><div><p class="nota" style="margin-top:0">Fuentes primarias para profundizar o verificar los datos.</p><div class="enlaces" id="oficinas"></div></div></details>
   <p style="margin-top:18px">Fuentes: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a>, <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener">Eurostat</a>, <a href="https://www.imf.org/external/datamapper" target="_blank" rel="noopener">FMI</a>, <a href="https://statistics.cepal.org" target="_blank" rel="noopener">CEPALSTAT</a>. Cada país publica con distinto rezago, por lo que los años del último dato pueden diferir.</p>
@@ -305,7 +363,7 @@
         <button id="btnMuestra">Muestra de 5 continentes</button>
       </div>
     </div>
-    <div class="hoja-pie"><button class="btn" data-cerrar>Listo</button></div>
+    <div class="hoja-pie"><button class="btn sec" id="btnIrComparar" hidden>Comparar estos países</button><button class="btn" data-cerrar>Listo</button></div>
   </div>
 </div>
 

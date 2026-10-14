@@ -6,6 +6,10 @@ Es un sitio estático: el archivo `index.html` contiene toda la aplicación.
 
 Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.europa.eu/eurostat), [FMI DataMapper](https://www.imf.org/external/datamapper), [CEPALSTAT](https://statistics.cepal.org).
 
+## Novedades v0.6
+- **Comparar países** (hasta 4): perfil con radar de posición mundial, tabla de 18 indicadores con puesto, tendencia y «mejor valor del grupo», y evolución. Cada comparación tiene su enlace (`#m=pais&p=COL,MEX`).
+- Corregido: el indicador «Esperanza de vida» tenía mal su ficha y fallaba al elegirlo.
+
 ## Novedades v0.5
 - Rediseño más limpio (móvil y escritorio, tema claro/oscuro): una frase de consulta con tres botones (estadística, países, periodo) y un resultado con titular, tres cifras clave y el gráfico.
 - 11 formas de ver cada dato: mapa, ranking, evolución (con índice base 100), cambio (inicio→fin), distribución, calor (país × año), carrera animada, participación (treemap), continentes, relación entre dos estadísticas y tabla.

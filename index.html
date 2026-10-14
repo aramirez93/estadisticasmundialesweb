@@ -134,6 +134,34 @@
   .repro b { font-family:var(--serif); font-size:1.2rem; min-width:3ch; }
   .enlaces { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:6px 16px; font-size:.88rem; }
 
+  /* modos y países */
+  .modos { display:flex; gap:4px; background:var(--sup); border:1px solid var(--linea); border-radius:99px; padding:3px; }
+  .modos button { background:none; border:none; border-radius:99px; padding:6px 14px; font-size:.86rem; font-weight:600; color:var(--suave); }
+  .modos button.on { background:var(--tinta); color:var(--sup); }
+  .add-fila { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:6px 0 4px; }
+  .add-fila select { width:240px; max-width:100%; }
+  .sug { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip-sug { background:none; border:1px solid var(--linea); border-radius:99px; padding:5px 12px; font-size:.82rem; color:var(--suave); }
+  .chip-sug:hover { color:var(--tinta); border-color:var(--suave); }
+  #estadoP { font-size:.84rem; color:var(--suave); min-height:1.3em; } #estadoP.err { color:var(--err); }
+  .pcards { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px; margin:14px 0; }
+  .pcard { position:relative; background:var(--sup); border:1px solid var(--linea); border-top:4px solid var(--c); border-radius:12px; padding:12px 14px; }
+  .pcard .pn { display:flex; align-items:center; gap:8px; margin-bottom:4px; padding-right:24px; } .pcard .pn b { font-family:var(--serif); font-size:1.2rem; font-weight:600; }
+  .pcard small { display:block; color:var(--suave); font-size:.78rem; }
+  .pcard .x { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--suave); width:26px; height:26px; border-radius:50%; }
+  .pcard .x:hover { background:var(--papel); color:var(--tinta); }
+  .flag { border-radius:3px; box-shadow:0 0 0 1px var(--linea); flex:none; }
+  .pinsights { margin:0 0 16px; padding-left:18px; font-size:.92rem; max-width:80ch; } .pinsights li { margin:5px 0; }
+  #pv-ind .tabla-box { max-height:none; }
+  .ptabla { min-width:520px; } .ptabla th { vertical-align:bottom; } .ptabla td { vertical-align:top; min-width:130px; }
+  .ptabla tbody th { position:static; background:none; }
+  .ptabla th.in { position:sticky; left:0; background:var(--sup); font-weight:500; font-size:.86rem; min-width:150px; z-index:1; }
+  .ptabla th.in small { display:block; color:var(--suave); font-weight:400; font-size:.74rem; }
+  .ptabla tr.grupo th { background:var(--papel); font-size:.78rem; color:var(--suave); position:static; }
+  .ptabla td b { font-weight:600; } .ptabla td small { display:block; color:var(--suave); font-size:.74rem; }
+  .ptabla td.mejor b { color:var(--ok); } .chk { color:var(--ok); font-weight:700; margin-left:5px; }
+  .ptabla td.mund, .ptabla td.vacio { color:var(--suave); } .spark { display:block; margin-top:3px; }
+
   /* hojas (paneles de elección) */
   .hoja { position:fixed; inset:0; z-index:50; display:grid; grid-template-columns:minmax(0,1fr); place-items:center; }
   .hoja-fondo { position:absolute; inset:0; background:rgba(8,14,24,.5); }
@@ -168,6 +196,8 @@
   footer a { color:var(--suave); }
 
   @media (max-width:640px) {
+    .pcards { grid-template-columns:repeat(2,1fr); } .ptabla th.in { min-width:104px; font-size:.8rem; } .ptabla td { min-width:118px; }
+    .top { padding:12px 14px 0; flex-wrap:wrap; } .modos { order:3; width:100%; } .modos button { flex:1; padding:7px 8px; }
     .top { padding:12px 14px 0; } main { padding:12px 14px 32px; } .estados .ok, .estados .wait { display:none; }
     .tiles { grid-template-columns:1fr; gap:8px; } .tile { display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:10px; } .tile small { grid-column:1; } .tile b { grid-column:2; grid-row:1 / span 2; text-align:right; } .tile span { grid-column:1; }
     .lienzo { padding:8px; border-radius:12px; } .canvas-box { height:360px; }
@@ -180,15 +210,16 @@
 <header class="top">
   <div class="marca">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c4.5 4 4.5 16 0 20M12 2c-4.5 4-4.5 16 0 20"/></svg>
-    Estadísticas Mundiales <span class="ver">v0.5</span>
+    Estadísticas Mundiales <span class="ver">v0.6</span>
   </div>
+  <nav class="modos" aria-label="Secciones"><button class="on" data-modo="explorar">Explorar datos</button><button data-modo="paises">Comparar países</button></nav>
   <div class="top-der">
     <div id="fuentesEstado" class="estados"></div>
     <button class="icono" id="btnTema" title="Cambiar entre tema claro y oscuro" aria-label="Cambiar tema">◐</button>
   </div>
 </header>
 
-<main>
+<main id="modo-explorar">
   <section>
     <h1 class="frase" id="frase">Mostrando
       <button class="slot" id="fraseInd" data-hoja="ind">una estadística</button>
@@ -256,6 +287,33 @@
   </section>
 </main>
 
+<main id="modo-paises" hidden>
+  <section>
+    <h1 class="frase" id="frasePaises">Elige uno o más países para ver su perfil o compararlos</h1>
+    <div class="add-fila"><select id="addPais" aria-label="Añadir un país"></select><span id="sugPaises" class="sug"></span></div>
+    <div id="estadoP" role="status"></div>
+  </section>
+  <section id="paisRes" hidden>
+    <div class="pcards" id="pCards"></div>
+    <h2 class="titular" id="pTitular"></h2>
+    <ul class="pinsights" id="pLineas"></ul>
+    <div class="lienzo">
+      <nav class="vistas" id="vistasP" aria-label="Forma de comparar"></nav>
+      <p class="ayuda" id="ayudaP"></p>
+      <div class="ctl-fila" id="ctrlP" hidden></div>
+      <div id="pv-graf"><div class="canvas-box" id="cajaP"><canvas id="cvP"></canvas></div></div>
+      <div id="pv-ind" hidden></div>
+      <p class="nota" id="avisoP"></p>
+    </div>
+    <div class="acciones">
+      <button class="btn sec" id="btnCSVP">Descargar CSV</button>
+      <button class="btn sec" id="btnEnlaceP">Copiar enlace a esta comparación</button>
+      <span class="nota" id="msgEnlaceP" style="margin:0"></span>
+    </div>
+    <p class="nota" id="fuenteP"></p>
+  </section>
+</main>
+
 <footer>
   <details class="mas"><summary>Oficinas nacionales de estadística y organismos internacionales</summary><div><p class="nota" style="margin-top:0">Fuentes primarias para profundizar o verificar los datos.</p><div class="enlaces" id="oficinas"></div></div></details>
   <p style="margin-top:18px">Fuentes: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a>, <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener">Eurostat</a>, <a href="https://www.imf.org/external/datamapper" target="_blank" rel="noopener">FMI</a>, <a href="https://statistics.cepal.org" target="_blank" rel="noopener">CEPALSTAT</a>. Cada país publica con distinto rezago, por lo que los años del último dato pueden diferir.</p>
@@ -305,7 +363,7 @@
         <button id="btnMuestra">Muestra de 5 continentes</button>
       </div>
     </div>
-    <div class="hoja-pie"><button class="btn" data-cerrar>Listo</button></div>
+    <div class="hoja-pie"><button class="btn sec" id="btnIrComparar" hidden>Comparar estos países</button><button class="btn" data-cerrar>Listo</button></div>
   </div>
 </div>
 
@@ -387,7 +445,7 @@ const WB_ROWS = [
   ["EN.POP.DNST","Población","Densidad de población","hab. por km²","n0","","","neutral","Habitantes por kilómetro cuadrado de territorio."],
   ["SM.POP.NETM","Población","Migración neta (5 años)","personas","big","","","neutral","Inmigrantes menos emigrantes en un periodo de cinco años. Negativo = salen más personas de las que llegan."],
   // Salud
-  ["SP.DYN.LE00.IN","Salud","Esperanza de vida al nacer","años","n1","",""," años","good","Años que viviría en promedio un recién nacido si se mantienen las condiciones actuales de mortalidad."],
+  ["SP.DYN.LE00.IN","Salud","Esperanza de vida al nacer","años","n1",""," años","good","Años que viviría en promedio un recién nacido si se mantienen las condiciones actuales de mortalidad."],
   ["SP.DYN.IMRT.IN","Salud","Mortalidad infantil","por 1.000 nacidos vivos","n1","","","bad","Niños que mueren antes de cumplir un año por cada 1.000 nacidos vivos."],
   ["SH.XPD.CHEX.GD.ZS","Salud","Gasto en salud","% del PIB","n1",""," %","neutral","Gasto total (público y privado) en salud como proporción del PIB."],
   ["SH.MED.PHYS.ZS","Salud","Médicos","por 1.000 hab.","n2","","","good","Médicos disponibles por cada 1.000 habitantes."],
@@ -586,12 +644,14 @@ function okChart() {
   if (typeof Chart === "undefined") { $("avisoVista").textContent = "No se cargó la librería de gráficos (Chart.js). Revisa tu conexión y recarga; el mapa y la tabla sí funcionan."; return false; }
   return true;
 }
-function nuevoGrafico(cfg, alto) {
-  if (graficoCv) { graficoCv.destroy(); graficoCv = null; }
-  $("cajaCv").style.height = alto + "px";
+let graficoP = null;
+function nuevoGrafico(cfg, alto, alt) {
+  const prev = alt ? graficoP : graficoCv; if (prev) prev.destroy();
+  if (alt) graficoP = null; else graficoCv = null;
+  $(alt ? "cajaP" : "cajaCv").style.height = alto + "px";
   Chart.defaults.color = css("--suave"); Chart.defaults.font.family = css("--sans"); Chart.defaults.font.size = 12; Chart.defaults.borderColor = css("--linea");
   cfg.options = Object.assign({responsive: true, maintainAspectRatio: false}, cfg.options || {});
-  graficoCv = new Chart($("cv"), cfg); return graficoCv;
+  const g = new Chart($(alt ? "cvP" : "cv"), cfg); if (alt) graficoP = g; else graficoCv = g; return g;
 }
 const MOVIL = () => innerWidth < 560;
 const corto = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
@@ -629,6 +689,7 @@ function actualizarFrase() {
   $("frasePais").textContent = sel.size ? (sel.size === 1 ? (paisMap.get([...sel][0]) || {nombre: "1 país"}).nombre : `${sel.size} países elegidos`) : c ? CONT_NOMBRE[c] : "todos los países";
   const d = $("desde").value, h = $("hasta").value;
   $("fraseTiempo").textContent = d && h ? `de ${d} a ${h}` : "de 2000 a hoy";
+  $("btnIrComparar").hidden = !(sel.size >= 1 && sel.size <= 4);
 }
 function renderResumen() {
   actualizarFrase();
@@ -935,19 +996,20 @@ function cerrarHojas() {
 function alternarTema() {
   const t = oscuro() ? "light" : "dark"; document.documentElement.dataset.theme = t;
   try { localStorage.setItem("tema", t); } catch (e) {}
-  if (D) renderVista({});
+  if (modo === "paises") { if (!$("paisRes").hidden) pintarPaises(); } else if (D) renderVista({});
 }
 function aplicarTemaGuardado() { try { const t = localStorage.getItem("tema"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {} }
 function guardarHash() {
   try {
-    const p = new URLSearchParams(); if (ind) p.set("i", ind.key); p.set("v", VISTA);
-    if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(","));
-    p.set("d", $("desde").value); p.set("h", $("hasta").value); history.replaceState(null, "", "#" + p.toString());
+    const p = new URLSearchParams();
+    if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); p.set("pi", PS.evoId); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
+    else { if (ind) p.set("i", ind.key); p.set("v", VISTA); if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(",")); p.set("d", $("desde").value); p.set("h", $("hasta").value); }
+    history.replaceState(null, "", "#" + p.toString());
   } catch (e) {}
 }
 function leerHash() { try { return Object.fromEntries(new URLSearchParams(location.hash.slice(1))); } catch (e) { return {}; } }
 async function copiarEnlace() {
-  guardarHash(); const m = $("msgEnlace");
+  guardarHash(); const m = $(modo === "paises" ? "msgEnlaceP" : "msgEnlace");
   try { await navigator.clipboard.writeText(location.href); m.textContent = "Enlace copiado."; } catch (e) { m.textContent = "Copia la dirección del navegador: ya incluye esta vista."; }
   setTimeout(() => { m.textContent = ""; }, 4000);
 }
@@ -963,6 +1025,196 @@ function eventosVistas() {
   $("btnEnlace").addEventListener("click", copiarEnlace);
   $("btnConsultar").addEventListener("click", cerrarHojas);
   let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (D && VISTA === "participacion") renderVista({}); }, 250); });
+}
+
+// ============================================================
+//  PÁGINAS DE PAÍS Y COMPARADOR (hasta 4 países)
+// ============================================================
+const PERFIL = ["NY.GDP.MKTP.CD", "NY.GDP.PCAP.CD", "NY.GDP.MKTP.KD.ZG", "FP.CPI.TOTL.ZG", "SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "SP.DYN.TFRT.IN", "SP.POP.65UP.TO.ZS",
+  "SP.DYN.LE00.IN", "SP.DYN.IMRT.IN", "SH.XPD.CHEX.GD.ZS", "SE.ADT.LITR.ZS", "SE.SEC.ENRR", "SL.UEM.TOTL.ZS", "SL.TLF.CACT.FE.ZS", "SI.POV.GINI", "IT.NET.USER.ZS", "EG.ELC.RNEW.ZS"];
+const SUGERENCIAS = [["COL", "MEX"], ["ARG", "CHL"], ["ESP", "PRT"], ["BRA", "ARG"], ["USA", "CHN"], ["COL", "PER", "ECU"]];
+const TITULO = document.title;
+let modo = "explorar", psToken = 0, mundoCache = null;
+const PS = {sel: [], vista: "resumen", evoId: "NY.GDP.PCAP.CD", evoModo: "real"};
+const histCache = new Map();               // iso3 -> Map(idIndicador -> [{y,v}])
+const perfilInds = () => PERFIL.map(id => REG.get("wb:" + id)).filter(Boolean);
+const AYUDA_P = {resumen: "El radar muestra, en cada tema, qué porcentaje de los países del mundo queda por debajo (más afuera = mejor posición; donde «menos es mejor» se invierte). La línea punteada es la mediana mundial.",
+                 ind: "Último dato disponible de cada país, su puesto en el mundo y la tendencia reciente. ✓ marca el mejor valor del grupo cuando hay un «mejor» claro.",
+                 evo: "Evolución de un indicador. El índice (primer año = 100) permite comparar países de tamaños muy distintos."};
+
+// ---------- datos ----------
+async function cargarHist(isos) {
+  const faltan = isos.filter(i => !histCache.has(i)); if (!faltan.length) return;
+  const inds = perfilInds(), l2 = faltan.map(i => paisMap.get(i).iso2).join(";");
+  const res = await Promise.all(inds.map(o => wbAll(`/country/${l2}/indicator/${o.id}`, {date: `${ANIO - 35}:${ANIO}`, per_page: 2000}).then(r => r.rows, () => null)));
+  if (res.every(r => r === null)) throw new Error("No se pudo consultar el Banco Mundial.");
+  faltan.forEach(i => histCache.set(i, new Map()));
+  res.forEach((rows, k) => (rows || []).forEach(x => {
+    if (x.value === null || x.value === undefined) return;
+    const m = histCache.get(x.countryiso3code); if (!m) return;
+    const id = inds[k].id; if (!m.has(id)) m.set(id, []); m.get(id).push({y: +x.date, v: x.value});
+  }));
+  histCache.forEach(m => m.forEach(a => a.sort((p, q) => p.y - q.y)));
+}
+async function cargarMundo() {
+  if (mundoCache) return;
+  const inds = perfilInds();
+  const res = await Promise.all(inds.map(o => wbAll(`/country/all/indicator/${o.id}`, {mrnev: 1, per_page: 400}).then(r => r.rows, () => null)));
+  const m = new Map();
+  res.forEach((rows, k) => { const arr = []; (rows || []).forEach(x => { const p = paisMap.get(x.countryiso3code); if (!p || p.agg || x.value === null || x.value === undefined) return; arr.push({iso: p.iso, v: x.value, y: +x.date}); }); m.set(inds[k].id, arr); });
+  mundoCache = m;
+}
+const ultimo = (iso, id) => { const a = (histCache.get(iso) || new Map()).get(id); return a && a.length ? a[a.length - 1] : null; };
+function rango(id, iso) {
+  const arr = (mundoCache && mundoCache.get(id)) || [], me = arr.find(x => x.iso === iso); if (!me) return null;
+  const n = arr.length; return {puesto: arr.filter(x => x.v > me.v).length + 1, n, pct: arr.filter(x => x.v < me.v).length / Math.max(1, n - 1) * 100};
+}
+function medianaMundo(id) { const v = ((mundoCache && mundoCache.get(id)) || []).map(x => x.v).sort((a, b) => a - b); return v.length ? (v.length % 2 ? v[v.length >> 1] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null; }
+const puntaje = (o, r) => o.tone === "bad" ? 100 - r.pct : r.pct;
+function mejorIso(o, vals) {
+  if (o.tone === "neutral" || vals.length < 2) return null;
+  const s = vals.slice().sort((a, b) => o.tone === "good" ? b.v - a.v : a.v - b.v);
+  return s[0].v === s[1].v ? null : s[0].iso;
+}
+
+// ---------- pantalla ----------
+const bandera = p => p.iso2 ? `<img class="flag" src="https://flagcdn.com/w40/${p.iso2.toLowerCase()}.png" alt="" width="28" height="21" loading="lazy" onerror="this.remove()">` : "";
+function poblarAddPais() {
+  $("addPais").innerHTML = `<option value="">Añadir un país…</option>` + paises.filter(p => !p.agg).map(p => `<option value="${p.iso}">${esc(p.nombre)}</option>`).join("");
+  $("sugPaises").innerHTML = SUGERENCIAS.filter(g => g.every(i => paisMap.has(i))).map(g => `<button class="chip-sug" data-sug="${g.join(",")}">${esc(g.map(i => paisMap.get(i).nombre).join(" vs "))}</button>`).join("");
+}
+function cabeceraP() {
+  const n = PS.sel.map(i => paisMap.get(i).nombre);
+  $("frasePaises").textContent = !n.length ? "Elige uno o más países para ver su perfil o compararlos" : n.length === 1 ? `Perfil de ${n[0]}` : `Comparando ${n.slice(0, -1).join(", ")} y ${n[n.length - 1]}`;
+  document.title = n.length ? `${n.join(" vs ")} – Estadísticas Mundiales` : TITULO;
+}
+function entrarModo(m) {
+  modo = m; $("modo-explorar").hidden = m !== "explorar"; $("modo-paises").hidden = m !== "paises";
+  document.querySelectorAll(".modos button").forEach(b => b.classList.toggle("on", b.dataset.modo === m));
+  window.scrollTo(0, 0);
+  if (m === "paises") renderPaises();
+  else { document.title = TITULO; if (D) { renderResumen(); renderVista({zoom: true}); } else if (ind) consultar(); guardarHash(); }
+}
+function anadirPais(iso) {
+  if (PS.sel.includes(iso)) return;
+  if (PS.sel.length >= 4) { $("estadoP").textContent = "Puedes comparar hasta 4 países a la vez. Quita uno para añadir otro."; $("estadoP").className = ""; return; }
+  PS.sel.push(iso); renderPaises();
+}
+function quitarPais(iso) { PS.sel = PS.sel.filter(i => i !== iso); renderPaises(); }
+async function renderPaises() {
+  const tok = ++psToken; cabeceraP();
+  if (!PS.sel.length) { $("paisRes").hidden = true; $("estadoP").textContent = ""; guardarHash(); return; }
+  $("estadoP").className = ""; $("estadoP").textContent = `Consultando ${perfilInds().length} indicadores del Banco Mundial…`;
+  try { await Promise.all([cargarHist(PS.sel), cargarMundo()]); }
+  catch (e) { if (tok === psToken) { $("estadoP").className = "err"; $("estadoP").textContent = "No se pudo consultar: " + explicarError(e, "el Banco Mundial"); } return; }
+  if (tok !== psToken) return;
+  $("estadoP").textContent = ""; pintarPaises(); guardarHash();
+}
+function insightsPaises() {
+  const inds = perfilInds(), sel = PS.sel, nom = iso => paisMap.get(iso).nombre, L = []; let titular = "";
+  if (sel.length === 1) {
+    const iso = sel[0], pop = rango("SP.POP.TOTL", iso), pib = rango("NY.GDP.MKTP.CD", iso);
+    if (pop || pib) titular = `${nom(iso)} ocupa ${[pop && `el puesto ${pop.puesto} de ${pop.n} del mundo por población`, pib && `el ${pib.puesto} por PIB total`].filter(Boolean).join(" y ")}.`;
+    else titular = `${nom(iso)}: último dato disponible de ${inds.length} indicadores.`;
+    const pts = inds.filter(o => o.tone !== "neutral").map(o => ({o, r: rango(o.id, iso), u: ultimo(iso, o.id)})).filter(x => x.r && x.u).map(x => Object.assign(x, {s: puntaje(x.o, x.r)})).sort((a, b) => b.s - a.s);
+    const f = pts.filter(x => x.s >= 60).slice(0, 3), d = pts.filter(x => x.s <= 40).slice(-3).reverse();
+    if (f.length) L.push(`<b>Puntos fuertes:</b> ` + f.map(x => `${esc(x.o.name)} (${esc(fmtVal(x.u.v, x.o))}, mejor que el ${num(x.s, 0)} % de los países)`).join("; ") + ".");
+    if (d.length) L.push(`<b>Puntos débiles:</b> ` + d.map(x => `${esc(x.o.name)} (${esc(fmtVal(x.u.v, x.o))}, peor que el ${num(100 - x.s, 0)} % de los países)`).join("; ") + ".");
+  } else {
+    const gana = Object.fromEntries(sel.map(i => [i, 0])); let comp = 0;
+    inds.filter(o => o.tone !== "neutral").forEach(o => {
+      const v = sel.map(iso => ({iso, u: ultimo(iso, o.id)})).filter(x => x.u); if (v.length < 2) return;
+      comp++; const b = mejorIso(o, v.map(x => ({iso: x.iso, v: x.u.v}))); if (b) gana[b]++;
+    });
+    const orden = sel.slice().sort((a, b) => gana[b] - gana[a]);
+    titular = comp ? (sel.length === 2 ? `${nom(orden[0])} queda mejor en ${gana[orden[0]]} de ${comp} indicadores comparables; ${nom(orden[1])}, en ${gana[orden[1]]}.`
+      : `${nom(orden[0])} queda mejor en ${gana[orden[0]]} de ${comp} indicadores comparables, seguido de ${nom(orden[1])} (${gana[orden[1]]}).`) : "No hay suficientes datos en común para comparar.";
+    const dif = [];
+    inds.forEach(o => { const v = sel.map(iso => ({iso, u: ultimo(iso, o.id)})).filter(x => x.u && x.u.v > 0); if (v.length < 2) return; const s = v.slice().sort((a, b) => b.u.v - a.u.v), r = s[0].u.v / s[s.length - 1].u.v; if (r >= 1.5) dif.push({o, r, a: s[0].iso, b: s[s.length - 1].iso}); });
+    dif.sort((a, b) => b.r - a.r);
+    if (dif.length) L.push(`<b>Mayores diferencias:</b> ` + dif.slice(0, 3).map(x => `${esc(x.o.name.toLowerCase())} (${esc(nom(x.a))} tiene ${num(x.r, 1)} veces el valor de ${esc(nom(x.b))})`).join("; ") + ".");
+    L.push(`Las cifras son el último dato disponible de cada país; pueden ser de años distintos.`);
+  }
+  return {titular, L};
+}
+function pintarPaises() {
+  $("paisRes").hidden = false;
+  const iP = REG.get("wb:SP.POP.TOTL");
+  $("pCards").innerHTML = PS.sel.map((iso, i) => { const p = paisMap.get(iso), pop = ultimo(iso, "SP.POP.TOTL");
+    return `<div class="pcard" style="--c:${serieColor(i)}"><button class="x" data-quitar="${iso}" aria-label="Quitar ${esc(p.nombre)}">✕</button><div class="pn">${bandera(p)}<b>${esc(p.nombre)}</b></div><small>${esc(CONT_NOMBRE[p.cont] || "")} · ${esc(p.ingreso)}</small>${p.capital ? `<small>Capital: ${esc(p.capital)}</small>` : ""}<small>Población: ${pop ? esc(fmtVal(pop.v, iP)) + " (" + pop.y + ")" : "—"}</small></div>`; }).join("");
+  const ins = insightsPaises();
+  $("pTitular").textContent = ins.titular; $("pLineas").innerHTML = ins.L.map(x => `<li>${x}</li>`).join("");
+  $("vistasP").innerHTML = [["resumen", "Perfil"], ["ind", "Indicadores"], ["evo", "Evolución"]].map(([v, t]) => `<button class="pill ${PS.vista === v ? "on" : ""}" data-pv="${v}">${t}</button>`).join("");
+  $("ayudaP").textContent = AYUDA_P[PS.vista]; $("avisoP").textContent = "";
+  $("pv-graf").hidden = PS.vista === "ind"; $("pv-ind").hidden = PS.vista !== "ind"; $("ctrlP").hidden = PS.vista !== "evo";
+  if (PS.vista === "ind") $("pv-ind").innerHTML = tablaInd();
+  else if (PS.vista === "resumen") pintarRadar(); else pintarEvo();
+  $("fuenteP").innerHTML = `Fuente: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a> (Indicadores del Desarrollo Mundial) · consultado ${new Date().toLocaleString("es-CO")} · Puesto = posición entre ${mundoCache && mundoCache.get("SP.POP.TOTL") ? mundoCache.get("SP.POP.TOTL").length : "los"} países y territorios con dato (1 = valor más alto).`;
+}
+function spark(arr, color) {
+  if (!arr || arr.length < 3) return "";
+  const a = arr.slice(-25), w = 84, h = 22, ys = a.map(p => p.v), mn = Math.min(...ys), mx = Math.max(...ys), x0 = a[0].y, x1 = a[a.length - 1].y;
+  const sx = y => (y - x0) / ((x1 - x0) || 1) * (w - 6) + 3, sy = v => mx === mn ? h / 2 : h - 3 - (v - mn) / (mx - mn) * (h - 6), l = a[a.length - 1];
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${a.map(p => sx(p.y).toFixed(1) + "," + sy(p.v).toFixed(1)).join(" ")}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${sx(l.y).toFixed(1)}" cy="${sy(l.v).toFixed(1)}" r="2.3" fill="${color}"/></svg>`;
+}
+function tablaInd() {
+  const inds = perfilInds(), cols = PS.sel; let cat = "";
+  let h = `<div class="tabla-box"><table class="ptabla"><thead><tr><th>Indicador</th>${cols.map((iso, i) => `<th><i class="pt" style="background:${serieColor(i)}"></i>${esc(paisMap.get(iso).nombre)}</th>`).join("")}<th>Mediana mundial</th></tr></thead><tbody>`;
+  inds.forEach(o => {
+    if (o.cat !== cat) { cat = o.cat; h += `<tr class="grupo"><th colspan="${cols.length + 2}">${esc(cat)}</th></tr>`; }
+    const vals = cols.map(iso => ({iso, u: ultimo(iso, o.id)})), best = mejorIso(o, vals.filter(x => x.u).map(x => ({iso: x.iso, v: x.u.v}))), med = medianaMundo(o.id);
+    h += `<tr><th class="in">${esc(o.name)}<small>${esc(o.unit)}</small></th>` + vals.map((x, i) => {
+      if (!x.u) return `<td class="vacio">—<small>sin dato reciente</small></td>`;
+      const r = rango(o.id, x.iso);
+      return `<td class="${best === x.iso ? "mejor" : ""}"><b>${esc(fmtVal(x.u.v, o))}</b>${best === x.iso ? '<span class="chk" title="Mejor valor del grupo">✓</span>' : ""}<small>${x.u.y}${r ? ` · puesto ${r.puesto} de ${r.n}` : ""}</small>${spark(histCache.get(x.iso).get(o.id), serieColor(i))}</td>`; }).join("") +
+      `<td class="mund">${med === null ? "—" : esc(fmtVal(med, o))}</td></tr>`;
+  });
+  return h + `</tbody></table></div>`;
+}
+function chartListoP() { if (typeof Chart === "undefined") { $("avisoP").textContent = "No se cargó la librería de gráficos. Revisa tu conexión y recarga; la pestaña Indicadores sí funciona."; return false; } return true; }
+function pintarRadar() {
+  if (!chartListoP()) return;
+  const inds = perfilInds().filter(o => o.tone !== "neutral");
+  const ds = PS.sel.map((iso, i) => ({label: paisMap.get(iso).nombre, data: inds.map(o => { const r = rango(o.id, iso); return r ? puntaje(o, r) : null; }), borderColor: serieColor(i), backgroundColor: serieColor(i) + "26", borderWidth: 2, pointRadius: 3, pointBackgroundColor: serieColor(i), spanGaps: true}));
+  ds.push({label: "Mediana mundial", data: inds.map(() => 50), borderColor: css("--suave"), borderDash: [5, 4], borderWidth: 1.3, pointRadius: 0, fill: false});
+  nuevoGrafico({type: "radar", data: {labels: inds.map(o => corto(o.name, 24)), datasets: ds},
+    options: {plugins: {legend: {labels: {usePointStyle: true}}, tooltip: {callbacks: {label: c => c.dataset.label === "Mediana mundial" ? "Mediana mundial" : `${c.dataset.label}: mejor que el ${num(c.parsed.r, 0)} % de los países`}}},
+      scales: {r: {min: 0, max: 100, ticks: {stepSize: 25, backdropColor: "transparent"}, pointLabels: {font: {size: MOVIL() ? 10 : 11}, color: css("--tinta")}, grid: {color: css("--linea")}, angleLines: {color: css("--linea")}}}}}, MOVIL() ? 400 : 500, true);
+  const sin = inds.filter(o => PS.sel.some(iso => !rango(o.id, iso))).length;
+  $("avisoP").textContent = sin ? `En ${sin} de ${inds.length} ejes falta el dato de algún país; esos puntos quedan sin dibujar.` : "";
+}
+function pintarEvo() {
+  if (!chartListoP()) return;
+  const inds = perfilInds(); if (!inds.some(o => o.id === PS.evoId)) PS.evoId = inds[0].id;
+  const o = inds.find(x => x.id === PS.evoId), base = PS.evoModo === "base";
+  $("ctrlP").innerHTML = `<label class="ctl">Indicador<select data-pk="evoId">${[...new Set(inds.map(x => x.cat))].map(c => `<optgroup label="${esc(c)}">${inds.filter(x => x.cat === c).map(x => `<option value="${x.id}" ${x.id === PS.evoId ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</optgroup>`).join("")}</select></label>` +
+    `<label class="ctl">Qué se grafica<select data-pk="evoModo"><option value="real" ${!base ? "selected" : ""}>Valores reales</option><option value="base" ${base ? "selected" : ""}>Índice (primer año = 100)</option></select></label>`;
+  let y0 = 9999, y1 = 0; PS.sel.forEach(iso => (histCache.get(iso).get(o.id) || []).forEach(p => { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }));
+  if (y1 === 0) { if (graficoP) { graficoP.destroy(); graficoP = null; } $("cajaP").style.height = "60px"; $("avisoP").textContent = "Ninguno de los países tiene datos recientes de este indicador."; return; }
+  const labels = []; for (let y = y0; y <= y1; y++) labels.push(y);
+  const ds = PS.sel.map((iso, i) => { const m = new Map((histCache.get(iso).get(o.id) || []).map(p => [p.y, p.v])); const b0 = base ? labels.map(y => m.get(y)).find(v => v !== undefined && v !== 0) : null;
+    return {label: paisMap.get(iso).nombre, borderColor: serieColor(i), backgroundColor: serieColor(i), borderWidth: 2.4, pointRadius: 0, pointHoverRadius: 4, tension: .2, spanGaps: true, data: labels.map(y => { const v = m.get(y); return v === undefined ? null : base ? (b0 ? v / b0 * 100 : null) : v; })}; });
+  const f = v => base ? num(v, 0) : fmtVal(v, o);
+  nuevoGrafico({type: "line", data: {labels, datasets: ds}, plugins: [plugEtiquetasFin()],
+    options: {layout: {padding: {right: 118}}, interaction: {mode: "nearest", intersect: false, axis: "x"}, plugins: {legend: {display: false}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${f(c.parsed.y)}`}}},
+      scales: {y: {ticks: {callback: v => f(v)}, title: {display: base || !!o.unit, text: base ? `Índice (${labels[0]} = 100)` : o.unit}}, x: {grid: {display: false}}}}}, 420, true);
+  $("avisoP").textContent = `${o.name}${o.desc ? ": " + o.desc : ""}`;
+}
+function csvPaises() {
+  const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;pais;iso3;anio;valor;unidad"];
+  perfilInds().forEach(o => PS.sel.forEach(iso => ((histCache.get(iso) || new Map()).get(o.id) || []).forEach(p => L.push([q(o.name), o.id, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || "")].join(";")))));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "comparacion_" + PS.sel.join("_") + ".csv"; document.body.appendChild(a); a.click(); a.remove();
+}
+function eventosPaises() {
+  document.querySelector(".modos").addEventListener("click", e => { const b = e.target.closest("button[data-modo]"); if (b && b.dataset.modo !== modo) entrarModo(b.dataset.modo); });
+  $("addPais").addEventListener("change", e => { const iso = e.target.value; e.target.value = ""; if (iso) anadirPais(iso); });
+  $("sugPaises").addEventListener("click", e => { const b = e.target.closest("[data-sug]"); if (b) { PS.sel = b.dataset.sug.split(","); renderPaises(); } });
+  $("pCards").addEventListener("click", e => { const b = e.target.closest("[data-quitar]"); if (b) quitarPais(b.dataset.quitar); });
+  $("vistasP").addEventListener("click", e => { const b = e.target.closest("[data-pv]"); if (b) { PS.vista = b.dataset.pv; pintarPaises(); guardarHash(); } });
+  $("ctrlP").addEventListener("change", e => { const k = e.target.dataset.pk; if (k) { PS[k] = e.target.value; pintarPaises(); guardarHash(); } });
+  $("btnCSVP").addEventListener("click", csvPaises);
+  $("btnEnlaceP").addEventListener("click", copiarEnlace);
+  $("btnIrComparar").addEventListener("click", () => { PS.sel = [...sel].slice(0, 4); cerrarHojas(); entrarModo("paises"); });
 }
 
 // ============================================================
@@ -1194,7 +1446,7 @@ async function cargarPaises() {
   const r = await wbAll("/country", {per_page: 400});
   paises = r.rows.map(c => {
     const agg = !c.region || c.region.id === "NA";
-    return {iso: c.id, iso2: c.iso2Code, nombre: (c.name || c.id).trim(), agg,
+    return {iso: c.id, iso2: c.iso2Code, nombre: (c.name || c.id).trim(), agg, capital: (c.capitalCity || "").trim(),
       cont: agg ? "" : (CONTINENTE[c.id] || ""),
       ingreso: agg ? "Agregados" : (c.incomeLevel.value || "").trim(),
       lat: parseFloat(c.latitude), lon: parseFloat(c.longitude)};
@@ -1628,7 +1880,7 @@ function descargarCSV() {
 //  EVENTOS E INICIO
 // ============================================================
 function eventos() {
-  eventosVistas();
+  eventosVistas(); eventosPaises();
   $("tabsFuente").addEventListener("click", e => { const b = e.target.closest("button[data-src]"); if (b) cambiarFuente(b.dataset.src); });
   $("chipsCat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; catFiltro = b.dataset.cat; renderChips(); renderCatalogo(); });
   $("buscarCat").addEventListener("input", renderCatalogo);
@@ -1676,7 +1928,12 @@ async function init() {
   elegirIndicador((H.i && REG.get(H.i)) || REG.get("wb:NY.GDP.PCAP.CD"), false);
   if (H.d && [...$("desde").options].some(o => o.value === H.d)) $("desde").value = H.d;
   if (H.h && [...$("hasta").options].some(o => o.value === H.h)) $("hasta").value = H.h;
-  actualizarFrase(); consultar();
+  actualizarFrase(); poblarAddPais();
+  if (H.m === "pais") {
+    PS.sel = (H.p || "").split(",").filter(i => paisMap.has(i) && !paisMap.get(i).agg).slice(0, 4);
+    if (["resumen", "ind", "evo"].includes(H.pv)) PS.vista = H.pv; if (H.pi) PS.evoId = H.pi; if (H.pm === "base") PS.evoModo = "base";
+    entrarModo("paises");
+  } else consultar();
 }
 init();
 
