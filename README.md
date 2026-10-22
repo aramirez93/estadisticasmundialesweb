@@ -24,3 +24,6 @@ Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.euro
 - `index.html`: el sitio publicado (se genera con `node src/build.js`).
 - `src/`: código fuente (HTML/CSS, catálogos, lógica, mapa).
 - `datos/imf/`: copia local de los datos del FMI.
+
+## v0.6.1
+- Banco Mundial más resistente: reintentos automáticos, consulta por tramos de años si la consulta completa falla, mensajes de error claros (429/5xx) y botón "Reintentar".
