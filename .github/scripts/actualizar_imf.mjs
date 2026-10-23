@@ -2,7 +2,8 @@
 // cuando el navegador no pueda consultar al FMI directamente. Se ejecuta con GitHub Actions.
 import fs from "node:fs";
 const BASE = "https://www.imf.org/external/datamapper/api/v1";
-const IDS = ["indicators", "NGDPD", "NGDPDPC", "PPPPC", "NGDP_RPCH", "PCPIPCH", "PCPIEPCH", "NID_NGDP", "NGSD_NGDP", "LUR", "GGXWDG_NGDP", "GGXCNL_NGDP", "BCA_NGDPD", "LP"];
+const IDS = ["indicators", "NGDPD", "NGDPDPC", "PPPPC", "NGDP_RPCH", "PCPIPCH", "PCPIEPCH", "LUR", "GGXWDG_NGDP", "GGXCNL_NGDP", "BCA_NGDPD", "LP",
+  "PPPSH", "rev", "exp", "ie", "pb", "Privatedebt_all", "HH_ALL", "NFC_ALL", "AI_PI", "GII_TC", "total_theil", "SITC1_total"];
 fs.mkdirSync("datos/imf", {recursive: true});
 async function bajar(id) {
   for (let i = 1; i <= 4; i++) {

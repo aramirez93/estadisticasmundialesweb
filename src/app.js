@@ -683,7 +683,7 @@ function descargarCSV() {
 //  EVENTOS E INICIO
 // ============================================================
 function eventos() {
-  eventosVistas(); eventosPaises();
+  eventosVistas(); eventosPaises(); eventosMiPais();
   $("alerta").addEventListener("click", e => { if (e.target.closest("[data-reintentar]")) consultar(); });
   $("tabsFuente").addEventListener("click", e => { const b = e.target.closest("button[data-src]"); if (b) cambiarFuente(b.dataset.src); });
   $("chipsCat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; catFiltro = b.dataset.cat; renderChips(); renderCatalogo(); });
@@ -733,7 +733,10 @@ async function init() {
   if (H.d && [...$("desde").options].some(o => o.value === H.d)) $("desde").value = H.d;
   if (H.h && [...$("hasta").options].some(o => o.value === H.h)) $("hasta").value = H.h;
   actualizarFrase(); poblarAddPais();
-  if (H.m === "pais") {
+  if (H.m === "mipais") {
+    if (H.p && paisMap.has(H.p.split(",")[0]) && !paisMap.get(H.p.split(",")[0]).agg) MP.iso = H.p.split(",")[0];
+    entrarModo("mipais");
+  } else if (H.m === "pais") {
     PS.sel = (H.p || "").split(",").filter(i => paisMap.has(i) && !paisMap.get(i).agg).slice(0, 4);
     if (["resumen", "ind", "evo"].includes(H.pv)) PS.vista = H.pv; if (H.pi) PS.evoId = H.pi; if (H.pm === "base") PS.evoModo = "base";
     entrarModo("paises");

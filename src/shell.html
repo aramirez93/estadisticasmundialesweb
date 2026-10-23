@@ -134,6 +134,49 @@
   .repro b { font-family:var(--serif); font-size:1.2rem; min-width:3ch; }
   .enlaces { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:6px 16px; font-size:.88rem; }
 
+  /* mi país */
+  .mp-hero { background:var(--sup); border:1px solid var(--linea); border-radius:14px; padding:16px; margin-bottom:12px; }
+  .mp-id { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .mp-id .flag { width:44px; height:auto; border-radius:4px; box-shadow:0 0 0 1px var(--linea); }
+  .mp-id h2 { margin:0; font-family:var(--serif); font-weight:500; font-size:clamp(1.4rem,3.4vw,2rem); }
+  .mp-id small { color:var(--suave); display:block; }
+  .mp-res { margin:12px 0 0; padding:0; list-style:none; display:grid; gap:6px; font-size:.95rem; }
+  .mp-res b { font-weight:650; }
+  .mp-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin-top:12px; }
+  .mp-kpi { background:var(--papel); border-radius:10px; padding:10px 12px; }
+  .mp-kpi small { color:var(--suave); display:block; font-size:.76rem; }
+  .mp-kpi b { font-size:1.15rem; font-variant-numeric:tabular-nums; }
+  .mp-guia { font-size:.85rem; color:var(--suave); background:var(--acento-t); border-radius:10px; padding:9px 12px; margin-bottom:10px; }
+  .mp-nav { display:flex; gap:6px; overflow-x:auto; padding:6px 0 10px; position:sticky; top:0; background:var(--papel); z-index:5; scrollbar-width:thin; }
+  .mp-sec { background:var(--sup); border:1px solid var(--linea); border-radius:14px; margin-bottom:10px; }
+  .mp-sec > summary { list-style:none; cursor:pointer; padding:13px 16px; display:flex; align-items:center; gap:10px; }
+  .mp-sec > summary::-webkit-details-marker { display:none; }
+  .mp-sec > summary::after { content:"›"; margin-left:auto; font-size:1.4rem; color:var(--suave); transition:transform .15s; }
+  .mp-sec[open] > summary::after { transform:rotate(90deg); }
+  .mp-sec h3 { margin:0; font-size:1.05rem; font-family:var(--serif); font-weight:600; }
+  .mp-sec .sub { color:var(--suave); font-size:.82rem; }
+  .mp-cuerpo { padding:0 12px 14px; display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,480px),1fr)); gap:12px; }
+  .mp-card { border:1px solid var(--linea); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .mp-card h4 { margin:0; font-size:1rem; font-weight:650; }
+  .mp-card .u { color:var(--suave); font-size:.78rem; }
+  .mp-card .que { font-size:.86rem; color:var(--suave); margin:0; }
+  .mp-hoy { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .mp-hoy b { font-size:1.6rem; font-family:var(--serif); font-weight:600; font-variant-numeric:tabular-nums; }
+  .mp-hoy span { color:var(--suave); font-size:.82rem; }
+  .mp-tag { display:inline-block; border-radius:99px; padding:2px 9px; font-size:.76rem; font-weight:600; background:var(--papel); color:var(--suave); }
+  .mp-tag.bien { background:#dff3e8; color:#0b6b43; } .mp-tag.mal { background:var(--err-f); color:var(--err); }
+  :root[data-theme="dark"] .mp-tag.bien { background:#12301f; color:#53d39b; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mp-tag.bien { background:#12301f; color:#53d39b; } }
+  .mp-pos { height:8px; border-radius:99px; background:linear-gradient(90deg,var(--sindato),var(--sindato)); position:relative; }
+  .mp-pos i { position:absolute; top:-3px; width:14px; height:14px; border-radius:50%; background:var(--acento); border:2px solid var(--sup); transform:translateX(-50%); }
+  .mp-pos-t { display:flex; justify-content:space-between; font-size:.72rem; color:var(--suave); margin-top:3px; }
+  .mp-graf { position:relative; height:230px; }
+  .mp-lee { font-size:.86rem; margin:0; }
+  .mp-leyenda { font-size:.74rem; color:var(--suave); margin:0; }
+  .mp-pie { display:flex; gap:10px; align-items:center; justify-content:space-between; font-size:.76rem; color:var(--suave); }
+  .mp-sin { grid-column:1/-1; font-size:.84rem; color:var(--suave); padding:4px 4px 0; }
+  .mp-cargando { padding:18px; color:var(--suave); font-size:.9rem; }
+  @media (max-width:560px) { .mp-cuerpo { padding:0 8px 12px; } .mp-card { padding:12px; } .mp-graf { height:210px; } }
   /* modos y países */
   .modos { display:flex; gap:4px; background:var(--sup); border:1px solid var(--linea); border-radius:99px; padding:3px; }
   .modos button { background:none; border:none; border-radius:99px; padding:6px 14px; font-size:.86rem; font-weight:600; color:var(--suave); }
@@ -210,9 +253,9 @@
 <header class="top">
   <div class="marca">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c4.5 4 4.5 16 0 20M12 2c-4.5 4-4.5 16 0 20"/></svg>
-    Estadísticas Mundiales <span class="ver">v0.6</span>
+    Estadísticas Mundiales <span class="ver">v0.7</span>
   </div>
-  <nav class="modos" aria-label="Secciones"><button class="on" data-modo="explorar">Explorar datos</button><button data-modo="paises">Comparar países</button></nav>
+  <nav class="modos" aria-label="Secciones"><button class="on" data-modo="explorar">Explorar datos</button><button data-modo="mipais">Mi país</button><button data-modo="paises">Comparar países</button></nav>
   <div class="top-der">
     <div id="fuentesEstado" class="estados"></div>
     <button class="icono" id="btnTema" title="Cambiar entre tema claro y oscuro" aria-label="Cambiar tema">◐</button>
@@ -284,6 +327,27 @@
 
     <details class="mas"><summary>Qué mide este dato y cómo leerlo</summary><div><div id="detalle" class="detalle"></div></div></details>
     <details class="mas"><summary>Más cifras y lectura rápida</summary><div><div class="stats2" id="stats2"></div><div class="lectura" id="lectura"></div></div></details>
+  </section>
+</main>
+
+<main id="modo-mipais" hidden>
+  <section>
+    <h1 class="frase" id="fraseMP">Elige un país para ver toda su historia en datos</h1>
+    <div class="add-fila"><select id="selMP" aria-label="Elegir país"></select><span id="sugMP" class="sug"></span></div>
+    <div id="estadoMP" role="status"></div>
+  </section>
+  <section id="resMP" hidden>
+    <div class="mp-hero" id="mpHero"></div>
+    <div class="mp-guia"><b>Cómo leer cada tarjeta:</b> <span>① qué mide el dato · ② cómo está hoy y cómo se compara con el mundo · ③ cómo ha cambiado en el tiempo · ④ qué dice la gráfica. Las secciones van de lo más relevante a lo más curioso.</span></div>
+    <nav class="mp-nav" id="mpNav" aria-label="Secciones del país"></nav>
+    <div id="mpSecs"></div>
+    <div class="acciones">
+      <button class="btn sec" id="btnCSVM">Descargar CSV</button>
+      <button class="btn sec" id="btnEnlaceM">Copiar enlace a este país</button>
+      <button class="btn sec" id="btnCompM">Comparar con otros países</button>
+      <span class="nota" id="msgEnlaceM" style="margin:0"></span>
+    </div>
+    <p class="nota" id="fuenteMP"></p>
   </section>
 </main>
 

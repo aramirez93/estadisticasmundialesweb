@@ -87,7 +87,33 @@ const WB_ROWS = [
   ["EG.ELC.RNEW.ZS","Ambiente y energía","Electricidad renovable","% de la generación","n1",""," %","good","Porcentaje de la electricidad que proviene de fuentes renovables."],
   ["EG.ELC.ACCS.ZS","Ambiente y energía","Acceso a electricidad","% de la población","n1",""," %","good","Porcentaje de la población con acceso a electricidad."],
   ["EN.ATM.PM25.MC.M3","Ambiente y energía","Contaminación del aire (PM2,5)","µg por m³","n1","","","bad","Concentración media anual de partículas finas PM2,5 a la que se expone la población."],
-  ["EN.GHG.CO2.PC.CE.AR5","Ambiente y energía","Emisiones de CO₂ por habitante","toneladas por persona","n1","","","bad","Emisiones de dióxido de carbono por persona (sin uso del suelo)."]
+  ["EN.GHG.CO2.PC.CE.AR5","Ambiente y energía","Emisiones de CO₂ por habitante","toneladas por persona","n1","","","bad","Emisiones de dióxido de carbono por persona (sin uso del suelo)."],
+  // Estructura de la economía
+  ["NV.AGR.TOTL.ZS","Economía","Agricultura en la economía","% del PIB","n1",""," %","neutral","Parte del PIB que aportan la agricultura, la ganadería, la pesca y la silvicultura. Baja a medida que los países se desarrollan."],
+  ["NV.IND.TOTL.ZS","Economía","Industria en la economía","% del PIB","n1",""," %","neutral","Parte del PIB que aportan la minería, la manufactura, la construcción y los servicios públicos como energía y agua."],
+  ["NV.SRV.TOTL.ZS","Economía","Servicios en la economía","% del PIB","n1",""," %","neutral","Parte del PIB que aportan el comercio, el transporte, las finanzas, el turismo y demás servicios."],
+  ["SL.AGR.EMPL.ZS","Trabajo","Empleo en agricultura","% del empleo total","n1",""," %","neutral","Porcentaje de las personas ocupadas que trabaja en el campo. Cuanto menor, más industrializada o de servicios es la economía."],
+  // Curiosidades
+  ["SG.GEN.PARL.ZS","Curiosidades","Mujeres en el parlamento","% de los escaños","n1",""," %","good","Porcentaje de escaños del parlamento nacional ocupados por mujeres (cifras de la Unión Interparlamentaria)."],
+  ["SG.LAW.INDX","Curiosidades","Igualdad legal de la mujer","0 a 100 puntos","n1","","","good","Índice «Mujeres, Empresa y el Derecho»: mide cuántas leyes tratan igual a hombres y mujeres en su vida laboral y económica. 100 = igualdad plena."],
+  ["ST.INT.ARVL","Curiosidades","Llegadas de turistas internacionales","personas por año","big","","","neutral","Visitantes extranjeros que llegan al país en un año, según la Organización Mundial del Turismo."],
+  ["ST.INT.RCPT.CD","Curiosidades","Ingresos por turismo internacional","US$ corrientes","big","US$ ","","neutral","Dinero que gastan los turistas extranjeros en el país en un año."],
+  ["IS.AIR.PSGR","Curiosidades","Pasajeros aéreos transportados","pasajeros por año","big","","","neutral","Pasajeros que viajaron en las aerolíneas registradas en el país (nacionales e internacionales)."],
+  ["VC.IHR.PSRC.P5","Curiosidades","Homicidios intencionales","por 100.000 hab.","n1","","","bad","Muertes por agresión intencional por cada 100.000 habitantes (Oficina de la ONU contra la Droga y el Delito)."],
+  ["SH.STA.TRAF.P5","Curiosidades","Muertes por accidentes de tránsito","por 100.000 hab.","n1","","","bad","Muertes en las vías por cada 100.000 habitantes (Organización Mundial de la Salud)."],
+  ["SH.ALC.PCAP.LI","Curiosidades","Consumo de alcohol","litros de alcohol puro por persona","n1","","","neutral","Litros de alcohol puro que consume al año, en promedio, cada persona de 15 años o más."],
+  ["EG.USE.ELEC.KH.PC","Curiosidades","Consumo de electricidad por habitante","kWh por persona","n0","","","neutral","Electricidad que usa cada habitante en un año, en kilovatios hora. Refleja el nivel de industria y comodidades del país."],
+  ["SP.POP.SCIE.RD.P6","Curiosidades","Investigadores","por millón de habitantes","n0","","","good","Personas dedicadas a la investigación y el desarrollo por cada millón de habitantes."],
+  ["IP.PAT.RESD","Curiosidades","Patentes solicitadas por residentes","solicitudes por año","big","","","good","Solicitudes de patente presentadas cada año por personas o empresas del propio país."],
+  ["TX.VAL.TECH.MF.ZS","Curiosidades","Exportaciones de alta tecnología","% de las exportaciones manufacturadas","n1",""," %","good","Parte de las exportaciones industriales que corresponde a productos de alta tecnología (aeroespacial, computadores, farmacia, electrónica)."],
+  ["IT.NET.SECR.P6","Curiosidades","Servidores de internet seguros","por millón de habitantes","n0","","","good","Servidores que usan cifrado seguro (HTTPS) por cada millón de habitantes. Aproxima el desarrollo del comercio digital."],
+  ["SH.IMM.MEAS","Curiosidades","Vacunación contra el sarampión","% de niños de 12 a 23 meses","n1",""," %","good","Porcentaje de niños vacunados contra el sarampión. Se necesita cerca de un 95 % para frenar los brotes."],
+  ["SH.DYN.MORT","Curiosidades","Mortalidad de menores de 5 años","por 1.000 nacidos vivos","n1","","","bad","Niños que mueren antes de cumplir 5 años por cada 1.000 nacidos vivos."],
+  ["SH.H2O.BASW.ZS","Curiosidades","Agua potable básica","% de la población","n1",""," %","good","Porcentaje de la población que dispone de un servicio básico de agua potable."],
+  ["ER.H2O.FWTL.ZS","Curiosidades","Uso de agua dulce","% de los recursos internos","n1",""," %","neutral","Agua dulce extraída para riego, industria y consumo, como proporción de los recursos propios del país. Por encima de 25 % hay estrés hídrico."],
+  ["AG.LND.ARBL.ZS","Curiosidades","Tierra cultivable","% del territorio","n1",""," %","neutral","Porcentaje del territorio apto para cultivos de ciclo corto como cereales, hortalizas o caña."],
+  ["SP.DYN.SMAM.FE","Curiosidades","Edad media al primer matrimonio (mujeres)","años","n1","","","neutral","Edad media a la que las mujeres se casan por primera vez."],
+  ["IC.REG.DURS","Curiosidades","Días para abrir una empresa","días","n0","","","bad","Tiempo que toman los trámites para registrar una empresa nueva."]
 ];
 
 const ES_ROWS = [
@@ -113,13 +139,23 @@ const IMF_ROWS = [
   ["NGDP_RPCH","Economía","Crecimiento del PIB real","% anual","n1",""," %","good","Cuánto crece (o cae) la economía cada año, descontando la inflación.", 1],
   ["PCPIPCH","Economía","Inflación (promedio anual)","% anual","n1",""," %","bad","Variación media anual de los precios al consumidor.", 1],
   ["PCPIEPCH","Economía","Inflación (diciembre a diciembre)","% anual","n1",""," %","bad","Variación de los precios al consumidor entre el final de un año y el del siguiente.", 1],
-  ["NID_NGDP","Economía","Inversión total","% del PIB","n1",""," %","neutral","Inversión de empresas, hogares y gobierno como proporción del PIB.", 1],
-  ["NGSD_NGDP","Economía","Ahorro nacional bruto","% del PIB","n1",""," %","neutral","Parte del ingreso nacional que no se consume, como proporción del PIB.", 1],
   ["LUR","Trabajo","Desempleo","% de la fuerza laboral","n1",""," %","bad","Porcentaje de personas activas que buscan empleo y no lo encuentran.", 1],
   ["GGXWDG_NGDP","Gobierno y deuda","Deuda bruta del gobierno","% del PIB","n1",""," %","bad","Deuda total del gobierno general, como proporción del PIB.", 1],
   ["GGXCNL_NGDP","Gobierno y deuda","Balance fiscal del gobierno","% del PIB","n1",""," %","good","Ingresos menos gastos del gobierno. Positivo = superávit; negativo = déficit.", 1],
   ["BCA_NGDPD","Finanzas y comercio","Cuenta corriente","% del PIB","n1",""," %","neutral","Diferencia entre lo que el país gana y gasta con el exterior. Negativo = depende de financiamiento externo.", 1],
-  ["LP","Población","Población","personas","big","","","neutral","Número de habitantes.", 1e6]
+  ["LP","Población","Población","personas","big","","","neutral","Número de habitantes.", 1e6],
+  ["PPPSH","Economía","Peso en la economía mundial (PPA)","% del PIB mundial","n2",""," %","neutral","Qué porcentaje de toda la producción del planeta, medida a precios comparables (paridad de poder adquisitivo), aporta este país.", 1],
+  ["rev","Gobierno y deuda","Ingresos del gobierno","% del PIB","n1",""," %","neutral","Impuestos y otros ingresos del gobierno, como proporción del PIB. Serie histórica muy larga (base «Finanzas públicas en la historia moderna» del FMI).", 1],
+  ["exp","Gobierno y deuda","Gasto del gobierno","% del PIB","n1",""," %","neutral","Todo lo que gasta el gobierno, como proporción del PIB. Serie histórica muy larga.", 1],
+  ["ie","Gobierno y deuda","Intereses de la deuda pública","% del PIB","n1",""," %","bad","Lo que paga el gobierno cada año solo por los intereses de su deuda. Es dinero que no se destina a servicios ni inversión.", 1],
+  ["pb","Gobierno y deuda","Balance primario del gobierno","% del PIB","n1",""," %","good","Ingresos menos gastos, sin contar los intereses de la deuda. Positivo = el gobierno puede reducir su deuda con sus propios recursos.", 1],
+  ["Privatedebt_all","Finanzas y comercio","Deuda privada (hogares y empresas)","% del PIB","n1",""," %","neutral","Todo lo que deben las familias y las empresas no financieras, como proporción del PIB (Base Global de Deuda del FMI).", 1],
+  ["HH_ALL","Finanzas y comercio","Deuda de los hogares","% del PIB","n1",""," %","neutral","Lo que deben las familias en préstamos y otros instrumentos, como proporción del PIB.", 1],
+  ["NFC_ALL","Finanzas y comercio","Deuda de las empresas no financieras","% del PIB","n1",""," %","neutral","Lo que deben las empresas (sin contar bancos ni aseguradoras), como proporción del PIB.", 1],
+  ["AI_PI","Curiosidades","Preparación para la inteligencia artificial","índice de 0 a 1","n2","","","good","Índice del FMI (2023) que mide qué tan listo está el país para adoptar la IA: infraestructura digital, capital humano, innovación y regulación.", 1],
+  ["GII_TC","Curiosidades","Desigualdad de género (índice)","0 = igualdad · 1 = máxima desigualdad","n2","","","bad","Índice de desigualdad de género con serie homogénea en el tiempo (Stotsky y otros, 2016, para el FMI). Combina salud reproductiva, empoderamiento y mercado laboral.", 1],
+  ["total_theil","Curiosidades","Concentración de las exportaciones (Theil)","índice","n2","","","neutral","Índice de Theil del FMI: cuanto más alto, más concentradas están las exportaciones en pocos productos; cuanto más bajo, más diversificadas.", 1],
+  ["SITC1_total","Curiosidades","Calidad de las exportaciones","índice","n2","","","good","Índice del FMI que resume la calidad y sofisticación de lo que exporta el país.", 1]
 ];
 
 // extra: miembros fijos por dimensión {idDimensión: idMiembro}

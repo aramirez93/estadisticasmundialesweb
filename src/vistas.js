@@ -438,20 +438,21 @@ function cerrarHojas() {
 function alternarTema() {
   const t = oscuro() ? "light" : "dark"; document.documentElement.dataset.theme = t;
   try { localStorage.setItem("tema", t); } catch (e) {}
-  if (modo === "paises") { if (!$("paisRes").hidden) pintarPaises(); } else if (D) renderVista({});
+  if (modo === "paises") { if (!$("paisRes").hidden) pintarPaises(); } else if (modo === "mipais") mpRedibujar(); else if (D) renderVista({});
 }
 function aplicarTemaGuardado() { try { const t = localStorage.getItem("tema"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {} }
 function guardarHash() {
   try {
     const p = new URLSearchParams();
-    if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); p.set("pi", PS.evoId); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
+    if (modo === "mipais") { p.set("m", "mipais"); if (MP.iso) p.set("p", MP.iso); }
+    else if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); p.set("pi", PS.evoId); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
     else { if (ind) p.set("i", ind.key); p.set("v", VISTA); if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(",")); p.set("d", $("desde").value); p.set("h", $("hasta").value); }
     history.replaceState(null, "", "#" + p.toString());
   } catch (e) {}
 }
 function leerHash() { try { return Object.fromEntries(new URLSearchParams(location.hash.slice(1))); } catch (e) { return {}; } }
 async function copiarEnlace() {
-  guardarHash(); const m = $(modo === "paises" ? "msgEnlaceP" : "msgEnlace");
+  guardarHash(); const m = $(modo === "paises" ? "msgEnlaceP" : modo === "mipais" ? "msgEnlaceM" : "msgEnlace");
   try { await navigator.clipboard.writeText(location.href); m.textContent = "Enlace copiado."; } catch (e) { m.textContent = "Copia la dirección del navegador: ya incluye esta vista."; }
   setTimeout(() => { m.textContent = ""; }, 4000);
 }

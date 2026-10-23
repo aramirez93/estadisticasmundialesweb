@@ -27,3 +27,8 @@ Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.euro
 
 ## v0.6.1
 - Banco Mundial más resistente: reintentos automáticos, consulta por tramos de años si la consulta completa falla, mensajes de error claros (429/5xx) y botón "Reintentar".
+
+## v0.7
+- **Mi país**: nueva sección con un solo país. Muestra su historial completo ordenado de lo esencial a lo curioso, con una tarjeta por indicador (qué mide, valor actual, tendencia, gráfica, puesto mundial y mediana). Dato curioso: se añaden 24 indicadores del Banco Mundial (turismo, mujeres en el parlamento, homicidios, patentes, vacunación…).
+- **Comparar países** ahora incluye datos del FMI (deuda, balance fiscal, cuenta corriente, ingresos y gasto públicos, intereses, deuda de los hogares) y dibuja con línea punteada las estimaciones y proyecciones del FMI.
+- **FMI**: se retiran «Inversión total» y «Ahorro nacional» (el FMI ya no los publica en DataMapper) y se añaden 12 indicadores nuevos. Después de este cambio hay que ejecutar una vez la acción «Actualizar datos del FMI» (pestaña Actions → Run workflow) para descargarlos.
