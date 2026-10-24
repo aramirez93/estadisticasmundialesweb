@@ -1,0 +1,54 @@
+{
+ "generado": "2026-10-24T00:57:31.106Z",
+ "fuentes": {
+  "oms": {
+   "ok": [
+    "WHOSIS_000002",
+    "NCD_HYP_PREVALENCE_A",
+    "M_Est_smk_curr_std",
+    "UHC_INDEX_REPORTED",
+    "HWF_0006",
+    "WHS6_102"
+   ],
+   "fallos": [
+    {
+     "id": "NCD_BMI_30A",
+     "motivo": "solo 0 países con datos"
+    },
+    {
+     "id": "NCD_BMI_25A",
+     "motivo": "solo 0 países con datos"
+    },
+    {
+     "id": "WSH_SANITATION_SAFELY_MANAGED",
+     "motivo": "solo 0 países con datos"
+    },
+    {
+     "id": "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
+     "motivo": "solo 0 países con datos"
+    }
+   ]
+  },
+  "oit": {
+   "ok": [
+    "UNE_2EAP_SEX_AGE_RT_A",
+    "SDG_0831_SEX_ECO_RT_A",
+    "HOW_TEMP_SEX_ECO_NB_A",
+    "ILR_TUMT_NOC_RT_A"
+   ],
+   "fallos": []
+  },
+  "owid": {
+   "ok": [
+    "happiness-cantril-ladder",
+    "human-development-index",
+    "daily-per-capita-caloric-supply",
+    "global-hunger-index",
+    "meat-supply-per-person",
+    "annual-working-hours-per-worker",
+    "per-capita-energy-use"
+   ],
+   "fallos": []
+  }
+ }
+}
