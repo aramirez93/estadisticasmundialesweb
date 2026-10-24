@@ -120,7 +120,7 @@ const sel = new Set();
 const REG = new Map();                      // key -> indicador
 let catFiltro = "", consultaId = 0, orden = {k: "valor", asc: false};
 let wbFuentes = [], wbIndCache = {}, imfCat = null, cepalItems = null, avzItems = [];
-const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait"};
+const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait"};
 const errFuente = {};
 let grafico = null, tabActiva = "mapa";
 Object.values(CATALOGO).flat().forEach(o => REG.set(o.key, o));
@@ -208,6 +208,10 @@ const ADAPT = {
     return {series, updated: imfModo === "copia" && imfCopia ? "copia del sitio del " + imfCopia.slice(0, 10) : "", link: "https://www.imf.org/external/datamapper/" + encodeURIComponent(o.id) + "@WEO"};
   },
 
+  async oms(o, d, h) { return adaptLocal(o, d, h); },
+  async oit(o, d, h) { return adaptLocal(o, d, h); },
+  async owid(o, d, h) { return adaptLocal(o, d, h); },
+
   async cepal(o, d, h) {
     const [dm, dt] = await Promise.all([
       fetchJSON(`${CEP}/indicator/${o.id}/dimensions?lang=es&format=json`),
@@ -292,7 +296,7 @@ function toggleSel(iso) {
 //  CATÁLOGO DE INDICADORES (interfaz)
 // ============================================================
 function renderTabsFuente() {
-  $("tabsFuente").innerHTML = Object.entries(FUENTES).map(([k, f]) =>
+  $("tabsFuente").innerHTML = Object.entries(FUENTES).filter(([k]) => CATALOGO[k].length).map(([k, f]) =>
     `<button data-src="${k}" class="${k === srcActual ? "on" : ""}">${esc(f.nombre)}<small>${esc(f.sub)}</small></button>`).join("");
   $("descFuente").innerHTML = esc(FUENTES[srcActual].desc) + (errFuente[srcActual] ? ` <b style="color:var(--rojo)">⚠ Última prueba de conexión fallida.</b>` : "") +
     (srcActual === "imf" && imfModo === "copia" ? ` <b>Datos tomados de la copia del sitio${imfCopia ? " (actualizada el " + esc(imfCopia.slice(0, 10)) + ")" : ""}, porque el FMI no responde a consultas directas desde el navegador.</b>` : "");
@@ -361,7 +365,8 @@ function resetAvanzado() { avzItems = []; $("avzLista").innerHTML = ""; $("avzCo
 async function abrirAvanzado() {
   const s = srcActual;
   $("avzDBbox").hidden = s !== "wb";
-  $("avzBuscar").disabled = s === "eurostat";
+  $("avzBuscar").disabled = s === "eurostat" || EXT.has(s);
+  if (EXT.has(s)) { avzItems = []; renderAvanzado(); $("avzCont").textContent = "Esta fuente se descarga ya filtrada: incluye solo la selección de arriba."; return; }
   if (s === "eurostat") { avzItems = []; renderAvanzado(); $("avzCont").textContent = "Eurostat publica miles de tablas con múltiples dimensiones. En esta versión se incluye una selección verificada de los indicadores principales (arriba); se pueden ir sumando más."; return; }
   $("avzCont").textContent = "Cargando catálogo…";
   try {
@@ -431,11 +436,12 @@ function pingFuentes() {
   const marca = (k, p) => p.then(() => { estadoFuente[k] = "ok"; }).catch(e => { estadoFuente[k] = "fail"; errFuente[k] = explicarError(e, FUENTES[k].corto); console.warn(k, e); }).finally(() => { renderEstados(); renderTabsFuente(); });
   marca("imf", cargarIMF());
   marca("eurostat", fetchJSON(`${ESU}/data/une_rt_a?format=JSON&lang=EN&unit=PC_ACT&sex=T&age=Y15-74&geo=ES&sinceTimePeriod=2024`));
+  EXT.forEach(k => marca(k, Promise.resolve().then(() => { if (!CATALOGO[k].length) throw new Error("Sin datos descargados todavía."); })));
   marca("cepal", fetchJSON(`${CEP}/indicator/3289/dimensions?lang=es&format=json`));
   cargarWBCatalogo().catch(e => console.warn("catálogo WB", e));
 }
 function renderEstados() {
-  $("fuentesEstado").innerHTML = Object.entries(FUENTES).map(([k, f]) => {
+  $("fuentesEstado").innerHTML = Object.entries(FUENTES).filter(([k]) => CATALOGO[k].length || !EXT.has(k)).map(([k, f]) => {
     const e = estadoFuente[k];
     const t = e === "ok" ? "conectado" : e === "fail" ? "sin conexión: " + (errFuente[k] || "") : "comprobando…";
     return `<span class="${e}" title="${esc(t)}">${esc(f.corto)}</span>`;
@@ -683,7 +689,7 @@ function descargarCSV() {
 //  EVENTOS E INICIO
 // ============================================================
 function eventos() {
-  eventosVistas(); eventosPaises(); eventosMiPais();
+  eventosVistas(); eventosPaises(); eventosMiPais(); eventosComparador();
   $("alerta").addEventListener("click", e => { if (e.target.closest("[data-reintentar]")) consultar(); });
   $("tabsFuente").addEventListener("click", e => { const b = e.target.closest("button[data-src]"); if (b) cambiarFuente(b.dataset.src); });
   $("chipsCat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; catFiltro = b.dataset.cat; renderChips(); renderCatalogo(); });
@@ -722,6 +728,7 @@ async function init() {
   try { await cargarPaises(); }
   catch (e) { estadoFuente.wb = "fail"; errFuente.wb = explicarError(e, "el Banco Mundial"); renderEstados(); setEstado("No se pudo conectar con el Banco Mundial: " + explicarError(e, "el Banco Mundial") + " Abre este archivo en Chrome, Edge o Firefox con internet activo (no en una vista previa).", "err"); return; }
   estadoFuente.wb = "ok"; renderEstados();
+  await cargarExtEstado();
   initMapa();
   const H = leerHash(); sel.clear();
   if (H.p) H.p.split(",").forEach(i => { if (paisMap.has(i)) sel.add(i); });
@@ -738,7 +745,7 @@ async function init() {
     entrarModo("mipais");
   } else if (H.m === "pais") {
     PS.sel = (H.p || "").split(",").filter(i => paisMap.has(i) && !paisMap.get(i).agg).slice(0, 4);
-    if (["resumen", "ind", "evo"].includes(H.pv)) PS.vista = H.pv; if (H.pi) PS.evoId = H.pi; if (H.pm === "base") PS.evoModo = "base";
+    if (["hist", "resumen", "ind"].includes(H.pv)) PS.vista = H.pv; if (H.pm === "base") PS.evoModo = "base";
     entrarModo("paises");
   } else consultar();
 }

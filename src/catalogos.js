@@ -16,7 +16,16 @@ const FUENTES = {
              url: "https://www.imf.org/external/datamapper"},
   cepal:    {nombre: "CEPAL",          corto: "CEPAL", sub: "América Latina y el Caribe",
              desc: "Comisión Económica para América Latina y el Caribe (CEPALSTAT). Estadísticas oficiales de la región, útiles para desigualdad y pobreza.",
-             url: "https://statistics.cepal.org"}
+             url: "https://statistics.cepal.org"},
+  oms:      {nombre: "OMS",            corto: "OMS", sub: "salud · Observatorio Mundial", ext: true,
+             desc: "Organización Mundial de la Salud (Observatorio Mundial de la Salud). Estimaciones comparables de salud: vida saludable, obesidad, cobertura sanitaria y más. Se descargan a diario con una acción de GitHub.",
+             url: "https://www.who.int/data/gho"},
+  oit:      {nombre: "OIT",            corto: "OIT", sub: "trabajo · ILOSTAT", ext: true,
+             desc: "Organización Internacional del Trabajo (ILOSTAT). Empleo informal, horas trabajadas, afiliación sindical y desempleo juvenil. Se descargan a diario con una acción de GitHub.",
+             url: "https://ilostat.ilo.org"},
+  owid:     {nombre: "Our World in Data", corto: "OWID", sub: "desarrollo y curiosidades", ext: true,
+             desc: "Our World in Data (Universidad de Oxford). Reúne series de organismos como la ONU, el PNUD o la FAO: felicidad, desarrollo humano, calorías, hambre y horas de trabajo. Licencia CC BY 4.0. Se descargan a diario con una acción de GitHub.",
+             url: "https://ourworldindata.org"}
 };
 
 const TONO_TXT = {
@@ -168,12 +177,43 @@ const CEPAL_ROWS = [
   ["2203","Economía","PIB total","US$ corrientes","big","US$ ","","neutral","Producto interno bruto anual a precios corrientes en dólares.", {}]
 ];
 
-const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: []};
+const OMS_ROWS = [
+  ["WHOSIS_000002","Salud","Esperanza de vida saludable","años","n1",""," años","good","Años que, en promedio, una persona puede esperar vivir con buena salud desde que nace. Es menor que la esperanza de vida total porque descuenta los años con enfermedad o discapacidad.", 1],
+  ["NCD_BMI_30A","Salud","Obesidad en adultos","% de adultos con IMC ≥ 30","n1",""," %","bad","Porcentaje de adultos con un índice de masa corporal de 30 o más (estimación ajustada por edad para poder comparar países).", 1],
+  ["NCD_BMI_25A","Salud","Sobrepeso en adultos","% de adultos con IMC ≥ 25","n1",""," %","bad","Porcentaje de adultos con un índice de masa corporal de 25 o más, incluida la obesidad (ajustado por edad).", 1],
+  ["NCD_HYP_PREVALENCE_A","Salud","Hipertensión en adultos","% de adultos de 30 a 79 años","n1",""," %","bad","Porcentaje de adultos con presión arterial alta (ajustado por edad). Es un factor de riesgo clave de infartos y derrames.", 1],
+  ["M_Est_smk_curr_std","Salud","Fumadores actuales de tabaco","% de personas de 15 años o más","n1",""," %","bad","Porcentaje de personas que fuman tabaco actualmente (ajustado por edad).", 1],
+  ["UHC_INDEX_REPORTED","Salud","Cobertura sanitaria universal","índice de 0 a 100","n0","","","good","Índice de la ONU y la OMS (ODS 3.8.1) que resume el acceso a servicios de salud esenciales: maternidad, vacunación, enfermedades infecciosas y no transmisibles.", 1],
+  ["WSH_SANITATION_SAFELY_MANAGED","Salud","Saneamiento seguro","% de la población","n1",""," %","good","Población que usa baños no compartidos, cuyos residuos se tratan de forma segura.", 1],
+  ["HWF_0006","Salud","Personal de enfermería y partería","por 10.000 habitantes","n1","","","good","Enfermeras, enfermeros y parteras por cada 10.000 habitantes.", 1],
+  ["WHS6_102","Salud","Camas de hospital","por 10.000 habitantes","n1","","","good","Camas hospitalarias por cada 10.000 habitantes.", 1],
+  ["PHE_HHAIR_PROP_POP_CLEAN_FUELS","Ambiente y energía","Cocina con combustibles limpios","% de la población","n1",""," %","good","Población que cocina con gas, electricidad u otras fuentes limpias en lugar de leña o carbón, que contaminan el aire de la casa.", 1]
+];
+const OIT_ROWS = [
+  ["UNE_2EAP_SEX_AGE_RT_A","Trabajo","Desempleo juvenil (15 a 24 años)","% de la fuerza laboral joven","n1",""," %","bad","Porcentaje de jóvenes de 15 a 24 años que buscan trabajo y no lo encuentran.", 1],
+  ["SDG_0831_SEX_ECO_RT_A","Trabajo","Empleo informal","% del empleo total","n1",""," %","bad","Porcentaje de las personas ocupadas con empleos sin contrato formal ni protección social.", 1],
+  ["HOW_TEMP_SEX_ECO_NB_A","Trabajo","Horas trabajadas por semana","horas por persona ocupada","n1",""," h","neutral","Horas que trabaja en promedio por semana cada persona con empleo.", 1],
+  ["ILR_TUMT_NOC_RT_A","Trabajo","Afiliación sindical","% de los asalariados","n1",""," %","neutral","Porcentaje de los trabajadores asalariados que pertenece a un sindicato.", 1]
+];
+const OWID_ROWS = [
+  ["happiness-cantril-ladder","Curiosidades","Felicidad: satisfacción con la vida","escala de 0 a 10","n2","","","good","Qué nota de 0 a 10 se dan las personas al valorar su vida (Informe Mundial de la Felicidad, encuesta Gallup).", 1],
+  ["human-development-index","Economía","Índice de Desarrollo Humano","índice de 0 a 1","n3","","","good","Resume en un número la salud (esperanza de vida), la educación y el ingreso de un país. Lo publica el PNUD (ONU).", 1],
+  ["daily-per-capita-caloric-supply","Salud","Calorías disponibles por persona","kilocalorías por día","n0","","","neutral","Calorías de alimentos que hay disponibles cada día por persona (FAO). No es lo que se come: incluye desperdicio.", 1],
+  ["global-hunger-index","Salud","Índice Global del Hambre","0 = sin hambre · 100 = máximo","n1","","","bad","Resume desnutrición, retraso del crecimiento infantil y mortalidad infantil (Welthungerhilfe y Concern).", 1],
+  ["meat-supply-per-person","Curiosidades","Carne disponible por persona","kg por persona al año","n1","","","neutral","Kilos de carne disponibles cada año por persona (FAO).", 1],
+  ["annual-working-hours-per-worker","Trabajo","Horas de trabajo al año","horas por trabajador","n0","","","neutral","Horas que trabaja al año, en promedio, cada persona con empleo (Penn World Table).", 1],
+  ["per-capita-energy-use","Ambiente y energía","Consumo de energía por persona","kWh por persona al año","n0","","","neutral","Energía primaria que usa cada persona al año, en kilovatios hora (Energy Institute).", 1]
+];
+
+const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: []};
 const base = (src, r) => ({key: src + ":" + r[0], src, id: String(r[0]).split(":")[0], cat: r[1], name: r[2], unit: r[3], k: r[4], pre: r[5], suf: r[6], tone: r[7], desc: r[8], curated: true});
 WB_ROWS.forEach(r => CATALOGO.wb.push(base("wb", r)));
 ES_ROWS.forEach(r => CATALOGO.eurostat.push(Object.assign(base("eurostat", r), {ds: r[9], flt: r[10]})));
 IMF_ROWS.forEach(r => CATALOGO.imf.push(Object.assign(base("imf", r), {scale: r[9]})));
 CEPAL_ROWS.forEach(r => CATALOGO.cepal.push(Object.assign(base("cepal", r), {pick: r[9]})));
+OMS_ROWS.forEach(r => CATALOGO.oms.push(Object.assign(base("oms", r), {scale: r[9]})));
+OIT_ROWS.forEach(r => CATALOGO.oit.push(Object.assign(base("oit", r), {scale: r[9]})));
+OWID_ROWS.forEach(r => CATALOGO.owid.push(Object.assign(base("owid", r), {scale: r[9]})));
 
 const MUESTRA = ["COL","MEX","BRA","ARG","USA","ESP","DEU","FRA","CHN","IND","JPN","NGA","ZAF","EGY","AUS","NZL"];
 const MUESTRA_FUENTE = {

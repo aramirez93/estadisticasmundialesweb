@@ -8,13 +8,14 @@ const fmiNoDisp = new Set();                // indicadores del FMI cuya copia lo
 const SUGERENCIAS = [["COL", "MEX"], ["ARG", "CHL"], ["ESP", "PRT"], ["BRA", "ARG"], ["USA", "CHN"], ["COL", "PER", "ECU"]];
 const TITULO = document.title;
 let modo = "explorar", psToken = 0, mundoCache = null;
-const PS = {sel: [], vista: "resumen", evoId: "NY.GDP.PCAP.CD", evoModo: "real"};
+const PS = {sel: [], vista: "hist", evoModo: "real"};
 const histCache = new Map();               // iso3 -> Map(idIndicador -> [{y,v}])
 const perfilInds = () => PERFIL.map(id => REG.get(id.includes(":") ? id : "wb:" + id)).filter(o => o && !fmiNoDisp.has(o.key));
 const nombreInd = o => o.name + (o.src === "imf" ? " (FMI)" : "");
-const AYUDA_P = {resumen: "El radar muestra, en cada tema, qué porcentaje de los países del mundo queda por debajo (más afuera = mejor posición; donde «menos es mejor» se invierte). La línea punteada es la mediana mundial.",
-                 ind: "Último dato disponible de cada país, su puesto en el mundo y la tendencia reciente. ✓ marca el mejor valor del grupo cuando hay un «mejor» claro.",
-                 evo: "Evolución de un indicador. El índice (primer año = 100) permite comparar países de tamaños muy distintos. La línea punteada es una estimación o proyección del FMI."};
+const AYUDA_P = {hist: "Cada tarjeta muestra la evolución de un indicador en los países elegidos, con su valor actual, su tendencia y su puesto en el mundo. Las secciones van de lo esencial a lo curioso; ábrelas para cargar más temas.",
+                 resumen: "El radar muestra, en cada tema, qué porcentaje de los países del mundo queda por debajo (más afuera = mejor posición; donde «menos es mejor» se invierte). La línea punteada es la mediana mundial.",
+                 ind: "Último dato disponible de cada país, su puesto en el mundo y la tendencia reciente. ✓ marca el mejor valor del grupo cuando hay un «mejor» claro."
+};
 
 // ---------- datos ----------
 async function filasFmi(o, isos) {            // filas con la forma del Banco Mundial, a partir de la copia local del FMI
@@ -26,7 +27,7 @@ async function filasFmi(o, isos) {            // filas con la forma del Banco Mu
 async function cargarHist(isos) {
   const faltan = isos.filter(i => !histCache.has(i)); if (!faltan.length) return;
   const inds = perfilInds(), l2 = faltan.map(i => paisMap.get(i).iso2).join(";");
-  const res = await Promise.all(inds.map(o => o.src === "imf" ? filasFmi(o, faltan) : wbAll(`/country/${l2}/indicator/${o.id}`, {date: `${ANIO - 35}:${ANIO}`, per_page: 2000}).then(r => r.rows, () => null)));
+  const res = await Promise.all(inds.map(o => o.src === "imf" ? filasFmi(o, faltan) : wbAll(`/country/${l2}/indicator/${o.id}`, {date: `1960:${ANIO}`, per_page: 4000}).then(r => r.rows, () => null)));
   if (inds.every((o, k) => o.src === "imf" || res[k] === null)) throw new Error("No se pudo consultar el Banco Mundial.");
   faltan.forEach(i => histCache.set(i, new Map()));
   res.forEach((rows, k) => (rows || []).forEach(x => {
@@ -45,6 +46,8 @@ async function cargarHist(isos) {
     });
   }));
   histCache.forEach(m => m.forEach(a => a.sort((p, q) => p.y - q.y)));
+  faltan.forEach(iso => inds.forEach(o => { const a = histCache.get(iso).get(o.id) || [];      // se comparte con «Mi país» y el historial
+    if (a.length) { mpHist.set(iso + "|" + o.key, a.filter(p => !p.f).map(p => ({y: p.y, v: p.v}))); mpExtra.set(iso + "|" + o.key, a.filter(p => p.f).map(p => ({y: p.y, v: p.v}))); } }));
 }
 async function cargarMundo() {
   if (mundoCache) return;
@@ -55,7 +58,7 @@ async function cargarMundo() {
   res.forEach((rows, k) => { const arr = []; (rows || []).forEach(x => {
     if (x.iso) { arr.push(x); return; }                       // ya viene calculado (FMI)
     const p = paisMap.get(x.countryiso3code); if (!p || p.agg || x.value === null || x.value === undefined) return; arr.push({iso: p.iso, v: x.value, y: +x.date}); }); m.set(inds[k].id, arr); });
-  mundoCache = m;
+  mundoCache = m; inds.forEach(o => mpMundo.set(o.key, m.get(o.id) || []));
 }
 const ultimo = (iso, id) => { const a = (histCache.get(iso) || new Map()).get(id); if (!a) return null; for (let i = a.length - 1; i >= 0; i--) if (!a[i].f) return a[i]; return null; };   // ignora las proyecciones
 function rango(id, iso) {
@@ -73,7 +76,6 @@ function mejorIso(o, vals) {
 // ---------- pantalla ----------
 const bandera = p => p.iso2 ? `<img class="flag" src="https://flagcdn.com/w40/${p.iso2.toLowerCase()}.png" alt="" width="28" height="21" loading="lazy" onerror="this.remove()">` : "";
 function poblarAddPais() {
-  $("addPais").innerHTML = `<option value="">Añadir un país…</option>` + paises.filter(p => !p.agg).map(p => `<option value="${p.iso}">${esc(p.nombre)}</option>`).join("");
   $("sugPaises").innerHTML = SUGERENCIAS.filter(g => g.every(i => paisMap.has(i))).map(g => `<button class="chip-sug" data-sug="${g.join(",")}">${esc(g.map(i => paisMap.get(i).nombre).join(" vs "))}</button>`).join("");
 }
 function cabeceraP() {
@@ -138,11 +140,13 @@ function pintarPaises() {
     return `<div class="pcard" style="--c:${serieColor(i)}"><button class="x" data-quitar="${iso}" aria-label="Quitar ${esc(p.nombre)}">✕</button><div class="pn">${bandera(p)}<b>${esc(p.nombre)}</b></div><small>${esc(CONT_NOMBRE[p.cont] || "")} · ${esc(p.ingreso)}</small>${p.capital ? `<small>Capital: ${esc(p.capital)}</small>` : ""}<small>Población: ${pop ? esc(fmtVal(pop.v, iP)) + " (" + pop.y + ")" : "—"}</small></div>`; }).join("");
   const ins = insightsPaises();
   $("pTitular").textContent = ins.titular; $("pLineas").innerHTML = ins.L.map(x => `<li>${x}</li>`).join("");
-  $("vistasP").innerHTML = [["resumen", "Perfil"], ["ind", "Indicadores"], ["evo", "Evolución"]].map(([v, t]) => `<button class="pill ${PS.vista === v ? "on" : ""}" data-pv="${v}">${t}</button>`).join("");
+  $("vistasP").innerHTML = [["hist", "Historial"], ["resumen", "Perfil"], ["ind", "Indicadores"]].map(([v, t]) => `<button class="pill ${PS.vista === v ? "on" : ""}" data-pv="${v}">${t}</button>`).join("");
   $("ayudaP").textContent = AYUDA_P[PS.vista]; $("avisoP").textContent = "";
-  $("pv-graf").hidden = PS.vista === "ind"; $("pv-ind").hidden = PS.vista !== "ind"; $("ctrlP").hidden = PS.vista !== "evo";
+  $("pv-hist").hidden = PS.vista !== "hist"; $("pv-graf").hidden = PS.vista !== "resumen"; $("pv-ind").hidden = PS.vista !== "ind"; $("ctrlP").hidden = PS.vista !== "hist";
+  if (PS.vista !== "hist") cmDestruir();
   if (PS.vista === "ind") $("pv-ind").innerHTML = tablaInd();
-  else if (PS.vista === "resumen") pintarRadar(); else pintarEvo();
+  else if (PS.vista === "resumen") pintarRadar();
+  else { $("ctrlP").innerHTML = `<label class="ctl">Qué se grafica<select data-pk="evoModo"><option value="real" ${PS.evoModo !== "base" ? "selected" : ""}>Valores reales</option><option value="base" ${PS.evoModo === "base" ? "selected" : ""}>Índice (primer año = 100)</option></select></label>`; cmRender(); }
   $("fuenteP").innerHTML = `Fuente: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a> (Indicadores del Desarrollo Mundial) y <a href="https://www.imf.org/external/datamapper" target="_blank" rel="noopener">FMI</a> (indicadores marcados «FMI») · consultado ${new Date().toLocaleString("es-CO")} · Puesto = posición entre ${mundoCache && mundoCache.get("SP.POP.TOTL") ? mundoCache.get("SP.POP.TOTL").length : "los"} países y territorios con dato (1 = valor más alto).`;
 }
 function spark(arr, color) {
@@ -178,36 +182,22 @@ function pintarRadar() {
   const sin = inds.filter(o => PS.sel.some(iso => !rango(o.id, iso))).length;
   $("avisoP").textContent = sin ? `En ${sin} de ${inds.length} ejes falta el dato de algún país; esos puntos quedan sin dibujar.` : "";
 }
-function pintarEvo() {
-  if (!chartListoP()) return;
-  const inds = perfilInds(); if (!inds.some(o => o.id === PS.evoId)) PS.evoId = inds[0].id;
-  const o = inds.find(x => x.id === PS.evoId), base = PS.evoModo === "base";
-  $("ctrlP").innerHTML = `<label class="ctl">Indicador<select data-pk="evoId">${[...new Set(inds.map(x => x.cat))].map(c => `<optgroup label="${esc(c)}">${inds.filter(x => x.cat === c).map(x => `<option value="${x.id}" ${x.id === PS.evoId ? "selected" : ""}>${esc(nombreInd(x))}</option>`).join("")}</optgroup>`).join("")}</select></label>` +
-    `<label class="ctl">Qué se grafica<select data-pk="evoModo"><option value="real" ${!base ? "selected" : ""}>Valores reales</option><option value="base" ${base ? "selected" : ""}>Índice (primer año = 100)</option></select></label>`;
-  let y0 = 9999, y1 = 0; PS.sel.forEach(iso => (histCache.get(iso).get(o.id) || []).forEach(p => { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }));
-  if (y1 === 0) { if (graficoP) { graficoP.destroy(); graficoP = null; } $("cajaP").style.height = "60px"; $("avisoP").textContent = "Ninguno de los países tiene datos recientes de este indicador."; return; }
-  const labels = []; for (let y = y0; y <= y1; y++) labels.push(y);
-  let hayFmi = false;
-  const ds = PS.sel.map((iso, i) => { const pts = histCache.get(iso).get(o.id) || [], m = new Map(pts.map(p => [p.y, p.v])), fy = new Set(pts.filter(p => p.f).map(p => p.y)); if (fy.size) hayFmi = true; const b0 = base ? labels.map(y => m.get(y)).find(v => v !== undefined && v !== 0) : null;
-    return {label: paisMap.get(iso).nombre, borderColor: serieColor(i), backgroundColor: serieColor(i), borderWidth: 2.4, pointRadius: 0, pointHoverRadius: 4, tension: .2, spanGaps: true, segment: {borderDash: c => fy.has(labels[c.p1DataIndex]) ? [6, 4] : undefined}, data: labels.map(y => { const v = m.get(y); return v === undefined ? null : base ? (b0 ? v / b0 * 100 : null) : v; })}; });
-  const f = v => base ? num(v, 0) : fmtVal(v, o);
-  nuevoGrafico({type: "line", data: {labels, datasets: ds}, plugins: [plugEtiquetasFin()],
-    options: {layout: {padding: {right: 118}}, interaction: {mode: "nearest", intersect: false, axis: "x"}, plugins: {legend: {display: false}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${f(c.parsed.y)}`}}},
-      scales: {y: {ticks: {callback: v => f(v)}, title: {display: base || !!o.unit, text: base ? `Índice (${labels[0]} = 100)` : o.unit}}, x: {grid: {display: false}}}}}, 420, true);
-  $("avisoP").textContent = `${nombreInd(o)}${o.desc ? ": " + o.desc : ""}${hayFmi ? " · Línea punteada: estimación o proyección del FMI (Perspectivas de la Economía Mundial)." : ""}`;
-}
 function csvPaises() {
   const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;fuente;pais;iso3;anio;valor;unidad;tipo"];
-  perfilInds().forEach(o => PS.sel.forEach(iso => ((histCache.get(iso) || new Map()).get(o.id) || []).forEach(p => L.push([q(o.name), o.id, o.src, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || ""), p.f ? "estimacion/proyeccion FMI" : "observado"].join(";")))));
+  const inds = new Map(); perfilInds().concat(CM.secs.flatMap(s => s.inds)).forEach(o => inds.set(o.key, o));
+  inds.forEach(o => PS.sel.forEach(iso => {
+    (mpHist.get(iso + "|" + o.key) || []).forEach(p => L.push([q(o.name), o.id, o.src, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || ""), "observado"].join(";")));
+    (mpExtra.get(iso + "|" + o.key) || []).forEach(p => L.push([q(o.name), o.id, o.src, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || ""), "estimacion/proyeccion"].join(";")));
+  }));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "comparacion_" + PS.sel.join("_") + ".csv"; document.body.appendChild(a); a.click(); a.remove();
 }
 function eventosPaises() {
   document.querySelector(".modos").addEventListener("click", e => { const b = e.target.closest("button[data-modo]"); if (b && b.dataset.modo !== modo) entrarModo(b.dataset.modo); });
-  $("addPais").addEventListener("change", e => { const iso = e.target.value; e.target.value = ""; if (iso) anadirPais(iso); });
+  buscadorPais({input: $("addPais"), lista: $("lstAdd"), excluir: () => PS.sel, onElegir: iso => { $("addPais").value = ""; anadirPais(iso); }});
   $("sugPaises").addEventListener("click", e => { const b = e.target.closest("[data-sug]"); if (b) { PS.sel = b.dataset.sug.split(","); renderPaises(); } });
   $("pCards").addEventListener("click", e => { const b = e.target.closest("[data-quitar]"); if (b) quitarPais(b.dataset.quitar); });
   $("vistasP").addEventListener("click", e => { const b = e.target.closest("[data-pv]"); if (b) { PS.vista = b.dataset.pv; pintarPaises(); guardarHash(); } });
-  $("ctrlP").addEventListener("change", e => { const k = e.target.dataset.pk; if (k) { PS[k] = e.target.value; pintarPaises(); guardarHash(); } });
+  $("ctrlP").addEventListener("change", e => { const k = e.target.dataset.pk; if (k) { PS[k] = e.target.value; cmRedibujar(); guardarHash(); } });
   $("btnCSVP").addEventListener("click", csvPaises);
   $("btnEnlaceP").addEventListener("click", copiarEnlace);
   $("btnIrComparar").addEventListener("click", () => { PS.sel = [...sel].slice(0, 4); cerrarHojas(); entrarModo("paises"); });

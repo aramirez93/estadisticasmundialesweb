@@ -32,3 +32,9 @@ Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.euro
 - **Mi país**: nueva sección con un solo país. Muestra su historial completo ordenado de lo esencial a lo curioso, con una tarjeta por indicador (qué mide, valor actual, tendencia, gráfica, puesto mundial y mediana). Dato curioso: se añaden 24 indicadores del Banco Mundial (turismo, mujeres en el parlamento, homicidios, patentes, vacunación…).
 - **Comparar países** ahora incluye datos del FMI (deuda, balance fiscal, cuenta corriente, ingresos y gasto públicos, intereses, deuda de los hogares) y dibuja con línea punteada las estimaciones y proyecciones del FMI.
 - **FMI**: se retiran «Inversión total» y «Ahorro nacional» (el FMI ya no los publica en DataMapper) y se añaden 12 indicadores nuevos. Después de este cambio hay que ejecutar una vez la acción «Actualizar datos del FMI» (pestaña Actions → Run workflow) para descargarlos.
+
+## v0.8
+- **Nuevo logo e icono** (SVG, también como favicon).
+- **Buscador de países que filtra al escribir** (sin importar tildes ni mayúsculas) en «Mi país» y «Comparar países»; admite flechas y Enter.
+- **Comparar países, vista Historial**: una tarjeta por indicador con la evolución de cada país elegido (hasta 4), su valor actual, tendencia, puesto mundial, lectura en palabras y proyecciones del FMI en línea punteada. Cubre todo el catálogo (Banco Mundial, FMI, OMS, OIT y OWID), con el interruptor «Índice (primer año = 100)». «Perfil» (radar) e «Indicadores» (tabla) siguen disponibles.
+- **Fuentes nuevas**: OMS (10 indicadores de salud), OIT (4 de trabajo) y Our World in Data (7). Las descarga a diario la acción de GitHub «Actualizar datos» (`.github/scripts/actualizar_ext.mjs`) y quedan en `datos/ext/`; si una descarga falla se conserva la anterior y el motivo queda en `datos/ext/_estado.json`. Mientras no existan esos archivos, las fuentes nuevas se ocultan sin afectar al resto.

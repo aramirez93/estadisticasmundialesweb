@@ -36,12 +36,6 @@ function mpAbrev(v, o) {
 }
 
 // ---------- datos ----------
-async function mpFmiValores(idF) {
-  if (!mpFmiC.has(idF)) mpFmiC.set(idF, (async () => {
-    try { const j = await fetchJSON(`datos/imf/${idF}.json`, 20000); return ((j.datos || j).values || {})[idF] || null; } catch (e) { return null; }
-  })());
-  return mpFmiC.get(idF);
-}
 function fmiMundo(vals, sc) {                  // último dato (hasta el año pasado) de cada país en una copia del FMI
   const Y = ANIO - 1, arr = [];
   Object.entries(vals || {}).forEach(([c, s]) => {
@@ -51,19 +45,25 @@ function fmiMundo(vals, sc) {                  // último dato (hasta el año pa
   });
   return arr;
 }
-async function mpDatosFmi(o) {
-  const vals = await mpFmiValores(o.id), sc = o.scale || 1, k = MP.iso + "|" + o.key, cod = (vals && vals[MP.iso]) || {};
-  const todo = Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(p => !isNaN(p.v)).sort((a, b) => a.y - b.y);
-  mpHist.set(k, todo.filter(p => p.y < ANIO)); mpExtra.set(k, todo.filter(p => p.y >= ANIO));
+async function mpDatosLocal(o, isos) {              // FMI, OMS, OIT, OWID: copia local del sitio
+  const vals = await localValores(o.src, o.id), sc = o.scale || 1;
+  isos.forEach(iso => {
+    const k = iso + "|" + o.key, cod = (vals && vals[iso]) || {};
+    const todo = Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(p => !isNaN(p.v)).sort((a, b) => a.y - b.y);
+    mpHist.set(k, todo.filter(p => p.y < ANIO)); mpExtra.set(k, todo.filter(p => p.y >= ANIO));
+  });
   if (!mpMundo.has(o.key)) mpMundo.set(o.key, fmiMundo(vals, sc));
 }
-async function mpDatos(o) {
-  if (o.src === "imf") return mpDatosFmi(o);
-  const iso = MP.iso, p = paisMap.get(iso), k = iso + "|" + o.key, id = encodeURIComponent(o.id);
+async function mpDatos(o, isos = [MP.iso]) {         // carga lo que falte de uno o varios países (una sola consulta por indicador)
+  if (o.src !== "wb") return mpDatosLocal(o, isos);
+  const id = encodeURIComponent(o.id), faltan = isos.filter(i => !mpHist.has(i + "|" + o.key));
   const pedirPais = async () => {
-    if (mpHist.has(k)) return;
-    const r = await mpLimitar(() => wbAll(`/country/${p.iso2}/indicator/${id}`, {date: `1960:${ANIO}`, source: o.wbSource || "2", per_page: 200}));
-    mpHist.set(k, r.rows.filter(x => x.value !== null && x.value !== undefined).map(x => ({y: +x.date, v: x.value})).sort((a, b) => a.y - b.y));
+    if (!faltan.length) return;
+    const l2 = faltan.map(i => paisMap.get(i).iso2).join(";");
+    const r = await mpLimitar(() => wbAll(`/country/${l2}/indicator/${id}`, {date: `1960:${ANIO}`, source: o.wbSource || "2", per_page: 1000}));
+    faltan.forEach(i => mpHist.set(i + "|" + o.key, []));
+    r.rows.filter(x => x.value !== null && x.value !== undefined).forEach(x => { const a = mpHist.get(x.countryiso3code + "|" + o.key); if (a) a.push({y: +x.date, v: x.value}); });
+    faltan.forEach(i => mpHist.get(i + "|" + o.key).sort((a, b) => a.y - b.y));
   };
   const pedirMundo = async () => {
     if (mpMundo.has(o.key)) return;
@@ -76,17 +76,18 @@ async function mpDatos(o) {
   };
   await Promise.all([pedirPais(), pedirMundo()]);
   const idF = MP_FMI_DE[o.id];
-  if (idF && !mpExtra.has(k)) {
-    const vals = await mpFmiValores(idF), sc = (REG.get("imf:" + idF) || {}).scale || 1, cod = (vals && vals[iso]) || {};
-    mpExtra.set(k, Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(q => !isNaN(q.v)).sort((a, b) => a.y - b.y));
+  if (idF) {
+    const vals = await localValores("imf", idF), sc = (REG.get("imf:" + idF) || {}).scale || 1;
+    isos.forEach(iso => { const k = iso + "|" + o.key; if (mpExtra.has(k)) return; const cod = (vals && vals[iso]) || {};
+      mpExtra.set(k, Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(q => !isNaN(q.v)).sort((a, b) => a.y - b.y)); });
   }
 }
-function mpRango(o) {
-  const arr = mpMundo.get(o.key) || [], me = arr.find(x => x.iso === MP.iso); if (!me || arr.length < 5) return null;
+function mpRango(o, iso = MP.iso) {
+  const arr = mpMundo.get(o.key) || [], me = arr.find(x => x.iso === iso); if (!me || arr.length < 5) return null;
   const n = arr.length, vs = arr.map(x => x.v).sort((a, b) => a - b), med = n % 2 ? vs[n >> 1] : (vs[n / 2 - 1] + vs[n / 2]) / 2;
   return {puesto: arr.filter(x => x.v > me.v).length + 1, n, pct: arr.filter(x => x.v < me.v).length / (n - 1) * 100, med, y: me.y};
 }
-const mpUlt = o => { const s = mpHist.get(MP.iso + "|" + o.key); return s && s.length ? s[s.length - 1] : null; };
+const mpUlt = (o, iso = MP.iso) => { const s = mpHist.get(iso + "|" + o.key); return s && s.length ? s[s.length - 1] : null; };
 const mpPuntaje = (o, r) => o.tone === "bad" ? 100 - r.pct : r.pct;
 
 // ---------- análisis en lenguaje claro ----------
@@ -236,7 +237,7 @@ function mpHero() {
 
 // ---------- pantalla ----------
 function mpSecciones() {
-  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean);
+  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean).concat(CATALOGO.oms, CATALOGO.oit, CATALOGO.owid);
   const esenc = MP_ESENCIAL.map(id => REG.get("wb:" + id)).filter(Boolean), usados = new Set(esenc.map(o => o.key));
   const secs = [{id: "esencial", titulo: "Lo esencial", sub: "Los datos que mejor resumen al país", inds: esenc}];
   MP_ORDEN.forEach((c, i) => {
@@ -247,7 +248,6 @@ function mpSecciones() {
   return secs;
 }
 function mpPoblar() {
-  $("selMP").innerHTML = `<option value="">Elegir un país…</option>` + paises.filter(p => !p.agg).map(p => `<option value="${p.iso}">${esc(p.nombre)}</option>`).join("");
   $("sugMP").innerHTML = MP_SUG.filter(i => paisMap.has(i)).map(i => `<button class="chip-sug" data-mp-sug="${i}">${esc(paisMap.get(i).nombre)}</button>`).join("");
 }
 function mpAbrir(id, desplazar) {
@@ -255,13 +255,13 @@ function mpAbrir(id, desplazar) {
   if (desplazar) d.scrollIntoView({behavior: "smooth", block: "start"});
 }
 function renderMiPais() {
-  if (!$("selMP").options.length) mpPoblar();
+  if (!$("sugMP").innerHTML) mpPoblar();
   if (!MP.iso) { try { const g = localStorage.getItem("miPais"); if (g && paisMap.has(g)) MP.iso = g; } catch (e) {} }
   if (!MP.iso) MP.iso = paisMap.has("COL") ? "COL" : null;
   if (!MP.iso) return;
   MP.token++; mpGraficos.forEach(g => g.destroy()); mpGraficos = [];
   try { localStorage.setItem("miPais", MP.iso); } catch (e) {}
-  const p = paisMap.get(MP.iso); $("selMP").value = MP.iso; $("fraseMP").textContent = `${p.nombre}: su historia en datos`;
+  const p = paisMap.get(MP.iso); $("buscaMP").value = p.nombre; $("fraseMP").textContent = `${p.nombre}: su historia en datos`;
   document.title = `${p.nombre} en datos – Estadísticas Mundiales`; $("estadoMP").textContent = ""; $("resMP").hidden = false;
   MP.secs = mpSecciones();
   $("mpNav").innerHTML = MP.secs.map(s => `<button class="pill" data-mp-ir="${s.id}">${esc(s.titulo)}</button>`).join("");
@@ -277,7 +277,7 @@ function csvMiPais() {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "mi_pais_" + MP.iso + ".csv"; document.body.appendChild(a); a.click(); a.remove();
 }
 function eventosMiPais() {
-  $("selMP").addEventListener("change", e => { if (e.target.value) { MP.iso = e.target.value; renderMiPais(); window.scrollTo(0, 0); } });
+  buscadorPais({input: $("buscaMP"), lista: $("lstMP"), onElegir: iso => { MP.iso = iso; renderMiPais(); window.scrollTo(0, 0); }});
   $("sugMP").addEventListener("click", e => { const b = e.target.closest("[data-mp-sug]"); if (b) { MP.iso = b.dataset.mpSug; renderMiPais(); } });
   $("mpNav").addEventListener("click", e => { const b = e.target.closest("[data-mp-ir]"); if (b) mpAbrir(b.dataset.mpIr, true); });
   $("mpSecs").addEventListener("toggle", e => { const d = e.target; if (d.open && d.dataset.sec) mpCargarSec(mpSecPorId(d.dataset.sec)); }, true);

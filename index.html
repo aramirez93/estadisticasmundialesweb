@@ -8,7 +8,7 @@
 <meta property="og:title" content="Estadísticas Mundiales">
 <meta property="og:description" content="Datos oficiales de todos los países en mapas, rankings y gráficos comparables.">
 <meta name="theme-color" content="#f3f4f6">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%231d4ed8'/%3E%3Cpath d='M6 50h88M50 6c28 24 28 64 0 88M50 6c-28 24-28 64 0 88' stroke='white' stroke-width='5' fill='none'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%232563eb%22/%3E%3Cstop offset=%221%22 stop-color=%22%230e9aa7%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22url(%23g)%22/%3E%3Cg fill=%22none%22 stroke=%22%23fff%22 stroke-opacity=%22.5%22 stroke-width=%222%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2220%22/%3E%3Cellipse cx=%2232%22 cy=%2232%22 rx=%228.5%22 ry=%2220%22/%3E%3Cpath d=%22M12 32h40%22/%3E%3C/g%3E%3Crect x=%2218.5%22 y=%2236%22 width=%227.5%22 height=%2213%22 rx=%222%22 fill=%22%23fff%22/%3E%3Crect x=%2228.25%22 y=%2228%22 width=%227.5%22 height=%2221%22 rx=%222%22 fill=%22%23fbbf24%22/%3E%3Crect x=%2238%22 y=%2219%22 width=%227.5%22 height=%2230%22 rx=%222%22 fill=%22%23fff%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -30,7 +30,12 @@
   /* cabecera */
   .top { max-width:1120px; margin:0 auto; padding:14px 20px 0; display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .marca { display:flex; align-items:center; gap:9px; font-weight:700; letter-spacing:-.01em; }
-  .marca svg { width:24px; height:24px; color:var(--acento); }
+  .marca { text-decoration:none; color:var(--tinta); }
+  .marca .logo { width:42px; height:42px; flex:none; border-radius:11px; box-shadow:0 3px 10px rgba(37,99,235,.28); transition:transform .25s; }
+  .marca:hover .logo { transform:rotate(-6deg) scale(1.05); }
+  .marca-t { display:flex; flex-direction:column; line-height:1; }
+  .marca-t b { font-family:var(--serif); font-size:1.28rem; font-weight:600; letter-spacing:-.015em; }
+  .marca-t i { font-style:normal; font-size:.68rem; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--acento); margin-top:3px; }
   .ver { font-size:.7rem; font-weight:600; color:var(--suave); border:1px solid var(--linea); border-radius:99px; padding:1px 8px; }
   .top-der { display:flex; align-items:center; gap:10px; }
   .estados { display:flex; gap:12px; font-size:.74rem; color:var(--suave); }
@@ -134,6 +139,24 @@
   .repro b { font-family:var(--serif); font-size:1.2rem; min-width:3ch; }
   .enlaces { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:6px 16px; font-size:.88rem; }
 
+  /* buscador de países */
+  .buscador { position:relative; width:290px; max-width:100%; }
+  .buscador input { padding-left:38px; background:var(--sup) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 12px 50%; }
+  .lista-bus { position:absolute; z-index:40; left:0; width:max(100%,360px); max-width:92vw; top:calc(100% + 4px); margin:0; padding:4px; list-style:none; max-height:min(340px,55vh); overflow:auto; background:var(--sup); border:1px solid var(--linea); border-radius:12px; box-shadow:var(--sombra); }
+  .lista-bus li { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; font-size:.94rem; }
+  .lista-bus li.act, .lista-bus li:hover { background:var(--acento-t); }
+  .lista-bus li small { margin-left:auto; color:var(--suave); font-size:.72rem; text-align:right; white-space:nowrap; }
+  .lista-bus li span { min-width:0; }
+  .lista-bus li.vacio { cursor:default; color:var(--suave); } .lista-bus li.vacio:hover { background:none; }
+  .lista-bus mark { background:none; color:var(--acento); font-weight:700; }
+  .lista-bus .flag { width:22px; height:auto; border-radius:2px; }
+  /* comparador */
+  .cm-vals { display:grid; gap:4px; }
+  .cm-fila { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.9rem; padding:5px 8px; background:var(--papel); border-radius:8px; }
+  .cm-fila .pt { width:10px; height:10px; border-radius:50%; flex:none; }
+  .cm-fila b { font-variant-numeric:tabular-nums; margin-left:auto; font-size:1rem; }
+  .cm-fila small { color:var(--suave); font-size:.74rem; }
+  .cm-fila.vacio { color:var(--suave); } .cm-fila em { margin-left:auto; font-size:.8rem; }
   /* mi país */
   .mp-hero { background:var(--sup); border:1px solid var(--linea); border-radius:14px; padding:16px; margin-bottom:12px; }
   .mp-id { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
@@ -251,10 +274,10 @@
 </head>
 <body>
 <header class="top">
-  <div class="marca">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c4.5 4 4.5 16 0 20M12 2c-4.5 4-4.5 16 0 20"/></svg>
-    Estadísticas Mundiales <span class="ver">v0.7</span>
-  </div>
+  <a class="marca" href="./" aria-label="Estadísticas Mundiales, inicio">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#0e9aa7"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lg)"/><g fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"><circle cx="32" cy="32" r="20"/><ellipse cx="32" cy="32" rx="8.5" ry="20"/><path d="M12 32h40"/></g><rect x="18.5" y="36" width="7.5" height="13" rx="2" fill="#fff"/><rect x="28.25" y="28" width="7.5" height="21" rx="2" fill="#fbbf24"/><rect x="38" y="19" width="7.5" height="30" rx="2" fill="#fff"/></svg>
+    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.8</span>
+  </a>
   <nav class="modos" aria-label="Secciones"><button class="on" data-modo="explorar">Explorar datos</button><button data-modo="mipais">Mi país</button><button data-modo="paises">Comparar países</button></nav>
   <div class="top-der">
     <div id="fuentesEstado" class="estados"></div>
@@ -333,7 +356,7 @@
 <main id="modo-mipais" hidden>
   <section>
     <h1 class="frase" id="fraseMP">Elige un país para ver toda su historia en datos</h1>
-    <div class="add-fila"><select id="selMP" aria-label="Elegir país"></select><span id="sugMP" class="sug"></span></div>
+    <div class="add-fila"><div class="buscador"><input type="search" id="buscaMP" placeholder="Escribe un país…" aria-label="Buscar país" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="lstMP"><ul class="lista-bus" id="lstMP" role="listbox" hidden></ul></div><span id="sugMP" class="sug"></span></div>
     <div id="estadoMP" role="status"></div>
   </section>
   <section id="resMP" hidden>
@@ -354,7 +377,7 @@
 <main id="modo-paises" hidden>
   <section>
     <h1 class="frase" id="frasePaises">Elige uno o más países para ver su perfil o compararlos</h1>
-    <div class="add-fila"><select id="addPais" aria-label="Añadir un país"></select><span id="sugPaises" class="sug"></span></div>
+    <div class="add-fila"><div class="buscador"><input type="search" id="addPais" placeholder="Añadir un país: escribe una letra…" aria-label="Añadir un país" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="lstAdd"><ul class="lista-bus" id="lstAdd" role="listbox" hidden></ul></div><span id="sugPaises" class="sug"></span></div>
     <div id="estadoP" role="status"></div>
   </section>
   <section id="paisRes" hidden>
@@ -365,6 +388,7 @@
       <nav class="vistas" id="vistasP" aria-label="Forma de comparar"></nav>
       <p class="ayuda" id="ayudaP"></p>
       <div class="ctl-fila" id="ctrlP" hidden></div>
+      <div id="pv-hist"><nav class="mp-nav" id="cmNav" aria-label="Secciones del comparador"></nav><div id="cmSecs"></div></div>
       <div id="pv-graf"><div class="canvas-box" id="cajaP"><canvas id="cvP"></canvas></div></div>
       <div id="pv-ind" hidden></div>
       <p class="nota" id="avisoP"></p>
@@ -470,7 +494,16 @@ const FUENTES = {
              url: "https://www.imf.org/external/datamapper"},
   cepal:    {nombre: "CEPAL",          corto: "CEPAL", sub: "América Latina y el Caribe",
              desc: "Comisión Económica para América Latina y el Caribe (CEPALSTAT). Estadísticas oficiales de la región, útiles para desigualdad y pobreza.",
-             url: "https://statistics.cepal.org"}
+             url: "https://statistics.cepal.org"},
+  oms:      {nombre: "OMS",            corto: "OMS", sub: "salud · Observatorio Mundial", ext: true,
+             desc: "Organización Mundial de la Salud (Observatorio Mundial de la Salud). Estimaciones comparables de salud: vida saludable, obesidad, cobertura sanitaria y más. Se descargan a diario con una acción de GitHub.",
+             url: "https://www.who.int/data/gho"},
+  oit:      {nombre: "OIT",            corto: "OIT", sub: "trabajo · ILOSTAT", ext: true,
+             desc: "Organización Internacional del Trabajo (ILOSTAT). Empleo informal, horas trabajadas, afiliación sindical y desempleo juvenil. Se descargan a diario con una acción de GitHub.",
+             url: "https://ilostat.ilo.org"},
+  owid:     {nombre: "Our World in Data", corto: "OWID", sub: "desarrollo y curiosidades", ext: true,
+             desc: "Our World in Data (Universidad de Oxford). Reúne series de organismos como la ONU, el PNUD o la FAO: felicidad, desarrollo humano, calorías, hambre y horas de trabajo. Licencia CC BY 4.0. Se descargan a diario con una acción de GitHub.",
+             url: "https://ourworldindata.org"}
 };
 
 const TONO_TXT = {
@@ -622,12 +655,43 @@ const CEPAL_ROWS = [
   ["2203","Economía","PIB total","US$ corrientes","big","US$ ","","neutral","Producto interno bruto anual a precios corrientes en dólares.", {}]
 ];
 
-const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: []};
+const OMS_ROWS = [
+  ["WHOSIS_000002","Salud","Esperanza de vida saludable","años","n1",""," años","good","Años que, en promedio, una persona puede esperar vivir con buena salud desde que nace. Es menor que la esperanza de vida total porque descuenta los años con enfermedad o discapacidad.", 1],
+  ["NCD_BMI_30A","Salud","Obesidad en adultos","% de adultos con IMC ≥ 30","n1",""," %","bad","Porcentaje de adultos con un índice de masa corporal de 30 o más (estimación ajustada por edad para poder comparar países).", 1],
+  ["NCD_BMI_25A","Salud","Sobrepeso en adultos","% de adultos con IMC ≥ 25","n1",""," %","bad","Porcentaje de adultos con un índice de masa corporal de 25 o más, incluida la obesidad (ajustado por edad).", 1],
+  ["NCD_HYP_PREVALENCE_A","Salud","Hipertensión en adultos","% de adultos de 30 a 79 años","n1",""," %","bad","Porcentaje de adultos con presión arterial alta (ajustado por edad). Es un factor de riesgo clave de infartos y derrames.", 1],
+  ["M_Est_smk_curr_std","Salud","Fumadores actuales de tabaco","% de personas de 15 años o más","n1",""," %","bad","Porcentaje de personas que fuman tabaco actualmente (ajustado por edad).", 1],
+  ["UHC_INDEX_REPORTED","Salud","Cobertura sanitaria universal","índice de 0 a 100","n0","","","good","Índice de la ONU y la OMS (ODS 3.8.1) que resume el acceso a servicios de salud esenciales: maternidad, vacunación, enfermedades infecciosas y no transmisibles.", 1],
+  ["WSH_SANITATION_SAFELY_MANAGED","Salud","Saneamiento seguro","% de la población","n1",""," %","good","Población que usa baños no compartidos, cuyos residuos se tratan de forma segura.", 1],
+  ["HWF_0006","Salud","Personal de enfermería y partería","por 10.000 habitantes","n1","","","good","Enfermeras, enfermeros y parteras por cada 10.000 habitantes.", 1],
+  ["WHS6_102","Salud","Camas de hospital","por 10.000 habitantes","n1","","","good","Camas hospitalarias por cada 10.000 habitantes.", 1],
+  ["PHE_HHAIR_PROP_POP_CLEAN_FUELS","Ambiente y energía","Cocina con combustibles limpios","% de la población","n1",""," %","good","Población que cocina con gas, electricidad u otras fuentes limpias en lugar de leña o carbón, que contaminan el aire de la casa.", 1]
+];
+const OIT_ROWS = [
+  ["UNE_2EAP_SEX_AGE_RT_A","Trabajo","Desempleo juvenil (15 a 24 años)","% de la fuerza laboral joven","n1",""," %","bad","Porcentaje de jóvenes de 15 a 24 años que buscan trabajo y no lo encuentran.", 1],
+  ["SDG_0831_SEX_ECO_RT_A","Trabajo","Empleo informal","% del empleo total","n1",""," %","bad","Porcentaje de las personas ocupadas con empleos sin contrato formal ni protección social.", 1],
+  ["HOW_TEMP_SEX_ECO_NB_A","Trabajo","Horas trabajadas por semana","horas por persona ocupada","n1",""," h","neutral","Horas que trabaja en promedio por semana cada persona con empleo.", 1],
+  ["ILR_TUMT_NOC_RT_A","Trabajo","Afiliación sindical","% de los asalariados","n1",""," %","neutral","Porcentaje de los trabajadores asalariados que pertenece a un sindicato.", 1]
+];
+const OWID_ROWS = [
+  ["happiness-cantril-ladder","Curiosidades","Felicidad: satisfacción con la vida","escala de 0 a 10","n2","","","good","Qué nota de 0 a 10 se dan las personas al valorar su vida (Informe Mundial de la Felicidad, encuesta Gallup).", 1],
+  ["human-development-index","Economía","Índice de Desarrollo Humano","índice de 0 a 1","n3","","","good","Resume en un número la salud (esperanza de vida), la educación y el ingreso de un país. Lo publica el PNUD (ONU).", 1],
+  ["daily-per-capita-caloric-supply","Salud","Calorías disponibles por persona","kilocalorías por día","n0","","","neutral","Calorías de alimentos que hay disponibles cada día por persona (FAO). No es lo que se come: incluye desperdicio.", 1],
+  ["global-hunger-index","Salud","Índice Global del Hambre","0 = sin hambre · 100 = máximo","n1","","","bad","Resume desnutrición, retraso del crecimiento infantil y mortalidad infantil (Welthungerhilfe y Concern).", 1],
+  ["meat-supply-per-person","Curiosidades","Carne disponible por persona","kg por persona al año","n1","","","neutral","Kilos de carne disponibles cada año por persona (FAO).", 1],
+  ["annual-working-hours-per-worker","Trabajo","Horas de trabajo al año","horas por trabajador","n0","","","neutral","Horas que trabaja al año, en promedio, cada persona con empleo (Penn World Table).", 1],
+  ["per-capita-energy-use","Ambiente y energía","Consumo de energía por persona","kWh por persona al año","n0","","","neutral","Energía primaria que usa cada persona al año, en kilovatios hora (Energy Institute).", 1]
+];
+
+const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: []};
 const base = (src, r) => ({key: src + ":" + r[0], src, id: String(r[0]).split(":")[0], cat: r[1], name: r[2], unit: r[3], k: r[4], pre: r[5], suf: r[6], tone: r[7], desc: r[8], curated: true});
 WB_ROWS.forEach(r => CATALOGO.wb.push(base("wb", r)));
 ES_ROWS.forEach(r => CATALOGO.eurostat.push(Object.assign(base("eurostat", r), {ds: r[9], flt: r[10]})));
 IMF_ROWS.forEach(r => CATALOGO.imf.push(Object.assign(base("imf", r), {scale: r[9]})));
 CEPAL_ROWS.forEach(r => CATALOGO.cepal.push(Object.assign(base("cepal", r), {pick: r[9]})));
+OMS_ROWS.forEach(r => CATALOGO.oms.push(Object.assign(base("oms", r), {scale: r[9]})));
+OIT_ROWS.forEach(r => CATALOGO.oit.push(Object.assign(base("oit", r), {scale: r[9]})));
+OWID_ROWS.forEach(r => CATALOGO.owid.push(Object.assign(base("owid", r), {scale: r[9]})));
 
 const MUESTRA = ["COL","MEX","BRA","ARG","USA","ESP","DEU","FRA","CHN","IND","JPN","NGA","ZAF","EGY","AUS","NZL"];
 const MUESTRA_FUENTE = {
@@ -655,6 +719,44 @@ const PALETAS = {   // ColorBrewer, 7 clases
   neutral: ["#eff3ff","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"]
 };
 const LINEAS = ["#0b6e4f","#d1495b","#2e86ab","#edae49","#6a4c93","#00798c","#e07a5f","#3d405b","#81b29a","#9c6644","#118ab2","#ef476f"];
+
+// ============================================================
+//  DATOS LOCALES: FMI (datos/imf) y fuentes externas OMS, OIT, OWID (datos/ext)
+//  Los descarga a diario una acción de GitHub, así no dependen de que el navegador pueda consultar esas webs.
+// ============================================================
+const EXT = new Set(["oms", "oit", "owid"]);
+const localC = new Map();
+function localCarga(src, id) {
+  const k = src + ":" + id;
+  if (!localC.has(k)) localC.set(k, (async () => {
+    try {
+      if (src === "imf") { const j = await fetchJSON(`datos/imf/${id}.json`, 20000); return {vals: ((j.datos || j).values || {})[id] || null, generado: j.generado || ""}; }
+      const j = await fetchJSON(`datos/ext/${src}_${id}.json`, 20000); return {vals: j.series || null, generado: j.generado || ""};
+    } catch (e) { return {vals: null, generado: ""}; }
+  })());
+  return localC.get(k);
+}
+const localValores = (src, id) => localCarga(src, id).then(r => r.vals);
+const mpFmiValores = id => localValores("imf", id);
+let extEstado = null;
+async function cargarExtEstado() {
+  try { extEstado = await fetchJSON("datos/ext/_estado.json", 10000); } catch (e) { extEstado = null; }
+  EXT.forEach(k => {
+    const ok = extEstado && extEstado.fuentes && extEstado.fuentes[k] && extEstado.fuentes[k].ok;
+    CATALOGO[k] = ok ? CATALOGO[k].filter(o => ok.includes(o.id)) : [];
+  });
+}
+// Adaptador para el explorador (misma forma que ADAPT.wb / imf)
+async function adaptLocal(o, d, h) {
+  const r = await localCarga(o.src, o.id);
+  if (!r.vals) throw new Error("Estos datos todavía no se han descargado. Se actualizan con la acción «Actualizar datos» de GitHub (Actions → Run workflow).");
+  const sc = o.scale || 1, series = new Map();
+  Object.entries(r.vals).forEach(([iso0, s]) => {
+    const iso = (iso0 === "KOS" || iso0 === "UVK") ? "XKX" : iso0; if (!paisMap.has(iso)) return;
+    Object.entries(s).forEach(([y, v]) => { const yy = +y, vv = Number(v) * sc; if (yy < d || yy > h || isNaN(vv)) return; agregar(series, iso, yy, vv); });
+  });
+  return {series, updated: r.generado ? "copia del sitio del " + r.generado.slice(0, 10) : "", link: FUENTES[o.src].url};
+}
 
 // ============================================================
 //  VISTAS: formas de mostrar los datos, resumen, hojas, tema y enlace
@@ -1096,14 +1198,14 @@ function cerrarHojas() {
 function alternarTema() {
   const t = oscuro() ? "light" : "dark"; document.documentElement.dataset.theme = t;
   try { localStorage.setItem("tema", t); } catch (e) {}
-  if (modo === "paises") { if (!$("paisRes").hidden) pintarPaises(); } else if (modo === "mipais") mpRedibujar(); else if (D) renderVista({});
+  if (modo === "paises") { if (!$("paisRes").hidden) { PS.vista === "hist" ? cmRedibujar() : pintarPaises(); } } else if (modo === "mipais") mpRedibujar(); else if (D) renderVista({});
 }
 function aplicarTemaGuardado() { try { const t = localStorage.getItem("tema"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {} }
 function guardarHash() {
   try {
     const p = new URLSearchParams();
     if (modo === "mipais") { p.set("m", "mipais"); if (MP.iso) p.set("p", MP.iso); }
-    else if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); p.set("pi", PS.evoId); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
+    else if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
     else { if (ind) p.set("i", ind.key); p.set("v", VISTA); if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(",")); p.set("d", $("desde").value); p.set("h", $("hasta").value); }
     history.replaceState(null, "", "#" + p.toString());
   } catch (e) {}
@@ -1129,6 +1231,36 @@ function eventosVistas() {
 }
 
 // ============================================================
+//  BUSCADOR DE PAÍSES: filtra mientras se escribe (sin importar tildes ni mayúsculas)
+// ============================================================
+function buscadorPais({input, lista, onElegir, excluir}) {
+  let items = [], act = -1;
+  const cerrar = () => { lista.hidden = true; input.setAttribute("aria-expanded", "false"); act = -1; };
+  const resaltar = (n, q) => { const i = q ? norm(n).indexOf(q) : -1; return i < 0 ? esc(n) : esc(n.slice(0, i)) + "<mark>" + esc(n.slice(i, i + q.length)) + "</mark>" + esc(n.slice(i + q.length)); };
+  function pintar() {
+    const q = norm(input.value).trim(), ex = excluir ? excluir() : [], base = paises.filter(p => !p.agg && !ex.includes(p.iso));
+    const ini = q ? base.filter(p => norm(p.nombre).startsWith(q)) : base;
+    const pal = q ? base.filter(p => !norm(p.nombre).startsWith(q) && norm(p.nombre).split(/[\s,()-]+/).some(w => w.startsWith(q))) : [];
+    const con = q ? base.filter(p => !ini.includes(p) && !pal.includes(p) && (norm(p.nombre).includes(q) || p.iso.toLowerCase() === q || (p.capital && norm(p.capital).startsWith(q)))) : [];
+    items = ini.concat(pal, con).slice(0, 80);
+    lista.innerHTML = items.length ? items.map((p, i) => `<li role="option" data-iso="${p.iso}" class="${i === act ? "act" : ""}">${bandera(p)}<span>${resaltar(p.nombre, q)}</span><small>${esc(CONT_NOMBRE[p.cont] || "")}</small></li>`).join("")
+      : `<li class="vacio">Ningún país coincide con «${esc(input.value)}»</li>`;
+    lista.hidden = false; input.setAttribute("aria-expanded", "true");
+    const a = lista.querySelector(".act"); if (a) a.scrollIntoView({block: "nearest"});
+  }
+  const elegir = iso => { cerrar(); input.blur(); onElegir(iso); };
+  input.addEventListener("input", () => { act = -1; pintar(); });
+  input.addEventListener("focus", () => { input.select(); pintar(); });
+  input.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (lista.hidden) pintar(); act = items.length ? (act + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length : -1; pintar(); }
+    else if (e.key === "Enter") { e.preventDefault(); const p = items[act >= 0 ? act : 0]; if (p) elegir(p.iso); }
+    else if (e.key === "Escape") { cerrar(); input.blur(); }
+  });
+  lista.addEventListener("mousedown", e => { const li = e.target.closest("[data-iso]"); if (li) { e.preventDefault(); elegir(li.dataset.iso); } });
+  input.addEventListener("blur", () => setTimeout(cerrar, 100));
+}
+
+// ============================================================
 //  PÁGINAS DE PAÍS Y COMPARADOR (hasta 4 países)
 // ============================================================
 const PERFIL = ["NY.GDP.MKTP.CD", "NY.GDP.PCAP.CD", "NY.GDP.MKTP.KD.ZG", "FP.CPI.TOTL.ZG", "SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "SP.DYN.TFRT.IN", "SP.POP.65UP.TO.ZS",
@@ -1138,13 +1270,14 @@ const fmiNoDisp = new Set();                // indicadores del FMI cuya copia lo
 const SUGERENCIAS = [["COL", "MEX"], ["ARG", "CHL"], ["ESP", "PRT"], ["BRA", "ARG"], ["USA", "CHN"], ["COL", "PER", "ECU"]];
 const TITULO = document.title;
 let modo = "explorar", psToken = 0, mundoCache = null;
-const PS = {sel: [], vista: "resumen", evoId: "NY.GDP.PCAP.CD", evoModo: "real"};
+const PS = {sel: [], vista: "hist", evoModo: "real"};
 const histCache = new Map();               // iso3 -> Map(idIndicador -> [{y,v}])
 const perfilInds = () => PERFIL.map(id => REG.get(id.includes(":") ? id : "wb:" + id)).filter(o => o && !fmiNoDisp.has(o.key));
 const nombreInd = o => o.name + (o.src === "imf" ? " (FMI)" : "");
-const AYUDA_P = {resumen: "El radar muestra, en cada tema, qué porcentaje de los países del mundo queda por debajo (más afuera = mejor posición; donde «menos es mejor» se invierte). La línea punteada es la mediana mundial.",
-                 ind: "Último dato disponible de cada país, su puesto en el mundo y la tendencia reciente. ✓ marca el mejor valor del grupo cuando hay un «mejor» claro.",
-                 evo: "Evolución de un indicador. El índice (primer año = 100) permite comparar países de tamaños muy distintos. La línea punteada es una estimación o proyección del FMI."};
+const AYUDA_P = {hist: "Cada tarjeta muestra la evolución de un indicador en los países elegidos, con su valor actual, su tendencia y su puesto en el mundo. Las secciones van de lo esencial a lo curioso; ábrelas para cargar más temas.",
+                 resumen: "El radar muestra, en cada tema, qué porcentaje de los países del mundo queda por debajo (más afuera = mejor posición; donde «menos es mejor» se invierte). La línea punteada es la mediana mundial.",
+                 ind: "Último dato disponible de cada país, su puesto en el mundo y la tendencia reciente. ✓ marca el mejor valor del grupo cuando hay un «mejor» claro."
+};
 
 // ---------- datos ----------
 async function filasFmi(o, isos) {            // filas con la forma del Banco Mundial, a partir de la copia local del FMI
@@ -1156,7 +1289,7 @@ async function filasFmi(o, isos) {            // filas con la forma del Banco Mu
 async function cargarHist(isos) {
   const faltan = isos.filter(i => !histCache.has(i)); if (!faltan.length) return;
   const inds = perfilInds(), l2 = faltan.map(i => paisMap.get(i).iso2).join(";");
-  const res = await Promise.all(inds.map(o => o.src === "imf" ? filasFmi(o, faltan) : wbAll(`/country/${l2}/indicator/${o.id}`, {date: `${ANIO - 35}:${ANIO}`, per_page: 2000}).then(r => r.rows, () => null)));
+  const res = await Promise.all(inds.map(o => o.src === "imf" ? filasFmi(o, faltan) : wbAll(`/country/${l2}/indicator/${o.id}`, {date: `1960:${ANIO}`, per_page: 4000}).then(r => r.rows, () => null)));
   if (inds.every((o, k) => o.src === "imf" || res[k] === null)) throw new Error("No se pudo consultar el Banco Mundial.");
   faltan.forEach(i => histCache.set(i, new Map()));
   res.forEach((rows, k) => (rows || []).forEach(x => {
@@ -1175,6 +1308,8 @@ async function cargarHist(isos) {
     });
   }));
   histCache.forEach(m => m.forEach(a => a.sort((p, q) => p.y - q.y)));
+  faltan.forEach(iso => inds.forEach(o => { const a = histCache.get(iso).get(o.id) || [];      // se comparte con «Mi país» y el historial
+    if (a.length) { mpHist.set(iso + "|" + o.key, a.filter(p => !p.f).map(p => ({y: p.y, v: p.v}))); mpExtra.set(iso + "|" + o.key, a.filter(p => p.f).map(p => ({y: p.y, v: p.v}))); } }));
 }
 async function cargarMundo() {
   if (mundoCache) return;
@@ -1185,7 +1320,7 @@ async function cargarMundo() {
   res.forEach((rows, k) => { const arr = []; (rows || []).forEach(x => {
     if (x.iso) { arr.push(x); return; }                       // ya viene calculado (FMI)
     const p = paisMap.get(x.countryiso3code); if (!p || p.agg || x.value === null || x.value === undefined) return; arr.push({iso: p.iso, v: x.value, y: +x.date}); }); m.set(inds[k].id, arr); });
-  mundoCache = m;
+  mundoCache = m; inds.forEach(o => mpMundo.set(o.key, m.get(o.id) || []));
 }
 const ultimo = (iso, id) => { const a = (histCache.get(iso) || new Map()).get(id); if (!a) return null; for (let i = a.length - 1; i >= 0; i--) if (!a[i].f) return a[i]; return null; };   // ignora las proyecciones
 function rango(id, iso) {
@@ -1203,7 +1338,6 @@ function mejorIso(o, vals) {
 // ---------- pantalla ----------
 const bandera = p => p.iso2 ? `<img class="flag" src="https://flagcdn.com/w40/${p.iso2.toLowerCase()}.png" alt="" width="28" height="21" loading="lazy" onerror="this.remove()">` : "";
 function poblarAddPais() {
-  $("addPais").innerHTML = `<option value="">Añadir un país…</option>` + paises.filter(p => !p.agg).map(p => `<option value="${p.iso}">${esc(p.nombre)}</option>`).join("");
   $("sugPaises").innerHTML = SUGERENCIAS.filter(g => g.every(i => paisMap.has(i))).map(g => `<button class="chip-sug" data-sug="${g.join(",")}">${esc(g.map(i => paisMap.get(i).nombre).join(" vs "))}</button>`).join("");
 }
 function cabeceraP() {
@@ -1268,11 +1402,13 @@ function pintarPaises() {
     return `<div class="pcard" style="--c:${serieColor(i)}"><button class="x" data-quitar="${iso}" aria-label="Quitar ${esc(p.nombre)}">✕</button><div class="pn">${bandera(p)}<b>${esc(p.nombre)}</b></div><small>${esc(CONT_NOMBRE[p.cont] || "")} · ${esc(p.ingreso)}</small>${p.capital ? `<small>Capital: ${esc(p.capital)}</small>` : ""}<small>Población: ${pop ? esc(fmtVal(pop.v, iP)) + " (" + pop.y + ")" : "—"}</small></div>`; }).join("");
   const ins = insightsPaises();
   $("pTitular").textContent = ins.titular; $("pLineas").innerHTML = ins.L.map(x => `<li>${x}</li>`).join("");
-  $("vistasP").innerHTML = [["resumen", "Perfil"], ["ind", "Indicadores"], ["evo", "Evolución"]].map(([v, t]) => `<button class="pill ${PS.vista === v ? "on" : ""}" data-pv="${v}">${t}</button>`).join("");
+  $("vistasP").innerHTML = [["hist", "Historial"], ["resumen", "Perfil"], ["ind", "Indicadores"]].map(([v, t]) => `<button class="pill ${PS.vista === v ? "on" : ""}" data-pv="${v}">${t}</button>`).join("");
   $("ayudaP").textContent = AYUDA_P[PS.vista]; $("avisoP").textContent = "";
-  $("pv-graf").hidden = PS.vista === "ind"; $("pv-ind").hidden = PS.vista !== "ind"; $("ctrlP").hidden = PS.vista !== "evo";
+  $("pv-hist").hidden = PS.vista !== "hist"; $("pv-graf").hidden = PS.vista !== "resumen"; $("pv-ind").hidden = PS.vista !== "ind"; $("ctrlP").hidden = PS.vista !== "hist";
+  if (PS.vista !== "hist") cmDestruir();
   if (PS.vista === "ind") $("pv-ind").innerHTML = tablaInd();
-  else if (PS.vista === "resumen") pintarRadar(); else pintarEvo();
+  else if (PS.vista === "resumen") pintarRadar();
+  else { $("ctrlP").innerHTML = `<label class="ctl">Qué se grafica<select data-pk="evoModo"><option value="real" ${PS.evoModo !== "base" ? "selected" : ""}>Valores reales</option><option value="base" ${PS.evoModo === "base" ? "selected" : ""}>Índice (primer año = 100)</option></select></label>`; cmRender(); }
   $("fuenteP").innerHTML = `Fuente: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a> (Indicadores del Desarrollo Mundial) y <a href="https://www.imf.org/external/datamapper" target="_blank" rel="noopener">FMI</a> (indicadores marcados «FMI») · consultado ${new Date().toLocaleString("es-CO")} · Puesto = posición entre ${mundoCache && mundoCache.get("SP.POP.TOTL") ? mundoCache.get("SP.POP.TOTL").length : "los"} países y territorios con dato (1 = valor más alto).`;
 }
 function spark(arr, color) {
@@ -1308,36 +1444,22 @@ function pintarRadar() {
   const sin = inds.filter(o => PS.sel.some(iso => !rango(o.id, iso))).length;
   $("avisoP").textContent = sin ? `En ${sin} de ${inds.length} ejes falta el dato de algún país; esos puntos quedan sin dibujar.` : "";
 }
-function pintarEvo() {
-  if (!chartListoP()) return;
-  const inds = perfilInds(); if (!inds.some(o => o.id === PS.evoId)) PS.evoId = inds[0].id;
-  const o = inds.find(x => x.id === PS.evoId), base = PS.evoModo === "base";
-  $("ctrlP").innerHTML = `<label class="ctl">Indicador<select data-pk="evoId">${[...new Set(inds.map(x => x.cat))].map(c => `<optgroup label="${esc(c)}">${inds.filter(x => x.cat === c).map(x => `<option value="${x.id}" ${x.id === PS.evoId ? "selected" : ""}>${esc(nombreInd(x))}</option>`).join("")}</optgroup>`).join("")}</select></label>` +
-    `<label class="ctl">Qué se grafica<select data-pk="evoModo"><option value="real" ${!base ? "selected" : ""}>Valores reales</option><option value="base" ${base ? "selected" : ""}>Índice (primer año = 100)</option></select></label>`;
-  let y0 = 9999, y1 = 0; PS.sel.forEach(iso => (histCache.get(iso).get(o.id) || []).forEach(p => { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }));
-  if (y1 === 0) { if (graficoP) { graficoP.destroy(); graficoP = null; } $("cajaP").style.height = "60px"; $("avisoP").textContent = "Ninguno de los países tiene datos recientes de este indicador."; return; }
-  const labels = []; for (let y = y0; y <= y1; y++) labels.push(y);
-  let hayFmi = false;
-  const ds = PS.sel.map((iso, i) => { const pts = histCache.get(iso).get(o.id) || [], m = new Map(pts.map(p => [p.y, p.v])), fy = new Set(pts.filter(p => p.f).map(p => p.y)); if (fy.size) hayFmi = true; const b0 = base ? labels.map(y => m.get(y)).find(v => v !== undefined && v !== 0) : null;
-    return {label: paisMap.get(iso).nombre, borderColor: serieColor(i), backgroundColor: serieColor(i), borderWidth: 2.4, pointRadius: 0, pointHoverRadius: 4, tension: .2, spanGaps: true, segment: {borderDash: c => fy.has(labels[c.p1DataIndex]) ? [6, 4] : undefined}, data: labels.map(y => { const v = m.get(y); return v === undefined ? null : base ? (b0 ? v / b0 * 100 : null) : v; })}; });
-  const f = v => base ? num(v, 0) : fmtVal(v, o);
-  nuevoGrafico({type: "line", data: {labels, datasets: ds}, plugins: [plugEtiquetasFin()],
-    options: {layout: {padding: {right: 118}}, interaction: {mode: "nearest", intersect: false, axis: "x"}, plugins: {legend: {display: false}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${f(c.parsed.y)}`}}},
-      scales: {y: {ticks: {callback: v => f(v)}, title: {display: base || !!o.unit, text: base ? `Índice (${labels[0]} = 100)` : o.unit}}, x: {grid: {display: false}}}}}, 420, true);
-  $("avisoP").textContent = `${nombreInd(o)}${o.desc ? ": " + o.desc : ""}${hayFmi ? " · Línea punteada: estimación o proyección del FMI (Perspectivas de la Economía Mundial)." : ""}`;
-}
 function csvPaises() {
   const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;fuente;pais;iso3;anio;valor;unidad;tipo"];
-  perfilInds().forEach(o => PS.sel.forEach(iso => ((histCache.get(iso) || new Map()).get(o.id) || []).forEach(p => L.push([q(o.name), o.id, o.src, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || ""), p.f ? "estimacion/proyeccion FMI" : "observado"].join(";")))));
+  const inds = new Map(); perfilInds().concat(CM.secs.flatMap(s => s.inds)).forEach(o => inds.set(o.key, o));
+  inds.forEach(o => PS.sel.forEach(iso => {
+    (mpHist.get(iso + "|" + o.key) || []).forEach(p => L.push([q(o.name), o.id, o.src, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || ""), "observado"].join(";")));
+    (mpExtra.get(iso + "|" + o.key) || []).forEach(p => L.push([q(o.name), o.id, o.src, q(paisMap.get(iso).nombre), iso, p.y, String(p.v).replace(".", ","), q(o.unit || ""), "estimacion/proyeccion"].join(";")));
+  }));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "comparacion_" + PS.sel.join("_") + ".csv"; document.body.appendChild(a); a.click(); a.remove();
 }
 function eventosPaises() {
   document.querySelector(".modos").addEventListener("click", e => { const b = e.target.closest("button[data-modo]"); if (b && b.dataset.modo !== modo) entrarModo(b.dataset.modo); });
-  $("addPais").addEventListener("change", e => { const iso = e.target.value; e.target.value = ""; if (iso) anadirPais(iso); });
+  buscadorPais({input: $("addPais"), lista: $("lstAdd"), excluir: () => PS.sel, onElegir: iso => { $("addPais").value = ""; anadirPais(iso); }});
   $("sugPaises").addEventListener("click", e => { const b = e.target.closest("[data-sug]"); if (b) { PS.sel = b.dataset.sug.split(","); renderPaises(); } });
   $("pCards").addEventListener("click", e => { const b = e.target.closest("[data-quitar]"); if (b) quitarPais(b.dataset.quitar); });
   $("vistasP").addEventListener("click", e => { const b = e.target.closest("[data-pv]"); if (b) { PS.vista = b.dataset.pv; pintarPaises(); guardarHash(); } });
-  $("ctrlP").addEventListener("change", e => { const k = e.target.dataset.pk; if (k) { PS[k] = e.target.value; pintarPaises(); guardarHash(); } });
+  $("ctrlP").addEventListener("change", e => { const k = e.target.dataset.pk; if (k) { PS[k] = e.target.value; cmRedibujar(); guardarHash(); } });
   $("btnCSVP").addEventListener("click", csvPaises);
   $("btnEnlaceP").addEventListener("click", copiarEnlace);
   $("btnIrComparar").addEventListener("click", () => { PS.sel = [...sel].slice(0, 4); cerrarHojas(); entrarModo("paises"); });
@@ -1381,12 +1503,6 @@ function mpAbrev(v, o) {
 }
 
 // ---------- datos ----------
-async function mpFmiValores(idF) {
-  if (!mpFmiC.has(idF)) mpFmiC.set(idF, (async () => {
-    try { const j = await fetchJSON(`datos/imf/${idF}.json`, 20000); return ((j.datos || j).values || {})[idF] || null; } catch (e) { return null; }
-  })());
-  return mpFmiC.get(idF);
-}
 function fmiMundo(vals, sc) {                  // último dato (hasta el año pasado) de cada país en una copia del FMI
   const Y = ANIO - 1, arr = [];
   Object.entries(vals || {}).forEach(([c, s]) => {
@@ -1396,19 +1512,25 @@ function fmiMundo(vals, sc) {                  // último dato (hasta el año pa
   });
   return arr;
 }
-async function mpDatosFmi(o) {
-  const vals = await mpFmiValores(o.id), sc = o.scale || 1, k = MP.iso + "|" + o.key, cod = (vals && vals[MP.iso]) || {};
-  const todo = Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(p => !isNaN(p.v)).sort((a, b) => a.y - b.y);
-  mpHist.set(k, todo.filter(p => p.y < ANIO)); mpExtra.set(k, todo.filter(p => p.y >= ANIO));
+async function mpDatosLocal(o, isos) {              // FMI, OMS, OIT, OWID: copia local del sitio
+  const vals = await localValores(o.src, o.id), sc = o.scale || 1;
+  isos.forEach(iso => {
+    const k = iso + "|" + o.key, cod = (vals && vals[iso]) || {};
+    const todo = Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(p => !isNaN(p.v)).sort((a, b) => a.y - b.y);
+    mpHist.set(k, todo.filter(p => p.y < ANIO)); mpExtra.set(k, todo.filter(p => p.y >= ANIO));
+  });
   if (!mpMundo.has(o.key)) mpMundo.set(o.key, fmiMundo(vals, sc));
 }
-async function mpDatos(o) {
-  if (o.src === "imf") return mpDatosFmi(o);
-  const iso = MP.iso, p = paisMap.get(iso), k = iso + "|" + o.key, id = encodeURIComponent(o.id);
+async function mpDatos(o, isos = [MP.iso]) {         // carga lo que falte de uno o varios países (una sola consulta por indicador)
+  if (o.src !== "wb") return mpDatosLocal(o, isos);
+  const id = encodeURIComponent(o.id), faltan = isos.filter(i => !mpHist.has(i + "|" + o.key));
   const pedirPais = async () => {
-    if (mpHist.has(k)) return;
-    const r = await mpLimitar(() => wbAll(`/country/${p.iso2}/indicator/${id}`, {date: `1960:${ANIO}`, source: o.wbSource || "2", per_page: 200}));
-    mpHist.set(k, r.rows.filter(x => x.value !== null && x.value !== undefined).map(x => ({y: +x.date, v: x.value})).sort((a, b) => a.y - b.y));
+    if (!faltan.length) return;
+    const l2 = faltan.map(i => paisMap.get(i).iso2).join(";");
+    const r = await mpLimitar(() => wbAll(`/country/${l2}/indicator/${id}`, {date: `1960:${ANIO}`, source: o.wbSource || "2", per_page: 1000}));
+    faltan.forEach(i => mpHist.set(i + "|" + o.key, []));
+    r.rows.filter(x => x.value !== null && x.value !== undefined).forEach(x => { const a = mpHist.get(x.countryiso3code + "|" + o.key); if (a) a.push({y: +x.date, v: x.value}); });
+    faltan.forEach(i => mpHist.get(i + "|" + o.key).sort((a, b) => a.y - b.y));
   };
   const pedirMundo = async () => {
     if (mpMundo.has(o.key)) return;
@@ -1421,17 +1543,18 @@ async function mpDatos(o) {
   };
   await Promise.all([pedirPais(), pedirMundo()]);
   const idF = MP_FMI_DE[o.id];
-  if (idF && !mpExtra.has(k)) {
-    const vals = await mpFmiValores(idF), sc = (REG.get("imf:" + idF) || {}).scale || 1, cod = (vals && vals[iso]) || {};
-    mpExtra.set(k, Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(q => !isNaN(q.v)).sort((a, b) => a.y - b.y));
+  if (idF) {
+    const vals = await localValores("imf", idF), sc = (REG.get("imf:" + idF) || {}).scale || 1;
+    isos.forEach(iso => { const k = iso + "|" + o.key; if (mpExtra.has(k)) return; const cod = (vals && vals[iso]) || {};
+      mpExtra.set(k, Object.entries(cod).map(([y, v]) => ({y: +y, v: Number(v) * sc})).filter(q => !isNaN(q.v)).sort((a, b) => a.y - b.y)); });
   }
 }
-function mpRango(o) {
-  const arr = mpMundo.get(o.key) || [], me = arr.find(x => x.iso === MP.iso); if (!me || arr.length < 5) return null;
+function mpRango(o, iso = MP.iso) {
+  const arr = mpMundo.get(o.key) || [], me = arr.find(x => x.iso === iso); if (!me || arr.length < 5) return null;
   const n = arr.length, vs = arr.map(x => x.v).sort((a, b) => a - b), med = n % 2 ? vs[n >> 1] : (vs[n / 2 - 1] + vs[n / 2]) / 2;
   return {puesto: arr.filter(x => x.v > me.v).length + 1, n, pct: arr.filter(x => x.v < me.v).length / (n - 1) * 100, med, y: me.y};
 }
-const mpUlt = o => { const s = mpHist.get(MP.iso + "|" + o.key); return s && s.length ? s[s.length - 1] : null; };
+const mpUlt = (o, iso = MP.iso) => { const s = mpHist.get(iso + "|" + o.key); return s && s.length ? s[s.length - 1] : null; };
 const mpPuntaje = (o, r) => o.tone === "bad" ? 100 - r.pct : r.pct;
 
 // ---------- análisis en lenguaje claro ----------
@@ -1581,7 +1704,7 @@ function mpHero() {
 
 // ---------- pantalla ----------
 function mpSecciones() {
-  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean);
+  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean).concat(CATALOGO.oms, CATALOGO.oit, CATALOGO.owid);
   const esenc = MP_ESENCIAL.map(id => REG.get("wb:" + id)).filter(Boolean), usados = new Set(esenc.map(o => o.key));
   const secs = [{id: "esencial", titulo: "Lo esencial", sub: "Los datos que mejor resumen al país", inds: esenc}];
   MP_ORDEN.forEach((c, i) => {
@@ -1592,7 +1715,6 @@ function mpSecciones() {
   return secs;
 }
 function mpPoblar() {
-  $("selMP").innerHTML = `<option value="">Elegir un país…</option>` + paises.filter(p => !p.agg).map(p => `<option value="${p.iso}">${esc(p.nombre)}</option>`).join("");
   $("sugMP").innerHTML = MP_SUG.filter(i => paisMap.has(i)).map(i => `<button class="chip-sug" data-mp-sug="${i}">${esc(paisMap.get(i).nombre)}</button>`).join("");
 }
 function mpAbrir(id, desplazar) {
@@ -1600,13 +1722,13 @@ function mpAbrir(id, desplazar) {
   if (desplazar) d.scrollIntoView({behavior: "smooth", block: "start"});
 }
 function renderMiPais() {
-  if (!$("selMP").options.length) mpPoblar();
+  if (!$("sugMP").innerHTML) mpPoblar();
   if (!MP.iso) { try { const g = localStorage.getItem("miPais"); if (g && paisMap.has(g)) MP.iso = g; } catch (e) {} }
   if (!MP.iso) MP.iso = paisMap.has("COL") ? "COL" : null;
   if (!MP.iso) return;
   MP.token++; mpGraficos.forEach(g => g.destroy()); mpGraficos = [];
   try { localStorage.setItem("miPais", MP.iso); } catch (e) {}
-  const p = paisMap.get(MP.iso); $("selMP").value = MP.iso; $("fraseMP").textContent = `${p.nombre}: su historia en datos`;
+  const p = paisMap.get(MP.iso); $("buscaMP").value = p.nombre; $("fraseMP").textContent = `${p.nombre}: su historia en datos`;
   document.title = `${p.nombre} en datos – Estadísticas Mundiales`; $("estadoMP").textContent = ""; $("resMP").hidden = false;
   MP.secs = mpSecciones();
   $("mpNav").innerHTML = MP.secs.map(s => `<button class="pill" data-mp-ir="${s.id}">${esc(s.titulo)}</button>`).join("");
@@ -1622,7 +1744,7 @@ function csvMiPais() {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "mi_pais_" + MP.iso + ".csv"; document.body.appendChild(a); a.click(); a.remove();
 }
 function eventosMiPais() {
-  $("selMP").addEventListener("change", e => { if (e.target.value) { MP.iso = e.target.value; renderMiPais(); window.scrollTo(0, 0); } });
+  buscadorPais({input: $("buscaMP"), lista: $("lstMP"), onElegir: iso => { MP.iso = iso; renderMiPais(); window.scrollTo(0, 0); }});
   $("sugMP").addEventListener("click", e => { const b = e.target.closest("[data-mp-sug]"); if (b) { MP.iso = b.dataset.mpSug; renderMiPais(); } });
   $("mpNav").addEventListener("click", e => { const b = e.target.closest("[data-mp-ir]"); if (b) mpAbrir(b.dataset.mpIr, true); });
   $("mpSecs").addEventListener("toggle", e => { const d = e.target; if (d.open && d.dataset.sec) mpCargarSec(mpSecPorId(d.dataset.sec)); }, true);
@@ -1630,6 +1752,99 @@ function eventosMiPais() {
   $("btnCSVM").addEventListener("click", csvMiPais);
   $("btnEnlaceM").addEventListener("click", copiarEnlace);
   $("btnCompM").addEventListener("click", () => { PS.sel = [MP.iso]; entrarModo("paises"); });
+}
+
+// ============================================================
+//  COMPARADOR · HISTORIAL: una tarjeta por indicador, con la evolución de cada país elegido
+// ============================================================
+const CM = {secs: [], abiertas: new Set(["esencial"]), token: 0};
+let cmGraficos = [];
+const cmNombre = iso => paisMap.get(iso).nombre;
+function cmDestruir() { cmGraficos.forEach(g => g.destroy()); cmGraficos = []; }
+
+function cmLectura(o, filas) {
+  const con = filas.filter(f => f.s.length); if (con.length < 2) return con.length ? `Solo ${esc(cmNombre(con[0].iso))} tiene datos de este indicador.` : "";
+  const ult = con.map(f => ({iso: f.iso, v: f.s[f.s.length - 1].v, y: f.s[f.s.length - 1].y})), ord = ult.slice().sort((a, b) => b.v - a.v);
+  const L = [], nom = cmNombre;
+  L.push(`<b>${esc(nom(ord[0].iso))}</b> tiene el valor más alto (${esc(mpFmt(ord[0].v, o))}) y <b>${esc(nom(ord[ord.length - 1].iso))}</b> el más bajo (${esc(mpFmt(ord[ord.length - 1].v, o))}).`);
+  const mej = mejorIso(o, ult); if (mej && o.tone !== "neutral") L.push(`Mejor situación: <b>${esc(nom(mej))}</b>.`);
+  if (mpTasa(o)) {
+    const pr = con.map(f => { const a = f.s.slice(-10); return {iso: f.iso, v: a.reduce((t, p) => t + p.v, 0) / a.length}; });
+    L.push(`Promedio de los últimos 10 años: ` + pr.map(x => `${esc(nom(x.iso))} ${esc(mpFmt(x.v, o))}`).join(" · ") + ".");
+  } else {
+    const cs = con.map(f => { const last = f.s[f.s.length - 1], ref = f.s.slice().reverse().find(p => p.y <= last.y - 10); if (!ref) return null; const c = mpCambio(o, ref.v, last.v); return {iso: f.iso, txt: c.txt, rel: c.rel, anos: last.y - ref.y}; }).filter(Boolean);
+    if (cs.length > 1) { const mx = cs.slice().sort((a, b) => b.rel - a.rel)[0]; L.push(`En unos 10 años, ` + cs.map(x => `${esc(nom(x.iso))} ${esc(x.txt)}`).join("; ") + `. Mayor aumento: <b>${esc(nom(mx.iso))}</b>.`); }
+  }
+  return L.join(" ");
+}
+function cmTarjeta(o) {
+  const isos = PS.sel, filas = isos.map((iso, k) => ({iso, k, s: mpHist.get(iso + "|" + o.key) || [], x: mpExtra.get(iso + "|" + o.key) || []})), fuente = FUENTES[o.src] || FUENTES.wb;
+  const hayProy = filas.some(f => f.s.length && f.x.some(p => p.y > f.s[f.s.length - 1].y));
+  const vals = filas.map(f => {
+    const nombre = esc(cmNombre(f.iso)), pt = `<i class="pt" style="background:${serieColor(f.k)}"></i>`;
+    if (!f.s.length) return `<div class="cm-fila vacio">${pt}<span>${nombre}</span><em>sin datos publicados</em></div>`;
+    const last = f.s[f.s.length - 1], an = mpAnalisis(o, f.s), r = mpRango(o, f.iso);
+    return `<div class="cm-fila">${pt}<span>${nombre}</span><b>${esc(mpFmt(last.v, o))}</b><small>${last.y}</small>${an.etiqueta ? `<span class="mp-tag ${an.clase}">${esc(an.etiqueta)}</span>` : ""}${r ? `<small>puesto ${r.puesto} de ${r.n}</small>` : ""}</div>`;
+  }).join("");
+  const base = PS.evoModo === "base" && !mpTasa(o) && filas.filter(f => f.s.length).every(f => f.s.some(p => p.v > 0));
+  const nota = PS.evoModo === "base" && !base ? " Este indicador no admite índice base 100; se muestran valores reales." : "";
+  return `<article class="mp-card" data-k="${esc(o.key)}"><div><h4>${esc(o.name)}</h4><span class="u">${esc(o.unit || "")}${base ? " · índice (primer año = 100)" : ""}</span></div>` +
+    `<p class="que">${esc(o.desc || "")}</p><div class="cm-vals">${vals}</div>` +
+    `<div class="mp-graf"><canvas role="img" aria-label="Evolución de ${esc(o.name)}" data-k="${esc(o.key)}"></canvas></div>` +
+    `<p class="mp-lee">${cmLectura(o, filas)}</p><p class="mp-leyenda">${hayProy ? "Línea punteada: estimación o proyección del FMI. " : ""}${esc(nota.trim())}</p>` +
+    `<div class="mp-pie"><span>${esc(TONO_TXT[o.tone] || "")}</span><a href="${esc(fuente.url)}" target="_blank" rel="noopener">${esc(fuente.corto)}</a></div></article>`;
+}
+function cmGraficar(cv, o) {
+  const isos = PS.sel, base = PS.evoModo === "base" && !mpTasa(o), pts = isos.map(iso => (mpHist.get(iso + "|" + o.key) || []).concat(mpExtra.get(iso + "|" + o.key) || []).filter((p, i, a) => i === 0 || p.y > a[i - 1].y));
+  const obs = isos.map(iso => mpHist.get(iso + "|" + o.key) || []);
+  const okBase = base && obs.filter(s => s.length).every(s => s.some(p => p.v > 0));
+  let y0 = 9999, y1 = 0; pts.forEach(a => a.forEach(p => { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); })); if (y1 === 0) return;
+  const labels = []; for (let y = y0; y <= y1; y++) labels.push(y);
+  const ds = isos.map((iso, i) => {
+    const m = new Map(pts[i].map(p => [p.y, p.v])), ultObs = obs[i].length ? obs[i][obs[i].length - 1].y : 0, b0 = okBase ? (obs[i].find(p => p.v > 0) || {}).v : 1;
+    return {label: cmNombre(iso), borderColor: serieColor(i), backgroundColor: serieColor(i), borderWidth: 2.3, pointRadius: labels.map(y => y === ultObs ? 3.6 : 0), pointHoverRadius: 5, tension: .2, spanGaps: true,
+      segment: {borderDash: c => labels[c.p1DataIndex] > ultObs ? [6, 4] : undefined}, data: labels.map(y => { const v = m.get(y); return v === undefined ? null : okBase ? v / b0 * 100 : v; })};
+  });
+  const f = v => okBase ? num(v, 0) : (o.pre || "") + mpAbrev(v, o) + (o.suf || ""), ft = v => okBase ? num(v, 1) : mpFmt(v, o);
+  Chart.defaults.color = css("--suave"); Chart.defaults.font.family = css("--sans"); Chart.defaults.font.size = 11; Chart.defaults.borderColor = css("--linea");
+  cmGraficos.push(new Chart(cv, {type: "line", data: {labels, datasets: ds}, options: {responsive: true, maintainAspectRatio: false, layout: {padding: {top: 8, right: 6}}, interaction: {mode: "index", intersect: false},
+    plugins: {legend: {display: false}, tooltip: {callbacks: {label: c => `${c.dataset.label}: ${ft(c.parsed.y)}`}}},
+    scales: {y: {grace: "6%", ticks: {callback: v => f(v), maxTicksLimit: MOVIL() ? 4 : 5}}, x: {grid: {display: false}, ticks: {maxRotation: 0, autoSkip: true, maxTicksLimit: MOVIL() ? 5 : 9}}}}}));
+}
+function cmPintarSec(sec) {
+  const cuerpo = $("cmb-" + sec.id); if (!cuerpo) return;
+  cmGraficos = cmGraficos.filter(g => { if (g.canvas && cuerpo.contains(g.canvas)) { g.destroy(); return false; } return true; });
+  const tiene = o => PS.sel.some(i => (mpHist.get(i + "|" + o.key) || []).length), con = sec.inds.filter(tiene), sin = sec.inds.filter(o => !tiene(o));
+  cuerpo.innerHTML = con.map(cmTarjeta).join("") + (sin.length ? `<p class="mp-sin">Ningún país elegido tiene datos publicados de: ${sin.map(o => esc(o.name)).join(" · ")}.</p>` : "");
+  if (typeof Chart === "undefined") { cuerpo.querySelectorAll(".mp-graf").forEach(x => x.remove()); return; }
+  con.forEach(o => { const cv = cuerpo.querySelector(`canvas[data-k="${CSS.escape(o.key)}"]`); if (cv) try { cmGraficar(cv, o); } catch (e) { console.error(e); cv.parentNode.remove(); } });
+}
+async function cmCargarSec(sec) {
+  if (sec.estado === "cargando") return;
+  const tok = CM.token, cuerpo = $("cmb-" + sec.id), isos = PS.sel.slice(); sec.estado = "cargando";
+  if (sec.estado0 !== "ok") cuerpo.innerHTML = `<div class="mp-cargando" style="grid-column:1/-1">Cargando ${sec.inds.length} indicadores…</div>`;
+  let fallos = 0, ult = null;
+  await Promise.all(sec.inds.map(o => mpDatos(o, isos).catch(e => { fallos++; ult = e; })));
+  if (tok !== CM.token) return;
+  if (fallos === sec.inds.length) { sec.estado = "err"; cuerpo.innerHTML = `<div class="mp-cargando" style="grid-column:1/-1">No se pudo consultar: ${esc(explicarError(ult, "la fuente de datos"))} <button class="btn sec" data-cm-reint="${sec.id}">Reintentar</button></div>`; return; }
+  sec.estado = "ok"; sec.estado0 = "ok"; cmPintarSec(sec);
+  if (fallos) cuerpo.insertAdjacentHTML("beforeend", `<p class="mp-sin">${fallos} indicador(es) no se pudieron consultar. <button class="btn sec" data-cm-reint="${sec.id}">Reintentar</button></p>`);
+}
+function cmAbrir(id, desplazar) {
+  const d = $("cms-" + id); if (!d) return; d.open = true; CM.abiertas.add(id); const s = CM.secs.find(x => x.id === id); if (s && s.estado !== "ok") cmCargarSec(s);
+  if (desplazar) d.scrollIntoView({behavior: "smooth", block: "start"});
+}
+function cmRender() {                       // se llama cada vez que cambian los países o el modo de graficar
+  CM.token++; cmDestruir(); CM.secs = mpSecciones();
+  $("cmNav").innerHTML = CM.secs.map(s => `<button class="pill" data-cm-ir="${s.id}">${esc(s.titulo)}</button>`).join("");
+  $("cmSecs").innerHTML = CM.secs.map(s => `<details class="mp-sec" id="cms-${s.id}" data-sec="${s.id}"${CM.abiertas.has(s.id) ? " open" : ""}><summary><div><h3>${esc(s.titulo)}</h3><div class="sub">${esc(s.sub)} · ${s.inds.length} indicadores</div></div></summary><div class="mp-cuerpo" id="cmb-${s.id}"></div></details>`).join("");
+  CM.secs.forEach(s => { if (CM.abiertas.has(s.id)) cmCargarSec(s); });
+}
+function cmRedibujar() { CM.secs.forEach(s => { if (s.estado === "ok") cmPintarSec(s); }); }
+function eventosComparador() {
+  $("cmNav").addEventListener("click", e => { const b = e.target.closest("[data-cm-ir]"); if (b) cmAbrir(b.dataset.cmIr, true); });
+  $("cmSecs").addEventListener("toggle", e => { const d = e.target, id = d.dataset && d.dataset.sec; if (!id) return; if (d.open) { CM.abiertas.add(id); const s = CM.secs.find(x => x.id === id); if (s && s.estado !== "ok" && s.estado !== "cargando") cmCargarSec(s); } else CM.abiertas.delete(id); }, true);
+  $("cmSecs").addEventListener("click", e => { const b = e.target.closest("[data-cm-reint]"); if (b) { const s = CM.secs.find(x => x.id === b.dataset.cmReint); s.estado = ""; s.estado0 = ""; cmCargarSec(s); } });
 }
 
 // ============================================================
@@ -1754,7 +1969,7 @@ const sel = new Set();
 const REG = new Map();                      // key -> indicador
 let catFiltro = "", consultaId = 0, orden = {k: "valor", asc: false};
 let wbFuentes = [], wbIndCache = {}, imfCat = null, cepalItems = null, avzItems = [];
-const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait"};
+const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait"};
 const errFuente = {};
 let grafico = null, tabActiva = "mapa";
 Object.values(CATALOGO).flat().forEach(o => REG.set(o.key, o));
@@ -1842,6 +2057,10 @@ const ADAPT = {
     return {series, updated: imfModo === "copia" && imfCopia ? "copia del sitio del " + imfCopia.slice(0, 10) : "", link: "https://www.imf.org/external/datamapper/" + encodeURIComponent(o.id) + "@WEO"};
   },
 
+  async oms(o, d, h) { return adaptLocal(o, d, h); },
+  async oit(o, d, h) { return adaptLocal(o, d, h); },
+  async owid(o, d, h) { return adaptLocal(o, d, h); },
+
   async cepal(o, d, h) {
     const [dm, dt] = await Promise.all([
       fetchJSON(`${CEP}/indicator/${o.id}/dimensions?lang=es&format=json`),
@@ -1926,7 +2145,7 @@ function toggleSel(iso) {
 //  CATÁLOGO DE INDICADORES (interfaz)
 // ============================================================
 function renderTabsFuente() {
-  $("tabsFuente").innerHTML = Object.entries(FUENTES).map(([k, f]) =>
+  $("tabsFuente").innerHTML = Object.entries(FUENTES).filter(([k]) => CATALOGO[k].length).map(([k, f]) =>
     `<button data-src="${k}" class="${k === srcActual ? "on" : ""}">${esc(f.nombre)}<small>${esc(f.sub)}</small></button>`).join("");
   $("descFuente").innerHTML = esc(FUENTES[srcActual].desc) + (errFuente[srcActual] ? ` <b style="color:var(--rojo)">⚠ Última prueba de conexión fallida.</b>` : "") +
     (srcActual === "imf" && imfModo === "copia" ? ` <b>Datos tomados de la copia del sitio${imfCopia ? " (actualizada el " + esc(imfCopia.slice(0, 10)) + ")" : ""}, porque el FMI no responde a consultas directas desde el navegador.</b>` : "");
@@ -1995,7 +2214,8 @@ function resetAvanzado() { avzItems = []; $("avzLista").innerHTML = ""; $("avzCo
 async function abrirAvanzado() {
   const s = srcActual;
   $("avzDBbox").hidden = s !== "wb";
-  $("avzBuscar").disabled = s === "eurostat";
+  $("avzBuscar").disabled = s === "eurostat" || EXT.has(s);
+  if (EXT.has(s)) { avzItems = []; renderAvanzado(); $("avzCont").textContent = "Esta fuente se descarga ya filtrada: incluye solo la selección de arriba."; return; }
   if (s === "eurostat") { avzItems = []; renderAvanzado(); $("avzCont").textContent = "Eurostat publica miles de tablas con múltiples dimensiones. En esta versión se incluye una selección verificada de los indicadores principales (arriba); se pueden ir sumando más."; return; }
   $("avzCont").textContent = "Cargando catálogo…";
   try {
@@ -2065,11 +2285,12 @@ function pingFuentes() {
   const marca = (k, p) => p.then(() => { estadoFuente[k] = "ok"; }).catch(e => { estadoFuente[k] = "fail"; errFuente[k] = explicarError(e, FUENTES[k].corto); console.warn(k, e); }).finally(() => { renderEstados(); renderTabsFuente(); });
   marca("imf", cargarIMF());
   marca("eurostat", fetchJSON(`${ESU}/data/une_rt_a?format=JSON&lang=EN&unit=PC_ACT&sex=T&age=Y15-74&geo=ES&sinceTimePeriod=2024`));
+  EXT.forEach(k => marca(k, Promise.resolve().then(() => { if (!CATALOGO[k].length) throw new Error("Sin datos descargados todavía."); })));
   marca("cepal", fetchJSON(`${CEP}/indicator/3289/dimensions?lang=es&format=json`));
   cargarWBCatalogo().catch(e => console.warn("catálogo WB", e));
 }
 function renderEstados() {
-  $("fuentesEstado").innerHTML = Object.entries(FUENTES).map(([k, f]) => {
+  $("fuentesEstado").innerHTML = Object.entries(FUENTES).filter(([k]) => CATALOGO[k].length || !EXT.has(k)).map(([k, f]) => {
     const e = estadoFuente[k];
     const t = e === "ok" ? "conectado" : e === "fail" ? "sin conexión: " + (errFuente[k] || "") : "comprobando…";
     return `<span class="${e}" title="${esc(t)}">${esc(f.corto)}</span>`;
@@ -2317,7 +2538,7 @@ function descargarCSV() {
 //  EVENTOS E INICIO
 // ============================================================
 function eventos() {
-  eventosVistas(); eventosPaises(); eventosMiPais();
+  eventosVistas(); eventosPaises(); eventosMiPais(); eventosComparador();
   $("alerta").addEventListener("click", e => { if (e.target.closest("[data-reintentar]")) consultar(); });
   $("tabsFuente").addEventListener("click", e => { const b = e.target.closest("button[data-src]"); if (b) cambiarFuente(b.dataset.src); });
   $("chipsCat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; catFiltro = b.dataset.cat; renderChips(); renderCatalogo(); });
@@ -2356,6 +2577,7 @@ async function init() {
   try { await cargarPaises(); }
   catch (e) { estadoFuente.wb = "fail"; errFuente.wb = explicarError(e, "el Banco Mundial"); renderEstados(); setEstado("No se pudo conectar con el Banco Mundial: " + explicarError(e, "el Banco Mundial") + " Abre este archivo en Chrome, Edge o Firefox con internet activo (no en una vista previa).", "err"); return; }
   estadoFuente.wb = "ok"; renderEstados();
+  await cargarExtEstado();
   initMapa();
   const H = leerHash(); sel.clear();
   if (H.p) H.p.split(",").forEach(i => { if (paisMap.has(i)) sel.add(i); });
@@ -2372,7 +2594,7 @@ async function init() {
     entrarModo("mipais");
   } else if (H.m === "pais") {
     PS.sel = (H.p || "").split(",").filter(i => paisMap.has(i) && !paisMap.get(i).agg).slice(0, 4);
-    if (["resumen", "ind", "evo"].includes(H.pv)) PS.vista = H.pv; if (H.pi) PS.evoId = H.pi; if (H.pm === "base") PS.evoModo = "base";
+    if (["hist", "resumen", "ind"].includes(H.pv)) PS.vista = H.pv; if (H.pm === "base") PS.evoModo = "base";
     entrarModo("paises");
   } else consultar();
 }
