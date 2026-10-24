@@ -171,6 +171,23 @@
   .mp-kpi b { font-size:1.15rem; font-variant-numeric:tabular-nums; }
   .mp-guia { font-size:.85rem; color:var(--suave); background:var(--acento-t); border-radius:10px; padding:9px 12px; margin-bottom:10px; }
   .mp-nav { display:flex; gap:6px; overflow-x:auto; padding:6px 0 10px; position:sticky; top:0; background:var(--papel); z-index:5; scrollbar-width:thin; }
+  .rg-cuerpo { padding:4px 16px 16px; }
+  .rg-grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:16px; align-items:start; }
+  .rg-svg { width:100%; height:auto; max-height:560px; display:block; }
+  .rg-r { stroke:var(--sup); stroke-width:.9px; vector-effect:non-scaling-stroke; cursor:pointer; transition:filter .1s; }
+  .rg-r:hover, .rg-r:focus-visible { filter:brightness(.88); stroke:var(--tinta); stroke-width:1.4px; outline:none; }
+  .rg-r.sel { stroke:var(--tinta); stroke-width:2.2px; }
+  .rg-sel { display:block; margin-bottom:8px; } .rg-sel span { display:block; font-size:.75rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--suave); margin-bottom:4px; }
+  .rg-lec { font-size:.9rem; margin:8px 0; }
+  .rg-ley { display:flex; align-items:center; gap:3px; font-size:.78rem; color:var(--suave); margin:8px 0; } .rg-ley i { width:34px; height:10px; border-radius:2px; display:inline-block; } .rg-ley span:first-child { margin-right:4px; } .rg-ley span:last-child { margin-left:4px; }
+  .rg-rank { list-style:none; margin:6px 0 0; padding:0; max-height:380px; overflow:auto; font-size:.84rem; }
+  .rg-rank li { display:grid; grid-template-columns:24px minmax(80px,1.1fr) minmax(40px,1fr) auto; gap:8px; align-items:center; padding:3px 4px; border-radius:6px; cursor:pointer; }
+  .rg-rank li:hover, .rg-rank li.sel { background:var(--acento-t); } .rg-rank .n { color:var(--suave); text-align:right; font-variant-numeric:tabular-nums; } .rg-rank .nm { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rg-rank .bar { height:8px; background:var(--linea); border-radius:4px; overflow:hidden; } .rg-rank .bar i { display:block; height:100%; background:var(--acento); }
+  .rg-det { background:var(--papel); border:1px solid var(--linea); border-radius:10px; padding:10px 12px; margin-top:10px; } .rg-det h4 { margin:0 0 6px; font-family:var(--serif); font-size:1.1rem; }
+  .rg-det table { width:100%; border-collapse:collapse; font-size:.84rem; } .rg-det th { text-align:left; color:var(--suave); font-weight:600; font-size:.74rem; } .rg-det td, .rg-det th { padding:3px 6px 3px 0; border-top:1px solid var(--linea); }
+  .rg-chips { display:flex; flex-wrap:wrap; gap:6px; max-height:300px; overflow:auto; }
+  @media (max-width:760px) { .rg-grid { grid-template-columns:1fr; } }
   .mp-sec { background:var(--sup); border:1px solid var(--linea); border-radius:14px; margin-bottom:10px; }
   .mp-sec > summary { list-style:none; cursor:pointer; padding:13px 16px; display:flex; align-items:center; gap:10px; }
   .mp-sec > summary::-webkit-details-marker { display:none; }
@@ -361,6 +378,7 @@
   </section>
   <section id="resMP" hidden>
     <div class="mp-hero" id="mpHero"></div>
+    <details class="mp-sec" id="mpReg" hidden></details>
     <div class="mp-guia"><b>Cómo leer cada tarjeta:</b> <span>① qué mide el dato · ② cómo está hoy y cómo se compara con el mundo · ③ cómo ha cambiado en el tiempo · ④ qué dice la gráfica. Las secciones van de lo más relevante a lo más curioso.</span></div>
     <nav class="mp-nav" id="mpNav" aria-label="Secciones del país"></nav>
     <div id="mpSecs"></div>

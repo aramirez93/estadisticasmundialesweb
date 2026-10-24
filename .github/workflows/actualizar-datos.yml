@@ -19,6 +19,9 @@ jobs:
       - name: Datos de la OMS, la OIT y Our World in Data
         run: node .github/scripts/actualizar_ext.mjs
         continue-on-error: true
+      - name: Datos por regiones (Europa, EE. UU., Canadá, Brasil, Colombia, México)
+        run: node .github/scripts/actualizar_reg.mjs
+        continue-on-error: true
       - name: Guardar cambios
         run: |
           git config user.name "datos-bot"

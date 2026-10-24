@@ -266,7 +266,7 @@ function renderMiPais() {
   MP.secs = mpSecciones();
   $("mpNav").innerHTML = MP.secs.map(s => `<button class="pill" data-mp-ir="${s.id}">${esc(s.titulo)}</button>`).join("");
   $("mpSecs").innerHTML = MP.secs.map(s => `<details class="mp-sec" id="mps-${s.id}" data-sec="${s.id}"><summary><div><h3>${esc(s.titulo)}</h3><div class="sub">${esc(s.sub)} · ${s.inds.length} indicadores</div></div></summary><div class="mp-cuerpo" id="mpb-${s.id}"></div></details>`).join("");
-  mpHero();
+  mpHero(); renderRegiones(MP.iso);
   $("fuenteMP").innerHTML = `Fuentes: <a href="https://data.worldbank.org" target="_blank" rel="noopener">Banco Mundial</a> (Indicadores del Desarrollo Mundial, series anuales desde 1960) y <a href="https://www.imf.org/external/datamapper" target="_blank" rel="noopener">FMI</a> (estimaciones y proyecciones). Los datos curiosos provienen de organismos que alimentan al Banco Mundial: ONU, OMS, Unión Interparlamentaria, OMT y otros. · consultado ${new Date().toLocaleString("es-CO")}`;
   mpAbrir("esencial", false); guardarHash();
 }

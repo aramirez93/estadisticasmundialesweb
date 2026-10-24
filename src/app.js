@@ -689,7 +689,7 @@ function descargarCSV() {
 //  EVENTOS E INICIO
 // ============================================================
 function eventos() {
-  eventosVistas(); eventosPaises(); eventosMiPais(); eventosComparador();
+  eventosVistas(); eventosPaises(); eventosMiPais(); eventosRegiones(); eventosComparador();
   $("alerta").addEventListener("click", e => { if (e.target.closest("[data-reintentar]")) consultar(); });
   $("tabsFuente").addEventListener("click", e => { const b = e.target.closest("button[data-src]"); if (b) cambiarFuente(b.dataset.src); });
   $("chipsCat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; catFiltro = b.dataset.cat; renderChips(); renderCatalogo(); });
