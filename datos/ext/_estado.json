@@ -1,33 +1,20 @@
 {
- "generado": "2026-10-24T09:36:13.719Z",
+ "generado": "2026-10-25T02:17:37.239Z",
  "fuentes": {
   "oms": {
    "ok": [
     "WHOSIS_000002",
+    "NCD_BMI_30A",
+    "NCD_BMI_25A",
     "NCD_HYP_PREVALENCE_A",
     "M_Est_smk_curr_std",
     "UHC_INDEX_REPORTED",
+    "WSH_SANITATION_SAFELY_MANAGED",
     "HWF_0006",
-    "WHS6_102"
+    "WHS6_102",
+    "PHE_HHAIR_PROP_POP_CLEAN_FUELS"
    ],
-   "fallos": [
-    {
-     "id": "NCD_BMI_30A",
-     "motivo": "solo 0 países con datos"
-    },
-    {
-     "id": "NCD_BMI_25A",
-     "motivo": "solo 0 países con datos"
-    },
-    {
-     "id": "WSH_SANITATION_SAFELY_MANAGED",
-     "motivo": "solo 0 países con datos"
-    },
-    {
-     "id": "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
-     "motivo": "solo 0 países con datos"
-    }
-   ]
+   "fallos": []
   },
   "oit": {
    "ok": [
@@ -46,7 +33,36 @@
     "global-hunger-index",
     "meat-supply-per-person",
     "annual-working-hours-per-worker",
-    "per-capita-energy-use"
+    "per-capita-energy-use",
+    "gdp-per-capita-maddison-project-database",
+    "ti-corruption-perception-index",
+    "gender-inequality-index-from-the-human-development-report",
+    "homicide-rate-unodc",
+    "renewable-share-energy",
+    "share-electricity-renewables",
+    "carbon-intensity-electricity",
+    "median-age",
+    "mean-years-of-schooling",
+    "total-alcohol-consumption-per-capita-litres-of-pure-alcohol",
+    "plastic-waste-per-capita"
+   ],
+   "fallos": [
+    {
+     "id": "democracy-index-eiu",
+     "motivo": "HTTP 403"
+    },
+    {
+     "id": "global-gender-gap-index",
+     "motivo": "HTTP 404"
+    }
+   ]
+  },
+  "acnur": {
+   "ok": [
+    "ref_acogidos",
+    "ref_origen",
+    "desplaz_internos",
+    "asilo_solicitudes"
    ],
    "fallos": []
   }
