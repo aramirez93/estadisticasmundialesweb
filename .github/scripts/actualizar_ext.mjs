@@ -10,6 +10,7 @@ const OMS = ["WHOSIS_000002", "NCD_BMI_30A", "NCD_BMI_25A", "NCD_HYP_PREVALENCE_
 const OIT = [   // clasificación preferida (si no se indica, se usa el total o la categoría con más datos)
   {id: "UNE_2EAP_SEX_AGE_RT_A", classif1: "AGE_YTHADULT_Y15-24"}, {id: "SDG_0831_SEX_ECO_RT_A"}, {id: "HOW_TEMP_SEX_ECO_NB_A"}, {id: "ILR_TUMT_NOC_RT_A"}];
 const ACNUR = [{id: "ref_acogidos", campo: "refugees", por: "coa"}, {id: "ref_origen", campo: "refugees", por: "coo"}, {id: "desplaz_internos", campo: "idps", por: "coo"}, {id: "asilo_solicitudes", campo: "asylum_seekers", por: "coa"}];
+const UNESCO = ["CR.1", "CR.2", "CR.3", "ROFST.1.CP", "ROFST.2.CP", "PTRHC.1", "PTRHC.2", "YEARS.FC.COMP.02", "YEARS.FC.FREE.02"];
 const OWID = ["happiness-cantril-ladder", "human-development-index", "daily-per-capita-caloric-supply", "global-hunger-index", "meat-supply-per-person", "annual-working-hours-per-worker", "per-capita-energy-use", "gdp-per-capita-maddison-project-database", "democracy-index-eiu", "ti-corruption-perception-index", "gender-inequality-index-from-the-human-development-report", "global-gender-gap-index", "homicide-rate-unodc", "renewable-share-energy", "share-electricity-renewables", "carbon-intensity-electricity", "median-age", "mean-years-of-schooling", "total-alcohol-consumption-per-capita-litres-of-pure-alcohol", "plastic-waste-per-capita"];
 
 async function pedir(url, formato, intentos = 3) {
@@ -85,6 +86,20 @@ async function oit(def) {
   }
   return series;
 }
+async function unesco(id) {
+  const series = {}; let url = `https://api.uis.unesco.org/api/public/data/indicators?indicator=${encodeURIComponent(id)}&geoUnitType=NATIONAL&start=1990&end=${new Date().getFullYear()}`, paginas = 0;
+  while (url && paginas++ < 40) {
+    const j = await pedir(url, "json"), filas = j.records || j.data || [];
+    for (const r of filas) {
+      const iso = r.geoUnit || r.geoUnitId, v = Number(r.value), y = +r.year;
+      if (!ISO3.test(iso || "") || !isFinite(v) || !y) continue;
+      (series[iso] = series[iso] || {})[y] = v;
+    }
+    const sig = j.next || j.links?.next || null;
+    url = sig && sig !== url ? (sig.startsWith("http") ? sig : "https://api.uis.unesco.org" + sig) : null;
+  }
+  return series;
+}
 const cacheAcnur = {};
 async function acnur(def) {
   if (!cacheAcnur[def.por]) {
@@ -135,5 +150,6 @@ await fuente("oms", "OMS (Observatorio Mundial de la Salud)", OMS, oms);
 await fuente("oit", "OIT (ILOSTAT)", OIT, oit);
 await fuente("owid", "Our World in Data", OWID, owid);
 await fuente("acnur", "ACNUR (refugiados)", ACNUR, acnur);
+await fuente("unesco", "UNESCO (educación)", UNESCO, unesco);
 fs.writeFileSync(`${OUT}/_estado.json`, JSON.stringify(estado, null, 1));
 console.log(JSON.stringify(Object.fromEntries(Object.entries(estado.fuentes).map(([k, v]) => [k, {ok: v.ok.length, fallos: v.fallos.length}]))));

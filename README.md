@@ -49,3 +49,7 @@ Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.euro
 - Nueva fuente **ACNUR** (refugiados, solicitantes de asilo y desplazados) y 13 indicadores nuevos de Our World in Data (historia del PIB desde 1820, democracia, corrupción, género, homicidios, renovables…).
 - Cifras regionales de **todos los países** que las tengan en Wikidata (población, superficie, densidad); Europa, EE. UU., Canadá, Brasil, Colombia y México siguen con sus fuentes oficiales.
 - Correcciones tras la primera ejecución real: paro regional de Eurostat (dimensión de nivel educativo) y desgloses de los indicadores de la OMS (obesidad, sobrepeso, saneamiento y combustibles limpios).
+
+## v0.11 – Colores y UNESCO
+- Mapas y mapa de calor con escala divergente **rojo (peor) → amarillo claro → azul (mejor)**, apta para daltonismo; los indicadores sin «bueno/malo» (población, densidad…) siguen en una sola gama azul. Los mapas regionales aplican la misma lógica donde corresponde (PIB, empleo, paro, pobreza…).
+- Nueva fuente **UNESCO** (Instituto de Estadística): finalización de estudios, niños fuera de la escuela, alumnos por docente y años de educación obligatoria y gratuita.

@@ -14,7 +14,7 @@ const serieColor = i => SERIE[i % SERIE.length][oscuro() ? 1 : 0];
 const CONT_IDX = {EU: 0, AF: 1, SA: 2, OC: 3, NA: 4, AS: 6};
 const contColor = c => CONT_IDX[c] === undefined ? "#8a94a6" : serieColor(CONT_IDX[c]);
 const CONT_FORMA = {EU: "circle", AF: "triangle", SA: "rect", OC: "rectRot", NA: "star", AS: "crossRot"};
-const verTono = () => PALETAS[ind.tone][5];
+const verTono = () => PALETAS[ind.tone][ind.tone === "neutral" ? 5 : 6];
 const txtSobre = hex => { const n = parseInt(hex.slice(1), 16), L = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; return L > 0.62 ? "#0f1b2d" : "#ffffff"; };
 const leyendaCont = codes => CONT_ORDER.filter(c => codes.includes(c)).map(c => `<span class="lg"><i style="background:${contColor(c)}"></i>${esc(CONT_NOMBRE[c])}</span>`).join("");
 
@@ -298,7 +298,7 @@ function vCalor() {
   const color = (v, i) => { if (v === null) return ""; if (!fila) return palG[sc.classOf(v)]; const a = M[i].filter(x => x !== null), mn = Math.min(...a), mx = Math.max(...a); return pal[mx === mn ? 3 : Math.min(6, Math.floor((v - mn) / (mx - mn) * 6.999))]; };
   $("htmlVista").innerHTML = `<div class="calor-wrap"><table class="calor"><thead><tr><th class="rn"></th>${ys.map(y => `<th class="y">${y}</th>`).join("")}</tr></thead><tbody>` +
     rows.map((r, i) => `<tr><th class="rn">${esc(r.nombre)}</th>${ys.map((y, k) => { const v = M[i][k]; return `<td ${v === null ? "" : `style="background:${color(v, i)}" title="${esc(r.nombre)} · ${y}: ${esc(f(v))}"`}></td>`; }).join("")}</tr>`).join("") + `</tbody></table></div>`;
-  $("extraVista").innerHTML = `<div class="barra-esc">menor ${pal.map(c => `<i style="background:${c}"></i>`).join("")} mayor<span>· ${fila ? "cada fila usa su propia escala: muestra cuándo subió o bajó, no cuánto vale" : "mismos colores para todos los países: se pueden comparar entre sí"}. Casillas vacías = sin dato.</span></div>`;
+  $("extraVista").innerHTML = `<div class="barra-esc">menor ${pal.map(c => `<i style="background:${c}"></i>`).join("")} mayor<span>${ind.tone === "neutral" ? "" : " · rojo = menos favorable, azul = más favorable"} · ${fila ? "cada fila usa su propia escala: muestra cuándo subió o bajó, no cuánto vale" : "mismos colores para todos los países: se pueden comparar entre sí"}. Casillas vacías = sin dato.</span></div>`;
 }
 
 // ---------- CARRERA ----------

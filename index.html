@@ -178,6 +178,7 @@
   .rg-r:hover, .rg-r:focus-visible { filter:brightness(.88); stroke:var(--tinta); stroke-width:1.4px; outline:none; }
   .rg-r.sel { stroke:var(--tinta); stroke-width:2.2px; }
   .rg-sel { display:block; margin-bottom:8px; } .rg-sel span { display:block; font-size:.75rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--suave); margin-bottom:4px; }
+  .ley-nota { font-size:.78rem; color:var(--suave); }
   .rg-lec { font-size:.9rem; margin:8px 0; }
   .rg-ley { display:flex; align-items:center; gap:3px; font-size:.78rem; color:var(--suave); margin:8px 0; } .rg-ley i { width:34px; height:10px; border-radius:2px; display:inline-block; } .rg-ley span:first-child { margin-right:4px; } .rg-ley span:last-child { margin-left:4px; }
   .rg-rank { list-style:none; margin:6px 0 0; padding:0; max-height:380px; overflow:auto; font-size:.84rem; }
@@ -293,7 +294,7 @@
 <header class="top">
   <a class="marca" href="./" aria-label="Estadísticas Mundiales, inicio">
     <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#0e9aa7"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lg)"/><g fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"><circle cx="32" cy="32" r="20"/><ellipse cx="32" cy="32" rx="8.5" ry="20"/><path d="M12 32h40"/></g><rect x="18.5" y="36" width="7.5" height="13" rx="2" fill="#fff"/><rect x="28.25" y="28" width="7.5" height="21" rx="2" fill="#fbbf24"/><rect x="38" y="19" width="7.5" height="30" rx="2" fill="#fff"/></svg>
-    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.10</span>
+    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.11</span>
   </a>
   <nav class="modos" aria-label="Secciones"><button class="on" data-modo="mipais">Mi país</button><button data-modo="paises">Comparar países</button><button data-modo="explorar">Explorar datos</button></nav>
   <div class="top-der">
@@ -524,7 +525,10 @@ const FUENTES = {
              url: "https://ourworldindata.org"},
   acnur:    {nombre: "ACNUR", corto: "ACNUR", sub: "refugiados y desplazados", ext: true,
              desc: "Agencia de la ONU para los Refugiados (ACNUR). Cuántas personas refugiadas, solicitantes de asilo y desplazadas internas hay en cada país, desde el año 2000. Se descargan a diario con una acción de GitHub.",
-             url: "https://www.unhcr.org/refugee-statistics"}
+             url: "https://www.unhcr.org/refugee-statistics"},
+  unesco:   {nombre: "UNESCO", corto: "UNESCO", sub: "educación · Instituto de Estadística", ext: true,
+             desc: "Instituto de Estadística de la UNESCO (UIS). Indicadores del Objetivo de Desarrollo Sostenible 4: finalización de estudios, niños fuera de la escuela, alumnos por docente y años de educación gratuita. Se descargan a diario con una acción de GitHub.",
+             url: "https://databrowser.uis.unesco.org"}
 };
 
 const TONO_TXT = {
@@ -716,6 +720,17 @@ const OWID_ROWS = [
   ["total-alcohol-consumption-per-capita-litres-of-pure-alcohol","Curiosidades","Consumo de alcohol","litros de alcohol puro por persona al año","n1","","","neutral","Litros de alcohol puro que consume al año cada persona de 15 años o más (OMS).", 1],
   ["plastic-waste-per-capita","Ambiente y energía","Residuos plásticos por persona","kg por persona al día","n2","","","bad","Cuántos kilos de residuos plásticos genera cada persona al día (Our World in Data a partir de Jambeck et al.).", 1]
 ];
+const UNESCO_ROWS = [
+  ["CR.1","Educación","Finalización de primaria","% de jóvenes que terminan primaria","n1",""," %","good","De cada 100 jóvenes en edad de terminar la primaria, cuántos la completan (UNESCO).", 1],
+  ["CR.2","Educación","Finalización del primer ciclo de secundaria","% de jóvenes que lo terminan","n1",""," %","good","De cada 100 jóvenes en la edad de terminar el primer ciclo de secundaria, cuántos lo completan (UNESCO).", 1],
+  ["CR.3","Educación","Finalización del bachillerato","% de jóvenes que lo terminan","n1",""," %","good","De cada 100 jóvenes en la edad de terminar el segundo ciclo de secundaria, cuántos lo completan (UNESCO).", 1],
+  ["ROFST.1.CP","Educación","Niños fuera de la escuela primaria","% de niños en edad de primaria","n1",""," %","bad","Porcentaje de niños en edad de cursar primaria que no están escolarizados (UNESCO).", 1],
+  ["ROFST.2.CP","Educación","Adolescentes fuera de la escuela","% de adolescentes en edad de secundaria baja","n1",""," %","bad","Porcentaje de adolescentes en edad de cursar el primer ciclo de secundaria que no están escolarizados (UNESCO).", 1],
+  ["PTRHC.1","Educación","Alumnos por docente en primaria","alumnos por docente","n1","","","bad","Cuántos alumnos hay, en promedio, por cada docente en primaria. Menos alumnos por docente permite una atención más personal (UNESCO).", 1],
+  ["PTRHC.2","Educación","Alumnos por docente en secundaria baja","alumnos por docente","n1","","","bad","Cuántos alumnos hay, en promedio, por cada docente en el primer ciclo de secundaria (UNESCO).", 1],
+  ["YEARS.FC.COMP.02","Educación","Años de educación obligatoria","años que exige la ley","n0","","","good","Número de años de escuela que la ley obliga a cursar (UNESCO).", 1],
+  ["YEARS.FC.FREE.02","Curiosidades","Años de educación gratuita garantizada","años que garantiza la ley","n0","","","good","Número de años de escuela gratuita que el Estado garantiza por ley (UNESCO).", 1]
+];
 const ACNUR_ROWS = [
   ["ref_acogidos","Población","Refugiados acogidos","personas refugiadas que viven en el país","big","","","neutral","Personas que huyeron de su país por persecución o conflicto y están refugiadas en este país (ACNUR).", 1],
   ["ref_origen","Población","Refugiados de origen","personas del país refugiadas en el exterior","big","","","bad","Personas de este país que han tenido que huir y viven como refugiadas en otros países (ACNUR).", 1],
@@ -723,7 +738,7 @@ const ACNUR_ROWS = [
   ["asilo_solicitudes","Población","Solicitantes de asilo","personas con solicitud de asilo pendiente","big","","","neutral","Personas que han pedido protección internacional en este país y esperan respuesta (ACNUR).", 1]
 ];
 
-const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: [], acnur: []};
+const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: [], acnur: [], unesco: []};
 const base = (src, r) => ({key: src + ":" + r[0], src, id: String(r[0]).split(":")[0], cat: r[1], name: r[2], unit: r[3], k: r[4], pre: r[5], suf: r[6], tone: r[7], desc: r[8], curated: true});
 WB_ROWS.forEach(r => CATALOGO.wb.push(base("wb", r)));
 ES_ROWS.forEach(r => CATALOGO.eurostat.push(Object.assign(base("eurostat", r), {ds: r[9], flt: r[10]})));
@@ -733,6 +748,7 @@ OMS_ROWS.forEach(r => CATALOGO.oms.push(Object.assign(base("oms", r), {scale: r[
 OIT_ROWS.forEach(r => CATALOGO.oit.push(Object.assign(base("oit", r), {scale: r[9]})));
 OWID_ROWS.forEach(r => CATALOGO.owid.push(Object.assign(base("owid", r), {scale: r[9]})));
 ACNUR_ROWS.forEach(r => CATALOGO.acnur.push(Object.assign(base("acnur", r), {scale: r[9]})));
+UNESCO_ROWS.forEach(r => CATALOGO.unesco.push(Object.assign(base("unesco", r), {scale: r[9]})));
 
 const MUESTRA = ["COL","MEX","BRA","ARG","USA","ESP","DEU","FRA","CHN","IND","JPN","NGA","ZAF","EGY","AUS","NZL"];
 const MUESTRA_FUENTE = {
@@ -754,9 +770,9 @@ const OFICINAS = [
   ["CEPAL – CEPALSTAT","https://statistics.cepal.org"],["BID – Data","https://data.iadb.org"]
 ];
 const CONT_NOMBRE = {AF:"África", AS:"Asia", EU:"Europa", NA:"América del Norte y Central", SA:"América del Sur", OC:"Oceanía", AN:"Antártida"};
-const PALETAS = {   // ColorBrewer, 7 clases
-  good:    ["#edf8e9","#c7e9c0","#a1d99b","#74c476","#41ab5d","#238b45","#005a32"],
-  bad:     ["#fef0d9","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f","#990000"],
+const PALETAS = {   // ColorBrewer RdYlBu (divergente, apta para daltonismo): rojo = peor · amarillo claro = intermedio · azul = mejor
+  good:    ["#d73027","#fc8d59","#fee090","#ffffbf","#abd9e9","#74add1","#4575b4"],   // valor bajo = peor (rojo) → valor alto = mejor (azul)
+  bad:     ["#4575b4","#74add1","#abd9e9","#ffffbf","#fee090","#fc8d59","#d73027"],   // valor bajo = mejor (azul) → valor alto = peor (rojo)
   neutral: ["#eff3ff","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"]
 };
 const LINEAS = ["#0b6e4f","#d1495b","#2e86ab","#edae49","#6a4c93","#00798c","#e07a5f","#3d405b","#81b29a","#9c6644","#118ab2","#ef476f"];
@@ -765,7 +781,7 @@ const LINEAS = ["#0b6e4f","#d1495b","#2e86ab","#edae49","#6a4c93","#00798c","#e0
 //  DATOS LOCALES: FMI (datos/imf) y fuentes externas OMS, OIT, OWID (datos/ext)
 //  Los descarga a diario una acción de GitHub, así no dependen de que el navegador pueda consultar esas webs.
 // ============================================================
-const EXT = new Set(["oms", "oit", "owid", "acnur"]);
+const EXT = new Set(["oms", "oit", "owid", "acnur", "unesco"]);
 const localC = new Map();
 function localCarga(src, id) {
   const k = src + ":" + id;
@@ -815,7 +831,7 @@ const serieColor = i => SERIE[i % SERIE.length][oscuro() ? 1 : 0];
 const CONT_IDX = {EU: 0, AF: 1, SA: 2, OC: 3, NA: 4, AS: 6};
 const contColor = c => CONT_IDX[c] === undefined ? "#8a94a6" : serieColor(CONT_IDX[c]);
 const CONT_FORMA = {EU: "circle", AF: "triangle", SA: "rect", OC: "rectRot", NA: "star", AS: "crossRot"};
-const verTono = () => PALETAS[ind.tone][5];
+const verTono = () => PALETAS[ind.tone][ind.tone === "neutral" ? 5 : 6];
 const txtSobre = hex => { const n = parseInt(hex.slice(1), 16), L = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; return L > 0.62 ? "#0f1b2d" : "#ffffff"; };
 const leyendaCont = codes => CONT_ORDER.filter(c => codes.includes(c)).map(c => `<span class="lg"><i style="background:${contColor(c)}"></i>${esc(CONT_NOMBRE[c])}</span>`).join("");
 
@@ -1099,7 +1115,7 @@ function vCalor() {
   const color = (v, i) => { if (v === null) return ""; if (!fila) return palG[sc.classOf(v)]; const a = M[i].filter(x => x !== null), mn = Math.min(...a), mx = Math.max(...a); return pal[mx === mn ? 3 : Math.min(6, Math.floor((v - mn) / (mx - mn) * 6.999))]; };
   $("htmlVista").innerHTML = `<div class="calor-wrap"><table class="calor"><thead><tr><th class="rn"></th>${ys.map(y => `<th class="y">${y}</th>`).join("")}</tr></thead><tbody>` +
     rows.map((r, i) => `<tr><th class="rn">${esc(r.nombre)}</th>${ys.map((y, k) => { const v = M[i][k]; return `<td ${v === null ? "" : `style="background:${color(v, i)}" title="${esc(r.nombre)} · ${y}: ${esc(f(v))}"`}></td>`; }).join("")}</tr>`).join("") + `</tbody></table></div>`;
-  $("extraVista").innerHTML = `<div class="barra-esc">menor ${pal.map(c => `<i style="background:${c}"></i>`).join("")} mayor<span>· ${fila ? "cada fila usa su propia escala: muestra cuándo subió o bajó, no cuánto vale" : "mismos colores para todos los países: se pueden comparar entre sí"}. Casillas vacías = sin dato.</span></div>`;
+  $("extraVista").innerHTML = `<div class="barra-esc">menor ${pal.map(c => `<i style="background:${c}"></i>`).join("")} mayor<span>${ind.tone === "neutral" ? "" : " · rojo = menos favorable, azul = más favorable"} · ${fila ? "cada fila usa su propia escala: muestra cuándo subió o bajó, no cuánto vale" : "mismos colores para todos los países: se pueden comparar entre sí"}. Casillas vacías = sin dato.</span></div>`;
 }
 
 // ---------- CARRERA ----------
@@ -1745,7 +1761,7 @@ function mpHero() {
 
 // ---------- pantalla ----------
 function mpSecciones() {
-  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean).concat(CATALOGO.oms, CATALOGO.oit, CATALOGO.owid, CATALOGO.acnur);
+  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean).concat(CATALOGO.oms, CATALOGO.oit, CATALOGO.owid, CATALOGO.acnur, CATALOGO.unesco);
   const esenc = MP_ESENCIAL.map(id => REG.get("wb:" + id)).filter(Boolean), usados = new Set(esenc.map(o => o.key));
   const secs = [{id: "esencial", titulo: "Lo esencial", sub: "Los datos que mejor resumen al país", inds: esenc}];
   MP_ORDEN.forEach((c, i) => {
@@ -1824,25 +1840,30 @@ function rgClases(vals) {                 // quintiles → cortes
   const s = vals.slice().sort((a, b) => a - b), q = p => s[Math.min(s.length - 1, Math.floor(p * s.length))];
   return [q(.2), q(.4), q(.6), q(.8)];
 }
-function rgColor(v, cortes) {
-  const c = cortes.findIndex(x => v < x), k = c < 0 ? 4 : c, pct = [16, 34, 54, 74, 94][k];
-  return `color-mix(in srgb, var(--acento) ${pct}%, var(--sup))`;
+// Indicadores donde «más» es mejor ("good") o peor ("bad"): se pintan de rojo (peor) a azul (mejor). El resto, en una sola gama azul.
+const RG_TONO = {pib_pc: "good", pib_pps: "good", pib: "good", empleo: "good", vida: "good", ingreso: "good", paro: "bad", pobreza: "bad"};
+const RG_DIV = ["#d7191c", "#fdae61", "#ffffbf", "#abd9e9", "#2c7bb6"];          // ColorBrewer RdYlBu, 5 clases
+const rgPaleta = tono => tono === "good" ? RG_DIV : tono === "bad" ? RG_DIV.slice().reverse() : null;
+function rgColor(v, cortes, tono) {
+  const c = cortes.findIndex(x => v < x), k = c < 0 ? 4 : c, pal = rgPaleta(tono);
+  return pal ? pal[k] : `color-mix(in srgb, var(--acento) ${[16, 34, 54, 74, 94][k]}%, var(--sup))`;
 }
 function rgMediana(vals) { const s = vals.slice().sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
 
-function rgMapa(geo, ind, lista) {
+function rgMapa(geo, ind, lista, tono) {
   const val = new Map((lista || []).map(x => [x.rid, x])), cortes = lista && lista.length > 4 ? rgClases(lista.map(x => x.v)) : null;
   const paths = geo.r.map(r => {
-    const x = val.get(r.i), fill = x && cortes ? rgColor(x.v, cortes) : x ? "color-mix(in srgb, var(--acento) 45%, var(--sup))" : lista ? "var(--sindato)" : "var(--acento-t)";
+    const x = val.get(r.i), fill = x && cortes ? rgColor(x.v, cortes, tono) : x ? "color-mix(in srgb, var(--acento) 45%, var(--sup))" : lista ? "var(--sindato)" : "var(--acento-t)";
     const tt = `${r.n}${x ? ": " + rgFmt(x.v, ind) + (x.y ? " (" + x.y + ")" : "") : lista ? ": sin dato" : ""}`;
     return `<path d="${r.p}" fill="${fill}" fill-rule="evenodd" class="rg-r${RG.sel === r.i ? " sel" : ""}" data-rid="${esc(r.i)}" tabindex="0" role="button" aria-label="${esc(tt)}"><title>${esc(tt)}</title></path>`;
   }).join("");
   return `<svg class="rg-svg" viewBox="-6 -6 ${geo.w + 12} ${geo.h + 12}" role="group" aria-label="Mapa de ${esc(geo.n.toLowerCase())}">${paths}</svg>`;
 }
-function rgLeyenda(lista, ind) {
+function rgLeyenda(lista, ind, tono) {
   if (!lista || lista.length < 5) return "";
   const c = rgClases(lista.map(x => x.v)), min = lista[lista.length - 1].v, max = lista[0].v;
-  return `<div class="rg-ley"><span>${esc(rgFmt(min, ind))}</span>${[0, 1, 2, 3, 4].map(k => `<i style="background:${rgColor(k === 0 ? min : c[k - 1], c)}"></i>`).join("")}<span>${esc(rgFmt(max, ind))}</span></div>`;
+  return `<div class="rg-ley"><span>${esc(rgFmt(min, ind))}</span>${[0, 1, 2, 3, 4].map(k => `<i style="background:${rgColor(k === 0 ? min : c[k - 1], c, tono)}"></i>`).join("")}<span>${esc(rgFmt(max, ind))}</span></div>` +
+    (tono ? `<div class="nota" style="margin:0 0 6px">Rojo = situación menos favorable · azul = más favorable.</div>` : "");
 }
 function rgLectura(lista, ind, geo) {
   if (lista.length < 3) return "";
@@ -1875,13 +1896,13 @@ function rgPintar() {
   el.hidden = false;
   const inds = dat ? Object.entries(dat.ind).filter(([, o]) => Object.keys(o.s).length >= 3) : [];
   if (inds.length && !inds.some(([id]) => id === RG.ind)) RG.ind = inds[0][0];
-  const ind = inds.length ? dat.ind[RG.ind] : null, lista = ind ? rgLista(ind) : null;
+  const ind = inds.length ? dat.ind[RG.ind] : null, lista = ind ? rgLista(ind) : null, tono = RG_TONO[RG.ind] || null;
   const años = lista ? [...new Set(lista.map(x => x.y))].filter(Boolean) : [];
   const head = `<summary><div><h3>Mapa por regiones</h3><div class="sub">${esc(geo.n)} · ${geo.r.length} regiones${ind ? " · " + inds.length + " indicadores" : " · solo territorio"}</div></div></summary>`;
   let panel;
   if (ind) {
     panel = `<label class="rg-sel"><span>Indicador</span><select id="rgInd">${inds.map(([id, o]) => `<option value="${esc(id)}"${id === RG.ind ? " selected" : ""}>${esc(o.n)}</option>`).join("")}</select></label>` +
-      `<p class="rg-lec">${rgLectura(lista, ind, geo)}</p>${rgLeyenda(lista, ind)}` +
+      `<p class="rg-lec">${rgLectura(lista, ind, geo)}</p>${rgLeyenda(lista, ind, tono)}` +
       (años.length > 1 ? `<p class="nota" style="margin:6px 0">Cada región muestra su dato más reciente; los años pueden variar (${esc(Math.min(...años))}–${esc(Math.max(...años))}).</p>` : "") +
       rgRanking(lista, ind, geo);
   } else {
@@ -1891,7 +1912,7 @@ function rgPintar() {
   const fuentes = [geo.f, ...new Set(inds.map(([, o]) => o.f))].filter(Boolean);
   const enlaces = ind ? ` · <a href="${esc(ind.l)}" target="_blank" rel="noopener">ver la fuente del indicador</a>` : "";
   const open = el.open;
-  el.innerHTML = head + `<div class="rg-cuerpo"><div class="rg-grid"><div class="rg-mapa">${rgMapa(geo, ind, lista)}${rgDetalle(geo, dat)}</div><div class="rg-panel">${panel}</div></div>` +
+  el.innerHTML = head + `<div class="rg-cuerpo"><div class="rg-grid"><div class="rg-mapa">${rgMapa(geo, ind, lista, tono)}${rgDetalle(geo, dat)}</div><div class="rg-panel">${panel}</div></div>` +
     `<div class="nota" style="margin:10px 0 0">Fuentes: ${fuentes.map(esc).join("; ")}${enlaces}${dat ? ` · datos de ${esc(dat.generado)}` : ""}${ind ? ` <button class="btn sec" id="btnCSVR" style="margin-left:8px;padding:3px 10px;font-size:.8rem">CSV regional</button>` : ""}</div></div>`;
   el.open = open;
 }
@@ -2134,7 +2155,7 @@ const sel = new Set();
 const REG = new Map();                      // key -> indicador
 let catFiltro = "", consultaId = 0, orden = {k: "valor", asc: false};
 let wbFuentes = [], wbIndCache = {}, imfCat = null, cepalItems = null, avzItems = [];
-const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait", acnur: "wait"};
+const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait", acnur: "wait", unesco: "wait"};
 const errFuente = {};
 let grafico = null, tabActiva = "mapa";
 Object.values(CATALOGO).flat().forEach(o => REG.set(o.key, o));
@@ -2226,6 +2247,7 @@ const ADAPT = {
   async oit(o, d, h) { return adaptLocal(o, d, h); },
   async owid(o, d, h) { return adaptLocal(o, d, h); },
   async acnur(o, d, h) { return adaptLocal(o, d, h); },
+  async unesco(o, d, h) { return adaptLocal(o, d, h); },
 
   async cepal(o, d, h) {
     const [dm, dt] = await Promise.all([
@@ -2634,7 +2656,8 @@ function pintarMapa() {
   mapRank = new Map([...mapVals.entries()].sort((a, b) => b[1].v - a[1].v).map(([iso], i) => [iso, i + 1]));
   const bordes = [sc.min, ...sc.br, sc.max];
   leyenda.innerHTML = pal.slice(0, sc.n).map((c, i) => `<span><i style="background:${c}"></i>${esc(fmtVal(bordes[i], ind))} – ${esc(fmtVal(bordes[i + 1], ind))}</span>`).join("") +
-    `<span><i style="background:#dfe3e8"></i>Sin datos</span>`;
+    `<span><i style="background:#dfe3e8"></i>Sin datos</span>` +
+    (ind.tone === "neutral" ? "" : `<span class="ley-nota">Rojo = situación menos favorable · azul = más favorable</span>`);
   const proy = ind.src === "imf" && yr !== "ultimo" && +yr >= ANIO ? " (proyección del FMI)" : "";
   $("notaMapa").textContent = `${contSel() ? "Continente: " + CONT_NOMBRE[contSel()] + " · " : ""}${mapVals.size} países con dato${yr === "ultimo" ? " · se muestra el último año disponible de cada país (puede variar entre países)" : " en " + yr + proy}. ` +
     `Los círculos son países muy pequeños. Toca un país para compararlo; con la rueda o los botones + y − te acercas.`;

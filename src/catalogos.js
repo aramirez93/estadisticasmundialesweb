@@ -28,7 +28,10 @@ const FUENTES = {
              url: "https://ourworldindata.org"},
   acnur:    {nombre: "ACNUR", corto: "ACNUR", sub: "refugiados y desplazados", ext: true,
              desc: "Agencia de la ONU para los Refugiados (ACNUR). Cuántas personas refugiadas, solicitantes de asilo y desplazadas internas hay en cada país, desde el año 2000. Se descargan a diario con una acción de GitHub.",
-             url: "https://www.unhcr.org/refugee-statistics"}
+             url: "https://www.unhcr.org/refugee-statistics"},
+  unesco:   {nombre: "UNESCO", corto: "UNESCO", sub: "educación · Instituto de Estadística", ext: true,
+             desc: "Instituto de Estadística de la UNESCO (UIS). Indicadores del Objetivo de Desarrollo Sostenible 4: finalización de estudios, niños fuera de la escuela, alumnos por docente y años de educación gratuita. Se descargan a diario con una acción de GitHub.",
+             url: "https://databrowser.uis.unesco.org"}
 };
 
 const TONO_TXT = {
@@ -220,6 +223,17 @@ const OWID_ROWS = [
   ["total-alcohol-consumption-per-capita-litres-of-pure-alcohol","Curiosidades","Consumo de alcohol","litros de alcohol puro por persona al año","n1","","","neutral","Litros de alcohol puro que consume al año cada persona de 15 años o más (OMS).", 1],
   ["plastic-waste-per-capita","Ambiente y energía","Residuos plásticos por persona","kg por persona al día","n2","","","bad","Cuántos kilos de residuos plásticos genera cada persona al día (Our World in Data a partir de Jambeck et al.).", 1]
 ];
+const UNESCO_ROWS = [
+  ["CR.1","Educación","Finalización de primaria","% de jóvenes que terminan primaria","n1",""," %","good","De cada 100 jóvenes en edad de terminar la primaria, cuántos la completan (UNESCO).", 1],
+  ["CR.2","Educación","Finalización del primer ciclo de secundaria","% de jóvenes que lo terminan","n1",""," %","good","De cada 100 jóvenes en la edad de terminar el primer ciclo de secundaria, cuántos lo completan (UNESCO).", 1],
+  ["CR.3","Educación","Finalización del bachillerato","% de jóvenes que lo terminan","n1",""," %","good","De cada 100 jóvenes en la edad de terminar el segundo ciclo de secundaria, cuántos lo completan (UNESCO).", 1],
+  ["ROFST.1.CP","Educación","Niños fuera de la escuela primaria","% de niños en edad de primaria","n1",""," %","bad","Porcentaje de niños en edad de cursar primaria que no están escolarizados (UNESCO).", 1],
+  ["ROFST.2.CP","Educación","Adolescentes fuera de la escuela","% de adolescentes en edad de secundaria baja","n1",""," %","bad","Porcentaje de adolescentes en edad de cursar el primer ciclo de secundaria que no están escolarizados (UNESCO).", 1],
+  ["PTRHC.1","Educación","Alumnos por docente en primaria","alumnos por docente","n1","","","bad","Cuántos alumnos hay, en promedio, por cada docente en primaria. Menos alumnos por docente permite una atención más personal (UNESCO).", 1],
+  ["PTRHC.2","Educación","Alumnos por docente en secundaria baja","alumnos por docente","n1","","","bad","Cuántos alumnos hay, en promedio, por cada docente en el primer ciclo de secundaria (UNESCO).", 1],
+  ["YEARS.FC.COMP.02","Educación","Años de educación obligatoria","años que exige la ley","n0","","","good","Número de años de escuela que la ley obliga a cursar (UNESCO).", 1],
+  ["YEARS.FC.FREE.02","Curiosidades","Años de educación gratuita garantizada","años que garantiza la ley","n0","","","good","Número de años de escuela gratuita que el Estado garantiza por ley (UNESCO).", 1]
+];
 const ACNUR_ROWS = [
   ["ref_acogidos","Población","Refugiados acogidos","personas refugiadas que viven en el país","big","","","neutral","Personas que huyeron de su país por persecución o conflicto y están refugiadas en este país (ACNUR).", 1],
   ["ref_origen","Población","Refugiados de origen","personas del país refugiadas en el exterior","big","","","bad","Personas de este país que han tenido que huir y viven como refugiadas en otros países (ACNUR).", 1],
@@ -227,7 +241,7 @@ const ACNUR_ROWS = [
   ["asilo_solicitudes","Población","Solicitantes de asilo","personas con solicitud de asilo pendiente","big","","","neutral","Personas que han pedido protección internacional en este país y esperan respuesta (ACNUR).", 1]
 ];
 
-const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: [], acnur: []};
+const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: [], acnur: [], unesco: []};
 const base = (src, r) => ({key: src + ":" + r[0], src, id: String(r[0]).split(":")[0], cat: r[1], name: r[2], unit: r[3], k: r[4], pre: r[5], suf: r[6], tone: r[7], desc: r[8], curated: true});
 WB_ROWS.forEach(r => CATALOGO.wb.push(base("wb", r)));
 ES_ROWS.forEach(r => CATALOGO.eurostat.push(Object.assign(base("eurostat", r), {ds: r[9], flt: r[10]})));
@@ -237,6 +251,7 @@ OMS_ROWS.forEach(r => CATALOGO.oms.push(Object.assign(base("oms", r), {scale: r[
 OIT_ROWS.forEach(r => CATALOGO.oit.push(Object.assign(base("oit", r), {scale: r[9]})));
 OWID_ROWS.forEach(r => CATALOGO.owid.push(Object.assign(base("owid", r), {scale: r[9]})));
 ACNUR_ROWS.forEach(r => CATALOGO.acnur.push(Object.assign(base("acnur", r), {scale: r[9]})));
+UNESCO_ROWS.forEach(r => CATALOGO.unesco.push(Object.assign(base("unesco", r), {scale: r[9]})));
 
 const MUESTRA = ["COL","MEX","BRA","ARG","USA","ESP","DEU","FRA","CHN","IND","JPN","NGA","ZAF","EGY","AUS","NZL"];
 const MUESTRA_FUENTE = {
@@ -258,9 +273,9 @@ const OFICINAS = [
   ["CEPAL – CEPALSTAT","https://statistics.cepal.org"],["BID – Data","https://data.iadb.org"]
 ];
 const CONT_NOMBRE = {AF:"África", AS:"Asia", EU:"Europa", NA:"América del Norte y Central", SA:"América del Sur", OC:"Oceanía", AN:"Antártida"};
-const PALETAS = {   // ColorBrewer, 7 clases
-  good:    ["#edf8e9","#c7e9c0","#a1d99b","#74c476","#41ab5d","#238b45","#005a32"],
-  bad:     ["#fef0d9","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f","#990000"],
+const PALETAS = {   // ColorBrewer RdYlBu (divergente, apta para daltonismo): rojo = peor · amarillo claro = intermedio · azul = mejor
+  good:    ["#d73027","#fc8d59","#fee090","#ffffbf","#abd9e9","#74add1","#4575b4"],   // valor bajo = peor (rojo) → valor alto = mejor (azul)
+  bad:     ["#4575b4","#74add1","#abd9e9","#ffffbf","#fee090","#fc8d59","#d73027"],   // valor bajo = mejor (azul) → valor alto = peor (rojo)
   neutral: ["#eff3ff","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"]
 };
 const LINEAS = ["#0b6e4f","#d1495b","#2e86ab","#edae49","#6a4c93","#00798c","#e07a5f","#3d405b","#81b29a","#9c6644","#118ab2","#ef476f"];

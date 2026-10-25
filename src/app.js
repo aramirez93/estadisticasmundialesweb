@@ -120,7 +120,7 @@ const sel = new Set();
 const REG = new Map();                      // key -> indicador
 let catFiltro = "", consultaId = 0, orden = {k: "valor", asc: false};
 let wbFuentes = [], wbIndCache = {}, imfCat = null, cepalItems = null, avzItems = [];
-const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait", acnur: "wait"};
+const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait", acnur: "wait", unesco: "wait"};
 const errFuente = {};
 let grafico = null, tabActiva = "mapa";
 Object.values(CATALOGO).flat().forEach(o => REG.set(o.key, o));
@@ -212,6 +212,7 @@ const ADAPT = {
   async oit(o, d, h) { return adaptLocal(o, d, h); },
   async owid(o, d, h) { return adaptLocal(o, d, h); },
   async acnur(o, d, h) { return adaptLocal(o, d, h); },
+  async unesco(o, d, h) { return adaptLocal(o, d, h); },
 
   async cepal(o, d, h) {
     const [dm, dt] = await Promise.all([
@@ -620,7 +621,8 @@ function pintarMapa() {
   mapRank = new Map([...mapVals.entries()].sort((a, b) => b[1].v - a[1].v).map(([iso], i) => [iso, i + 1]));
   const bordes = [sc.min, ...sc.br, sc.max];
   leyenda.innerHTML = pal.slice(0, sc.n).map((c, i) => `<span><i style="background:${c}"></i>${esc(fmtVal(bordes[i], ind))} – ${esc(fmtVal(bordes[i + 1], ind))}</span>`).join("") +
-    `<span><i style="background:#dfe3e8"></i>Sin datos</span>`;
+    `<span><i style="background:#dfe3e8"></i>Sin datos</span>` +
+    (ind.tone === "neutral" ? "" : `<span class="ley-nota">Rojo = situación menos favorable · azul = más favorable</span>`);
   const proy = ind.src === "imf" && yr !== "ultimo" && +yr >= ANIO ? " (proyección del FMI)" : "";
   $("notaMapa").textContent = `${contSel() ? "Continente: " + CONT_NOMBRE[contSel()] + " · " : ""}${mapVals.size} países con dato${yr === "ultimo" ? " · se muestra el último año disponible de cada país (puede variar entre países)" : " en " + yr + proy}. ` +
     `Los círculos son países muy pequeños. Toca un país para compararlo; con la rueda o los botones + y − te acercas.`;

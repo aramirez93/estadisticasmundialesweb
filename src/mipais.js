@@ -237,7 +237,7 @@ function mpHero() {
 
 // ---------- pantalla ----------
 function mpSecciones() {
-  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean).concat(CATALOGO.oms, CATALOGO.oit, CATALOGO.owid, CATALOGO.acnur);
+  const wb = CATALOGO.wb.filter(o => o.curated), fmi = MP_FMI_PROPIOS.map(id => REG.get("imf:" + id)).filter(Boolean).concat(CATALOGO.oms, CATALOGO.oit, CATALOGO.owid, CATALOGO.acnur, CATALOGO.unesco);
   const esenc = MP_ESENCIAL.map(id => REG.get("wb:" + id)).filter(Boolean), usados = new Set(esenc.map(o => o.key));
   const secs = [{id: "esencial", titulo: "Lo esencial", sub: "Los datos que mejor resumen al país", inds: esenc}];
   MP_ORDEN.forEach((c, i) => {

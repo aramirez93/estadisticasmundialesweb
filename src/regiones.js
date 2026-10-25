@@ -27,25 +27,30 @@ function rgClases(vals) {                 // quintiles → cortes
   const s = vals.slice().sort((a, b) => a - b), q = p => s[Math.min(s.length - 1, Math.floor(p * s.length))];
   return [q(.2), q(.4), q(.6), q(.8)];
 }
-function rgColor(v, cortes) {
-  const c = cortes.findIndex(x => v < x), k = c < 0 ? 4 : c, pct = [16, 34, 54, 74, 94][k];
-  return `color-mix(in srgb, var(--acento) ${pct}%, var(--sup))`;
+// Indicadores donde «más» es mejor ("good") o peor ("bad"): se pintan de rojo (peor) a azul (mejor). El resto, en una sola gama azul.
+const RG_TONO = {pib_pc: "good", pib_pps: "good", pib: "good", empleo: "good", vida: "good", ingreso: "good", paro: "bad", pobreza: "bad"};
+const RG_DIV = ["#d7191c", "#fdae61", "#ffffbf", "#abd9e9", "#2c7bb6"];          // ColorBrewer RdYlBu, 5 clases
+const rgPaleta = tono => tono === "good" ? RG_DIV : tono === "bad" ? RG_DIV.slice().reverse() : null;
+function rgColor(v, cortes, tono) {
+  const c = cortes.findIndex(x => v < x), k = c < 0 ? 4 : c, pal = rgPaleta(tono);
+  return pal ? pal[k] : `color-mix(in srgb, var(--acento) ${[16, 34, 54, 74, 94][k]}%, var(--sup))`;
 }
 function rgMediana(vals) { const s = vals.slice().sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
 
-function rgMapa(geo, ind, lista) {
+function rgMapa(geo, ind, lista, tono) {
   const val = new Map((lista || []).map(x => [x.rid, x])), cortes = lista && lista.length > 4 ? rgClases(lista.map(x => x.v)) : null;
   const paths = geo.r.map(r => {
-    const x = val.get(r.i), fill = x && cortes ? rgColor(x.v, cortes) : x ? "color-mix(in srgb, var(--acento) 45%, var(--sup))" : lista ? "var(--sindato)" : "var(--acento-t)";
+    const x = val.get(r.i), fill = x && cortes ? rgColor(x.v, cortes, tono) : x ? "color-mix(in srgb, var(--acento) 45%, var(--sup))" : lista ? "var(--sindato)" : "var(--acento-t)";
     const tt = `${r.n}${x ? ": " + rgFmt(x.v, ind) + (x.y ? " (" + x.y + ")" : "") : lista ? ": sin dato" : ""}`;
     return `<path d="${r.p}" fill="${fill}" fill-rule="evenodd" class="rg-r${RG.sel === r.i ? " sel" : ""}" data-rid="${esc(r.i)}" tabindex="0" role="button" aria-label="${esc(tt)}"><title>${esc(tt)}</title></path>`;
   }).join("");
   return `<svg class="rg-svg" viewBox="-6 -6 ${geo.w + 12} ${geo.h + 12}" role="group" aria-label="Mapa de ${esc(geo.n.toLowerCase())}">${paths}</svg>`;
 }
-function rgLeyenda(lista, ind) {
+function rgLeyenda(lista, ind, tono) {
   if (!lista || lista.length < 5) return "";
   const c = rgClases(lista.map(x => x.v)), min = lista[lista.length - 1].v, max = lista[0].v;
-  return `<div class="rg-ley"><span>${esc(rgFmt(min, ind))}</span>${[0, 1, 2, 3, 4].map(k => `<i style="background:${rgColor(k === 0 ? min : c[k - 1], c)}"></i>`).join("")}<span>${esc(rgFmt(max, ind))}</span></div>`;
+  return `<div class="rg-ley"><span>${esc(rgFmt(min, ind))}</span>${[0, 1, 2, 3, 4].map(k => `<i style="background:${rgColor(k === 0 ? min : c[k - 1], c, tono)}"></i>`).join("")}<span>${esc(rgFmt(max, ind))}</span></div>` +
+    (tono ? `<div class="nota" style="margin:0 0 6px">Rojo = situación menos favorable · azul = más favorable.</div>` : "");
 }
 function rgLectura(lista, ind, geo) {
   if (lista.length < 3) return "";
@@ -78,13 +83,13 @@ function rgPintar() {
   el.hidden = false;
   const inds = dat ? Object.entries(dat.ind).filter(([, o]) => Object.keys(o.s).length >= 3) : [];
   if (inds.length && !inds.some(([id]) => id === RG.ind)) RG.ind = inds[0][0];
-  const ind = inds.length ? dat.ind[RG.ind] : null, lista = ind ? rgLista(ind) : null;
+  const ind = inds.length ? dat.ind[RG.ind] : null, lista = ind ? rgLista(ind) : null, tono = RG_TONO[RG.ind] || null;
   const años = lista ? [...new Set(lista.map(x => x.y))].filter(Boolean) : [];
   const head = `<summary><div><h3>Mapa por regiones</h3><div class="sub">${esc(geo.n)} · ${geo.r.length} regiones${ind ? " · " + inds.length + " indicadores" : " · solo territorio"}</div></div></summary>`;
   let panel;
   if (ind) {
     panel = `<label class="rg-sel"><span>Indicador</span><select id="rgInd">${inds.map(([id, o]) => `<option value="${esc(id)}"${id === RG.ind ? " selected" : ""}>${esc(o.n)}</option>`).join("")}</select></label>` +
-      `<p class="rg-lec">${rgLectura(lista, ind, geo)}</p>${rgLeyenda(lista, ind)}` +
+      `<p class="rg-lec">${rgLectura(lista, ind, geo)}</p>${rgLeyenda(lista, ind, tono)}` +
       (años.length > 1 ? `<p class="nota" style="margin:6px 0">Cada región muestra su dato más reciente; los años pueden variar (${esc(Math.min(...años))}–${esc(Math.max(...años))}).</p>` : "") +
       rgRanking(lista, ind, geo);
   } else {
@@ -94,7 +99,7 @@ function rgPintar() {
   const fuentes = [geo.f, ...new Set(inds.map(([, o]) => o.f))].filter(Boolean);
   const enlaces = ind ? ` · <a href="${esc(ind.l)}" target="_blank" rel="noopener">ver la fuente del indicador</a>` : "";
   const open = el.open;
-  el.innerHTML = head + `<div class="rg-cuerpo"><div class="rg-grid"><div class="rg-mapa">${rgMapa(geo, ind, lista)}${rgDetalle(geo, dat)}</div><div class="rg-panel">${panel}</div></div>` +
+  el.innerHTML = head + `<div class="rg-cuerpo"><div class="rg-grid"><div class="rg-mapa">${rgMapa(geo, ind, lista, tono)}${rgDetalle(geo, dat)}</div><div class="rg-panel">${panel}</div></div>` +
     `<div class="nota" style="margin:10px 0 0">Fuentes: ${fuentes.map(esc).join("; ")}${enlaces}${dat ? ` · datos de ${esc(dat.generado)}` : ""}${ind ? ` <button class="btn sec" id="btnCSVR" style="margin-left:8px;padding:3px 10px;font-size:.8rem">CSV regional</button>` : ""}</div></div>`;
   el.open = open;
 }
