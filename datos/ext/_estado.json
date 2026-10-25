@@ -1,5 +1,5 @@
 {
- "generado": "2026-10-25T02:17:37.239Z",
+ "generado": "2026-10-25T02:38:19.318Z",
  "fuentes": {
   "oms": {
    "ok": [
@@ -65,6 +65,27 @@
     "asilo_solicitudes"
    ],
    "fallos": []
+  },
+  "unesco": {
+   "ok": [
+    "CR.1",
+    "CR.2",
+    "CR.3",
+    "ROFST.1.CP",
+    "ROFST.2.CP",
+    "YEARS.FC.COMP.02",
+    "YEARS.FC.FREE.02"
+   ],
+   "fallos": [
+    {
+     "id": "PTRHC.1",
+     "motivo": "solo 0 países con datos"
+    },
+    {
+     "id": "PTRHC.2",
+     "motivo": "solo 0 países con datos"
+    }
+   ]
   }
  }
 }
