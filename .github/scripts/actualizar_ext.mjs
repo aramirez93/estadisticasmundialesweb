@@ -9,7 +9,8 @@ const UA = {"User-Agent": "Mozilla/5.0 (compatible; estadisticas-mundiales-bot)"
 const OMS = ["WHOSIS_000002", "NCD_BMI_30A", "NCD_BMI_25A", "NCD_HYP_PREVALENCE_A", "M_Est_smk_curr_std", "UHC_INDEX_REPORTED", "WSH_SANITATION_SAFELY_MANAGED", "HWF_0006", "WHS6_102", "PHE_HHAIR_PROP_POP_CLEAN_FUELS"];
 const OIT = [   // clasificación preferida (si no se indica, se usa el total o la categoría con más datos)
   {id: "UNE_2EAP_SEX_AGE_RT_A", classif1: "AGE_YTHADULT_Y15-24"}, {id: "SDG_0831_SEX_ECO_RT_A"}, {id: "HOW_TEMP_SEX_ECO_NB_A"}, {id: "ILR_TUMT_NOC_RT_A"}];
-const OWID = ["happiness-cantril-ladder", "human-development-index", "daily-per-capita-caloric-supply", "global-hunger-index", "meat-supply-per-person", "annual-working-hours-per-worker", "per-capita-energy-use"];
+const ACNUR = [{id: "ref_acogidos", campo: "refugees", por: "coa"}, {id: "ref_origen", campo: "refugees", por: "coo"}, {id: "desplaz_internos", campo: "idps", por: "coo"}, {id: "asilo_solicitudes", campo: "asylum_seekers", por: "coa"}];
+const OWID = ["happiness-cantril-ladder", "human-development-index", "daily-per-capita-caloric-supply", "global-hunger-index", "meat-supply-per-person", "annual-working-hours-per-worker", "per-capita-energy-use", "gdp-per-capita-maddison-project-database", "democracy-index-eiu", "ti-corruption-perception-index", "gender-inequality-index-from-the-human-development-report", "global-gender-gap-index", "homicide-rate-unodc", "renewable-share-energy", "share-electricity-renewables", "carbon-intensity-electricity", "median-age", "mean-years-of-schooling", "total-alcohol-consumption-per-capita-litres-of-pure-alcohol", "plastic-waste-per-capita"];
 
 async function pedir(url, formato, intentos = 3) {
   let err;
@@ -41,17 +42,26 @@ const vacio = v => v === null || v === undefined || v === "" || v === "SEX_BTSX"
 function paisesConDatos(series) { return Object.keys(series).length; }
 
 async function oms(id) {
-  const series = {}; let url = `https://ghoapi.azureedge.net/api/${id}?$filter=${encodeURIComponent("SpatialDimType eq 'COUNTRY'")}`, paginas = 0;
+  const filas = []; let url = `https://ghoapi.azureedge.net/api/${id}?$filter=${encodeURIComponent("SpatialDimType eq 'COUNTRY'")}`, paginas = 0;
   while (url && paginas++ < 50) {
     const j = await pedir(url, "json");
     for (const r of j.value || []) {
-      if (!ISO3.test(r.SpatialDim || "") || ![r.Dim1, r.Dim2, r.Dim3].every(vacio)) continue;
       const v = r.NumericValue ?? parseFloat(r.Value); const y = +r.TimeDim;
-      if (!isFinite(v) || !y) continue;
-      (series[r.SpatialDim] = series[r.SpatialDim] || {})[y] = v;
+      if (ISO3.test(r.SpatialDim || "") && isFinite(v) && y) filas.push({c: r.SpatialDim, y, v, d: [r.Dim1, r.Dim2, r.Dim3].map(x => x ?? "")});
     }
     url = j["@odata.nextLink"] || null;
   }
+  const armar = ok => { const s = {}; for (const f of filas) if (ok(f)) (s[f.c] = s[f.c] || {})[f.y] = f.v; return s; };
+  let series = armar(f => f.d.every(vacio));
+  if (paisesConDatos(series) >= 20) return series;
+  // plan B: el indicador trae desgloses (sexo, edad, zona…): se elige el total o la categoría más frecuente de cada dimensión
+  const TOTALES = ["", "SEX_BTSX", "TOTL", "TOTAL", "BTSX", "ALL", "AGEGROUP_YEARS18-PLUS", "AGEGROUP_YEARS20-PLUS"];
+  const elegidos = [0, 1, 2].map(k => {
+    const cuenta = {}; filas.forEach(f => { cuenta[f.d[k]] = (cuenta[f.d[k]] || 0) + 1; });
+    return TOTALES.find(t => cuenta[t]) ?? Object.entries(cuenta).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+  });
+  series = armar(f => f.d.every((x, k) => x === elegidos[k]));
+  console.log("   desglose elegido:", JSON.stringify(elegidos));
   return series;
 }
 async function oit(def) {
@@ -72,6 +82,24 @@ async function oit(def) {
   for (const r of rs) {
     const y = parseInt(r[iT], 10), v = parseFloat(r[iV]); if (!ISO3.test(r[iA]) || !isFinite(v) || !y) continue;
     (series[r[iA]] = series[r[iA]] || {})[y] = v;
+  }
+  return series;
+}
+const cacheAcnur = {};
+async function acnur(def) {
+  if (!cacheAcnur[def.por]) {
+    const items = []; let pagina = 1, max = 1;
+    do {
+      const j = await pedir(`https://api.unhcr.org/population/v1/population/?limit=1000&page=${pagina}&yearFrom=2000&yearTo=${new Date().getFullYear()}&${def.por}_all=true&cf_type=ISO`, "json");
+      items.push(...(j.items || [])); max = j.maxPages || 1;
+    } while (++pagina <= max && pagina < 100);
+    cacheAcnur[def.por] = items;
+  }
+  const series = {};
+  for (const it of cacheAcnur[def.por]) {
+    const iso = it[def.por + "_iso"], v = Number(it[def.campo]), y = +it.year;
+    if (!ISO3.test(iso || "") || !isFinite(v) || !y) continue;
+    series[iso] = series[iso] || {}; series[iso][y] = (series[iso][y] || 0) + v;
   }
   return series;
 }
@@ -106,5 +134,6 @@ async function fuente(clave, nombre, items, fn) {
 await fuente("oms", "OMS (Observatorio Mundial de la Salud)", OMS, oms);
 await fuente("oit", "OIT (ILOSTAT)", OIT, oit);
 await fuente("owid", "Our World in Data", OWID, owid);
+await fuente("acnur", "ACNUR (refugiados)", ACNUR, acnur);
 fs.writeFileSync(`${OUT}/_estado.json`, JSON.stringify(estado, null, 1));
 console.log(JSON.stringify(Object.fromEntries(Object.entries(estado.fuentes).map(([k, v]) => [k, {ok: v.ok.length, fallos: v.fallos.length}]))));

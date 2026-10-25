@@ -2,7 +2,7 @@
 //  DATOS LOCALES: FMI (datos/imf) y fuentes externas OMS, OIT, OWID (datos/ext)
 //  Los descarga a diario una acción de GitHub, así no dependen de que el navegador pueda consultar esas webs.
 // ============================================================
-const EXT = new Set(["oms", "oit", "owid"]);
+const EXT = new Set(["oms", "oit", "owid", "acnur"]);
 const localC = new Map();
 function localCarga(src, id) {
   const k = src + ":" + id;

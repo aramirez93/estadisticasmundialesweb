@@ -120,7 +120,7 @@ const sel = new Set();
 const REG = new Map();                      // key -> indicador
 let catFiltro = "", consultaId = 0, orden = {k: "valor", asc: false};
 let wbFuentes = [], wbIndCache = {}, imfCat = null, cepalItems = null, avzItems = [];
-const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait"};
+const estadoFuente = {wb: "wait", eurostat: "wait", imf: "wait", cepal: "wait", oms: "wait", oit: "wait", owid: "wait", acnur: "wait"};
 const errFuente = {};
 let grafico = null, tabActiva = "mapa";
 Object.values(CATALOGO).flat().forEach(o => REG.set(o.key, o));
@@ -211,6 +211,7 @@ const ADAPT = {
   async oms(o, d, h) { return adaptLocal(o, d, h); },
   async oit(o, d, h) { return adaptLocal(o, d, h); },
   async owid(o, d, h) { return adaptLocal(o, d, h); },
+  async acnur(o, d, h) { return adaptLocal(o, d, h); },
 
   async cepal(o, d, h) {
     const [dm, dt] = await Promise.all([
@@ -747,6 +748,7 @@ async function init() {
     PS.sel = (H.p || "").split(",").filter(i => paisMap.has(i) && !paisMap.get(i).agg).slice(0, 4);
     if (["hist", "resumen", "ind"].includes(H.pv)) PS.vista = H.pv; if (H.pm === "base") PS.evoModo = "base";
     entrarModo("paises");
-  } else consultar();
+  } else if (H.i || H.m === "explorar") entrarModo("explorar");
+  else entrarModo("mipais");
 }
 init();

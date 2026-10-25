@@ -293,16 +293,16 @@
 <header class="top">
   <a class="marca" href="./" aria-label="Estadísticas Mundiales, inicio">
     <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#0e9aa7"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lg)"/><g fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"><circle cx="32" cy="32" r="20"/><ellipse cx="32" cy="32" rx="8.5" ry="20"/><path d="M12 32h40"/></g><rect x="18.5" y="36" width="7.5" height="13" rx="2" fill="#fff"/><rect x="28.25" y="28" width="7.5" height="21" rx="2" fill="#fbbf24"/><rect x="38" y="19" width="7.5" height="30" rx="2" fill="#fff"/></svg>
-    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.8</span>
+    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.10</span>
   </a>
-  <nav class="modos" aria-label="Secciones"><button class="on" data-modo="explorar">Explorar datos</button><button data-modo="mipais">Mi país</button><button data-modo="paises">Comparar países</button></nav>
+  <nav class="modos" aria-label="Secciones"><button class="on" data-modo="mipais">Mi país</button><button data-modo="paises">Comparar países</button><button data-modo="explorar">Explorar datos</button></nav>
   <div class="top-der">
     <div id="fuentesEstado" class="estados"></div>
     <button class="icono" id="btnTema" title="Cambiar entre tema claro y oscuro" aria-label="Cambiar tema">◐</button>
   </div>
 </header>
 
-<main id="modo-explorar">
+<main id="modo-explorar" hidden>
   <section>
     <h1 class="frase" id="frase">Mostrando
       <button class="slot" id="fraseInd" data-hoja="ind">una estadística</button>
@@ -370,7 +370,7 @@
   </section>
 </main>
 
-<main id="modo-mipais" hidden>
+<main id="modo-mipais">
   <section>
     <h1 class="frase" id="fraseMP">Elige un país para ver toda su historia en datos</h1>
     <div class="add-fila"><div class="buscador"><input type="search" id="buscaMP" placeholder="Escribe un país…" aria-label="Buscar país" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="lstMP"><ul class="lista-bus" id="lstMP" role="listbox" hidden></ul></div><span id="sugMP" class="sug"></span></div>

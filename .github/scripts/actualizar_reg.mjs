@@ -75,13 +75,21 @@ async function intentar(iso3, id, fn) {
 function jsonstat(js) {                  // → [{geo, time, v}]
   const ids = js.id, size = js.size, filas = [];
   const pos = {}; ids.forEach((d, i) => (pos[d] = i));
-  for (const d of ids) if (d !== "geo" && d !== "time" && size[ids.indexOf(d)] > 1) throw new Error(`dimensión sin filtrar: ${d}`);
+  const fijo = {};                       // dimensiones sin filtrar: se usa su categoría «total»
+  for (const d of ids) {
+    const n = size[ids.indexOf(d)];
+    if (d === "geo" || d === "time" || n <= 1) { fijo[d] = 0; continue; }
+    const cat = Object.keys(js.dimension[d].category.index), t = cat.find((c) => /^(TOTAL|T|TOTAL_T)$/i.test(c));
+    if (!t) throw new Error(`dimensión sin filtrar: ${d}`);
+    fijo[d] = js.dimension[d].category.index[t];
+  }
   const paso = []; let acc = 1;
   for (let i = ids.length - 1; i >= 0; i--) { paso[i] = acc; acc *= size[i]; }
   const gi = js.dimension.geo.category.index, ti = js.dimension.time.category.index;
   const g = Object.entries(gi), t = Object.entries(ti);
   for (const [geo, a] of g) for (const [time, b] of t) {
-    const k = a * paso[pos.geo] + b * paso[pos.time];
+    let k = a * paso[pos.geo] + b * paso[pos.time];
+    for (const d of ids) if (d !== "geo" && d !== "time") k += fijo[d] * paso[pos[d]];
     const v = js.value?.[k];
     if (v !== undefined && v !== null) filas.push({ geo, time, v });
   }
@@ -126,10 +134,10 @@ async function eeuu() {
   const porFips = Object.fromEntries(geo.r.filter((r) => r.c).map((r) => [r.c, r.i]));
   const vars = "NAME,B01003_001E,B19013_001E,B01002_001E,B23025_003E,B23025_005E,B17001_001E,B17001_002E,B25077_001E";
   const S = { pob: {}, ingreso: {}, edad: {}, paro: {}, pobreza: {}, vivienda: {} };
-  let anios = 0;
+  let anios = 0, errCensus = "";
   for (const año of [2023, 2022, 2021, 2020, 2019, 2018]) {
     let tabla;
-    try { tabla = await json(`https://api.census.gov/data/${año}/acs/acs5?get=${vars}&for=state:*`); } catch (e) { console.warn(`[USA] ACS ${año}: ${e.message}`); continue; }
+    try { tabla = await json(`https://api.census.gov/data/${año}/acs/acs5?get=${vars}&for=state:*`); } catch (e) { errCensus = e.message; console.warn(`[USA] ACS ${año}: ${e.message}`); continue; }
     const h = tabla[0], ix = Object.fromEntries(h.map((c, i) => [c, i]));
     const num = (v) => { const x = Number(v); return Number.isFinite(x) && x > -1e6 ? x : NaN; };
     anios++;
@@ -145,7 +153,7 @@ async function eeuu() {
   const L = "https://www.census.gov/data/developers/data-sets/acs-5year.html";
   const M = { pob: ["Población", "hab."], ingreso: ["Ingreso mediano de los hogares", "US$"], edad: ["Edad mediana", "años"], paro: ["Tasa de paro", "%"], pobreza: ["Población bajo la línea de pobreza", "%"], vivienda: ["Valor mediano de la vivienda propia", "US$"] };
   for (const [id, [n, u]] of Object.entries(M)) await intentar(iso3, id, async () => {
-    if (!anios) throw new Error("sin respuesta del Census Bureau");
+    if (!anios) throw new Error("Census Bureau: " + errCensus);
     guardarInd(iso3, id, { n, u, f: "U.S. Census Bureau · ACS 5 años", l: L }, S[id]);
   });
 }
@@ -246,6 +254,19 @@ async function wikidata(iso3, prefijo, fuente, enlace) {
   await intentar(iso3, "dens", async () => guardarInd(iso3, "dens", { n: "Densidad de población", u: "hab./km²", ...meta }, dens));
 }
 
+// ---- Wikidata para todos los demás países (población y superficie de sus regiones) ----
+async function wikidataResto() {
+  for (const iso3 of Object.keys(regs)) {
+    if (acum[iso3]?.pob || /^[A-Z]{2}\d/.test(Object.keys(regs[iso3])[0] || "")) continue;      // ya tiene fuente oficial, o es NUTS
+    const cuenta2 = {};
+    for (const id of Object.keys(regs[iso3])) { const m = id.match(/^([A-Z]{2})-/); if (m) cuenta2[m[1]] = (cuenta2[m[1]] || 0) + 1; }
+    const pref = Object.entries(cuenta2).sort((a, b) => b[1] - a[1])[0]?.[0];
+    if (!pref) continue;
+    await wikidata(iso3, pref, "Wikidata (cifras de los institutos nacionales de estadística)", `https://www.wikidata.org/wiki/Special:Search?search=${pref}`);
+    await new Promise((ok) => setTimeout(ok, 800));
+  }
+}
+
 // ---- ejecución ----
 if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
   fs.mkdirSync(OUT, { recursive: true });
@@ -260,6 +281,7 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
   await canada();
   await wikidata("COL", "CO", "Wikidata (datos de DANE)", "https://www.dane.gov.co/index.php/estadisticas-por-tema/demografia-y-poblacion/proyecciones-de-poblacion");
   await wikidata("MEX", "MX", "Wikidata (datos de INEGI)", "https://www.inegi.org.mx/temas/estructura/");
+  await wikidataResto();
   let n = 0;
   for (const [iso3, ind] of Object.entries(acum)) {
     const ant = previo(iso3);

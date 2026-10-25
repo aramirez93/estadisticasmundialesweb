@@ -25,7 +25,10 @@ const FUENTES = {
              url: "https://ilostat.ilo.org"},
   owid:     {nombre: "Our World in Data", corto: "OWID", sub: "desarrollo y curiosidades", ext: true,
              desc: "Our World in Data (Universidad de Oxford). Reúne series de organismos como la ONU, el PNUD o la FAO: felicidad, desarrollo humano, calorías, hambre y horas de trabajo. Licencia CC BY 4.0. Se descargan a diario con una acción de GitHub.",
-             url: "https://ourworldindata.org"}
+             url: "https://ourworldindata.org"},
+  acnur:    {nombre: "ACNUR", corto: "ACNUR", sub: "refugiados y desplazados", ext: true,
+             desc: "Agencia de la ONU para los Refugiados (ACNUR). Cuántas personas refugiadas, solicitantes de asilo y desplazadas internas hay en cada país, desde el año 2000. Se descargan a diario con una acción de GitHub.",
+             url: "https://www.unhcr.org/refugee-statistics"}
 };
 
 const TONO_TXT = {
@@ -202,10 +205,29 @@ const OWID_ROWS = [
   ["global-hunger-index","Salud","Índice Global del Hambre","0 = sin hambre · 100 = máximo","n1","","","bad","Resume desnutrición, retraso del crecimiento infantil y mortalidad infantil (Welthungerhilfe y Concern).", 1],
   ["meat-supply-per-person","Curiosidades","Carne disponible por persona","kg por persona al año","n1","","","neutral","Kilos de carne disponibles cada año por persona (FAO).", 1],
   ["annual-working-hours-per-worker","Trabajo","Horas de trabajo al año","horas por trabajador","n0","","","neutral","Horas que trabaja al año, en promedio, cada persona con empleo (Penn World Table).", 1],
-  ["per-capita-energy-use","Ambiente y energía","Consumo de energía por persona","kWh por persona al año","n0","","","neutral","Energía primaria que usa cada persona al año, en kilovatios hora (Energy Institute).", 1]
+  ["per-capita-energy-use","Ambiente y energía","Consumo de energía por persona","kWh por persona al año","n0","","","neutral","Energía primaria que usa cada persona al año, en kilovatios hora (Energy Institute).", 1],
+  ["gdp-per-capita-maddison-project-database","Economía","PIB por habitante desde 1820 (Maddison)","dólares de 2011 ajustados por precios","n0","US$ ","","good","Serie histórica larga del PIB por habitante, reconstruida por historiadores económicos (Maddison Project Database). Sirve para ver siglos de crecimiento.", 1],
+  ["democracy-index-eiu","Gobierno y deuda","Índice de Democracia","escala de 0 a 10","n2","","","good","Califica de 0 a 10 qué tan democrático es un país: elecciones, libertades civiles y funcionamiento del gobierno (Economist Intelligence Unit).", 1],
+  ["ti-corruption-perception-index","Gobierno y deuda","Percepción de corrupción","0 = muy corrupto · 100 = muy limpio","n0","","","good","Qué tan corrupto se percibe el sector público según expertos y empresarios (Transparencia Internacional). Un número más alto es mejor.", 1],
+  ["gender-inequality-index-from-the-human-development-report","Pobreza y desigualdad","Índice de Desigualdad de Género","índice de 0 a 1","n3","","","bad","Mide las brechas entre mujeres y hombres en salud reproductiva, empoderamiento y mercado laboral (PNUD). Más cerca de 0 es más igualdad.", 1],
+  ["global-gender-gap-index","Pobreza y desigualdad","Brecha global de género","0 = brecha total · 1 = igualdad","n3","","","good","Qué tan cerca está un país de la igualdad entre mujeres y hombres en economía, educación, salud y política (Foro Económico Mundial).", 1],
+  ["homicide-rate-unodc","Curiosidades","Tasa de homicidios","homicidios por 100.000 habitantes","n1","","","bad","Homicidios intencionales por cada 100.000 habitantes (Oficina de la ONU contra la Droga y el Delito).", 1],
+  ["renewable-share-energy","Ambiente y energía","Energías renovables en la energía total","% de la energía primaria","n1","",""," %","good","Parte de toda la energía que consume el país (no solo electricidad) que viene de fuentes renovables (Energy Institute).", 1],
+  ["share-electricity-renewables","Ambiente y energía","Electricidad renovable","% de la electricidad","n1","","","good","Parte de la electricidad generada con fuentes renovables: agua, viento, sol y otras (Ember y Energy Institute).", 1],
+  ["carbon-intensity-electricity","Ambiente y energía","Emisiones de la electricidad","gramos de CO₂ por kWh","n0","","","bad","Cuánto CO₂ se emite por cada kilovatio hora de electricidad generada (Ember). Menos es mejor.", 1],
+  ["median-age","Población","Edad mediana","años","n1","","","neutral","Edad que divide a la población en dos mitades iguales: la mitad es más joven y la otra, mayor (ONU).", 1],
+  ["mean-years-of-schooling","Educación","Años de escolaridad promedio","años","n1","","","good","Años de estudio que ha completado, en promedio, la población adulta (PNUD y UNESCO).", 1],
+  ["total-alcohol-consumption-per-capita-litres-of-pure-alcohol","Curiosidades","Consumo de alcohol","litros de alcohol puro por persona al año","n1","","","neutral","Litros de alcohol puro que consume al año cada persona de 15 años o más (OMS).", 1],
+  ["plastic-waste-per-capita","Ambiente y energía","Residuos plásticos por persona","kg por persona al día","n2","","","bad","Cuántos kilos de residuos plásticos genera cada persona al día (Our World in Data a partir de Jambeck et al.).", 1]
+];
+const ACNUR_ROWS = [
+  ["ref_acogidos","Población","Refugiados acogidos","personas refugiadas que viven en el país","big","","","neutral","Personas que huyeron de su país por persecución o conflicto y están refugiadas en este país (ACNUR).", 1],
+  ["ref_origen","Población","Refugiados de origen","personas del país refugiadas en el exterior","big","","","bad","Personas de este país que han tenido que huir y viven como refugiadas en otros países (ACNUR).", 1],
+  ["desplaz_internos","Población","Desplazados internos","personas desplazadas dentro del país","big","","","bad","Personas obligadas a abandonar su hogar por conflicto o violencia, pero que siguen dentro de su propio país (ACNUR).", 1],
+  ["asilo_solicitudes","Población","Solicitantes de asilo","personas con solicitud de asilo pendiente","big","","","neutral","Personas que han pedido protección internacional en este país y esperan respuesta (ACNUR).", 1]
 ];
 
-const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: []};
+const CATALOGO = {wb: [], eurostat: [], imf: [], cepal: [], oms: [], oit: [], owid: [], acnur: []};
 const base = (src, r) => ({key: src + ":" + r[0], src, id: String(r[0]).split(":")[0], cat: r[1], name: r[2], unit: r[3], k: r[4], pre: r[5], suf: r[6], tone: r[7], desc: r[8], curated: true});
 WB_ROWS.forEach(r => CATALOGO.wb.push(base("wb", r)));
 ES_ROWS.forEach(r => CATALOGO.eurostat.push(Object.assign(base("eurostat", r), {ds: r[9], flt: r[10]})));
@@ -214,6 +236,7 @@ CEPAL_ROWS.forEach(r => CATALOGO.cepal.push(Object.assign(base("cepal", r), {pic
 OMS_ROWS.forEach(r => CATALOGO.oms.push(Object.assign(base("oms", r), {scale: r[9]})));
 OIT_ROWS.forEach(r => CATALOGO.oit.push(Object.assign(base("oit", r), {scale: r[9]})));
 OWID_ROWS.forEach(r => CATALOGO.owid.push(Object.assign(base("owid", r), {scale: r[9]})));
+ACNUR_ROWS.forEach(r => CATALOGO.acnur.push(Object.assign(base("acnur", r), {scale: r[9]})));
 
 const MUESTRA = ["COL","MEX","BRA","ARG","USA","ESP","DEU","FRA","CHN","IND","JPN","NGA","ZAF","EGY","AUS","NZL"];
 const MUESTRA_FUENTE = {

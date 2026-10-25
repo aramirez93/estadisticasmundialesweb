@@ -43,3 +43,9 @@ Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.euro
 - En «Mi país» aparece el **mapa de la primera subdivisión** del país (departamentos, estados, provincias, comunidades autónomas…) para los 251 territorios. Los límites están en `datos/geo/` y se generan con `.github/scripts/generar_geo.mjs` (Natural Earth, dominio público; en Europa, regiones NUTS 2 de Eurostat/GISCO).
 - **Cifras por región** (`datos/reg/`, las descarga `.github/scripts/actualizar_reg.mjs` dentro de la acción «Actualizar datos»): Europa (Eurostat NUTS 2), Estados Unidos (Census Bureau), Brasil (IBGE), Canadá (Statistics Canada), Colombia y México (Wikidata, que cita a DANE e INEGI). Para el resto de países solo hay mapa.
 - Lo que falle se registra en `datos/reg/_estado.json`; el sitio simplemente oculta lo que no tenga datos.
+
+## v0.10 – Mi país primero y más fuentes
+- Orden de las secciones: **Mi país → Comparar países → Explorar datos**. La web abre en «Mi país» (los enlaces antiguos al explorador siguen funcionando).
+- Nueva fuente **ACNUR** (refugiados, solicitantes de asilo y desplazados) y 13 indicadores nuevos de Our World in Data (historia del PIB desde 1820, democracia, corrupción, género, homicidios, renovables…).
+- Cifras regionales de **todos los países** que las tengan en Wikidata (población, superficie, densidad); Europa, EE. UU., Canadá, Brasil, Colombia y México siguen con sus fuentes oficiales.
+- Correcciones tras la primera ejecución real: paro regional de Eurostat (dimensión de nivel educativo) y desgloses de los indicadores de la OMS (obesidad, sobrepeso, saneamiento y combustibles limpios).
