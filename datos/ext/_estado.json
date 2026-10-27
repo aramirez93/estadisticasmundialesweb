@@ -1,5 +1,5 @@
 {
- "generado": "2026-10-26T11:12:27.103Z",
+ "generado": "2026-10-27T10:39:44.882Z",
  "fuentes": {
   "oms": {
    "ok": [
@@ -14,7 +14,48 @@
     "WHS6_102",
     "PHE_HHAIR_PROP_POP_CLEAN_FUELS"
    ],
-   "fallos": []
+   "fallos": [
+    {
+     "id": "WHOSIS_000002",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "NCD_BMI_30A",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "NCD_BMI_25A",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "NCD_HYP_PREVALENCE_A",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "M_Est_smk_curr_std",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "UHC_INDEX_REPORTED",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "WSH_SANITATION_SAFELY_MANAGED",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "HWF_0006",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "WHS6_102",
+     "motivo": "HTTP 500"
+    },
+    {
+     "id": "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
+     "motivo": "HTTP 500"
+    }
+   ]
   },
   "oit": {
    "ok": [
