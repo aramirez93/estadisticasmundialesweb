@@ -1,5 +1,5 @@
 {
- "generado": "2026-10-28T11:24:15.136Z",
+ "generado": "2026-10-29T11:34:47.234Z",
  "fuentes": {
   "oms": {
    "ok": [
@@ -44,15 +44,7 @@
      "motivo": "HTTP 500"
     },
     {
-     "id": "HWF_0006",
-     "motivo": "HTTP 500"
-    },
-    {
      "id": "WHS6_102",
-     "motivo": "HTTP 500"
-    },
-    {
-     "id": "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
      "motivo": "HTTP 500"
     }
    ]
@@ -76,6 +68,7 @@
     "annual-working-hours-per-worker",
     "per-capita-energy-use",
     "gdp-per-capita-maddison-project-database",
+    "electoral-democracy-index",
     "ti-corruption-perception-index",
     "gender-inequality-index-from-the-human-development-report",
     "homicide-rate-unodc",
@@ -87,16 +80,7 @@
     "total-alcohol-consumption-per-capita-litres-of-pure-alcohol",
     "plastic-waste-per-capita"
    ],
-   "fallos": [
-    {
-     "id": "democracy-index-eiu",
-     "motivo": "HTTP 403"
-    },
-    {
-     "id": "global-gender-gap-index",
-     "motivo": "HTTP 404"
-    }
-   ]
+   "fallos": []
   },
   "acnur": {
    "ok": [
@@ -114,19 +98,12 @@
     "CR.3",
     "ROFST.1.CP",
     "ROFST.2.CP",
+    "TRTP.1",
+    "TRTP.2",
     "YEARS.FC.COMP.02",
     "YEARS.FC.FREE.02"
    ],
-   "fallos": [
-    {
-     "id": "PTRHC.1",
-     "motivo": "solo 0 países con datos"
-    },
-    {
-     "id": "PTRHC.2",
-     "motivo": "solo 0 países con datos"
-    }
-   ]
+   "fallos": []
   }
  }
 }
