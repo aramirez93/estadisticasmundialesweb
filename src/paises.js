@@ -183,6 +183,7 @@ function pintarRadar() {
   $("avisoP").textContent = sin ? `En ${sin} de ${inds.length} ejes falta el dato de algún país; esos puntos quedan sin dibujar.` : "";
 }
 function csvPaises() {
+  medirEvento("csv-comparador");
   const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;fuente;pais;iso3;anio;valor;unidad;tipo"];
   const inds = new Map(); perfilInds().concat(CM.secs.flatMap(s => s.inds)).forEach(o => inds.set(o.key, o));
   inds.forEach(o => PS.sel.forEach(iso => {

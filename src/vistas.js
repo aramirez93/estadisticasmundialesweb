@@ -448,11 +448,12 @@ function guardarHash() {
     else if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
     else { if (ind) p.set("i", ind.key); p.set("v", VISTA); if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(",")); p.set("d", $("desde").value); p.set("h", $("hasta").value); }
     history.replaceState(null, "", "#" + p.toString());
+    medir(modo === "mipais" ? "/mi-pais/" + (MP.iso || "") : modo === "paises" ? "/comparar/" + PS.sel.join("-") : "/explorar/" + (ind ? ind.key : ""), document.title);
   } catch (e) {}
 }
 function leerHash() { try { return Object.fromEntries(new URLSearchParams(location.hash.slice(1))); } catch (e) { return {}; } }
 async function copiarEnlace() {
-  guardarHash(); const m = $(modo === "paises" ? "msgEnlaceP" : modo === "mipais" ? "msgEnlaceM" : "msgEnlace");
+  guardarHash(); medirEvento("copiar-enlace"); const m = $(modo === "paises" ? "msgEnlaceP" : modo === "mipais" ? "msgEnlaceM" : "msgEnlace");
   try { await navigator.clipboard.writeText(location.href); m.textContent = "Enlace copiado."; } catch (e) { m.textContent = "Copia la dirección del navegador: ya incluye esta vista."; }
   setTimeout(() => { m.textContent = ""; }, 4000);
 }

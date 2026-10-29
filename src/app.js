@@ -6,6 +6,20 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const ANIO = new Date().getFullYear();
+// Analítica sin cookies (GoatCounter). Cuando GC_CODE tenga el nombre del sitio, empieza a medir; vacío = no mide nada.
+const GC_CODE = "";
+let gcUlt = "";
+function medir(ruta, titulo) {
+  if (!GC_CODE || ruta === gcUlt) return; gcUlt = ruta;
+  try {
+    if (!window.goatcounter) {
+      window.goatcounter = {no_onload: true};
+      const s = document.createElement("script"); s.async = true; s.src = "https://gc.zgo.at/count.js"; s.dataset.goatcounter = `https://${GC_CODE}.goatcounter.com/count`;
+      s.onload = () => { try { window.goatcounter.count({path: ruta, title: titulo || ruta}); } catch (e) {} }; document.head.appendChild(s);
+    } else if (window.goatcounter.count) window.goatcounter.count({path: ruta, title: titulo || ruta});
+  } catch (e) {}
+}
+function medirEvento(nombre) { if (!GC_CODE) return; try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: "evento/" + nombre, title: nombre, event: true}); } catch (e) {} }
 const nfs = {};
 function num(v, d) { return (nfs[d] || (nfs[d] = new Intl.NumberFormat("es-CO", {minimumFractionDigits: d, maximumFractionDigits: d}))).format(v); }
 function big(v) {                       // escala larga del español: 1 billón = 10^12
@@ -679,6 +693,7 @@ function eventosMapa(svg) {
 // ============================================================
 function descargarCSV() {
   if (!D) return;
+  medirEvento("csv-explorador");
   const q = s => `"${String(s).replace(/"/g, '""')}"`;
   const L = ["fuente;indicador;codigo;pais;iso3;continente;anio;valor;unidad;tipo"];
   filas.forEach(r => D.series.get(r.iso).forEach(s => L.push([q(FUENTES[ind.src].nombre), q(ind.name), q(ind.id), q(r.nombre), r.iso, q(r.cont), s.y, String(s.v).replace(".", ","), q(ind.unit || ""), s.f === "proy" ? "proyeccion" : s.f === "p" ? "provisional" : "dato"].join(";"))));

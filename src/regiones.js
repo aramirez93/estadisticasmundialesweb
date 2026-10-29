@@ -113,6 +113,7 @@ async function renderRegiones(iso) {
   rgPintar();
 }
 function csvRegional() {
+  medirEvento("csv-regional");
   const {geo, dat} = RG.cur || {}; if (!geo || !dat) return;
   const q = s => `"${String(s).replace(/"/g, '""')}"`, nom = new Map(geo.r.map(r => [r.i, r.n])), L = ["indicador;fuente;pais;iso3;region;codigo_region;anio;valor;unidad"], p = paisMap.get(RG.iso);
   for (const [id, ind] of Object.entries(dat.ind)) for (const [rid, s] of Object.entries(ind.s)) for (const [y, v] of Object.entries(s))

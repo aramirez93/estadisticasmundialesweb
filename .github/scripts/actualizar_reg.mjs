@@ -135,7 +135,7 @@ async function eeuu() {
   const vars = "NAME,B01003_001E,B19013_001E,B01002_001E,B23025_003E,B23025_005E,B17001_001E,B17001_002E,B25077_001E";
   const S = { pob: {}, ingreso: {}, edad: {}, paro: {}, pobreza: {}, vivienda: {} };
   let anios = 0, errCensus = "";
-  for (const año of [2023, 2022, 2021, 2020, 2019, 2018]) {
+  for (const año of Array.from({ length: 7 }, (_, i) => new Date().getFullYear() - 2 - i)) {   // los últimos años disponibles, sin lista fija
     let tabla;
     try { tabla = await json(`https://api.census.gov/data/${año}/acs/acs5?get=${vars}&for=state:*`); } catch (e) { errCensus = e.message; console.warn(`[USA] ACS ${año}: ${e.message}`); continue; }
     const h = tabla[0], ix = Object.fromEntries(h.map((c, i) => [c, i]));

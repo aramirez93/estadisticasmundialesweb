@@ -4,9 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Estadísticas Mundiales – datos de todos los países</title>
-<meta name="description" content="Compara países del mundo con mapas, rankings, evolución y más gráficos. Datos oficiales del Banco Mundial, Eurostat, FMI y CEPAL, siempre con su fuente.">
-<meta property="og:title" content="Estadísticas Mundiales">
-<meta property="og:description" content="Datos oficiales de todos los países en mapas, rankings y gráficos comparables.">
+<meta name="description" content="Estadísticas de todos los países del mundo: población, economía, salud, educación, empleo y más. Historia de cada país, comparador y mapas por regiones con datos del Banco Mundial, FMI, ONU, OMS, OIT, Eurostat y otras fuentes, siempre citadas.">
+<link rel="canonical" href="https://estadisticasmundiales.online/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Estadísticas Mundiales">
+<meta property="og:locale" content="es_ES">
+<meta property="og:url" content="https://estadisticasmundiales.online/">
+<meta property="og:title" content="Estadísticas Mundiales – datos de todos los países">
+<meta property="og:description" content="Mira la historia en datos de cualquier país, compáralo con otros y explora mapas por regiones. Fuentes oficiales citadas.">
+<meta property="og:image" content="https://estadisticasmundiales.online/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Estadísticas Mundiales – datos de todos los países">
+<meta name="twitter:description" content="La historia en datos de cada país, comparador y mapas por regiones, con fuentes oficiales.">
+<meta name="twitter:image" content="https://estadisticasmundiales.online/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Estadísticas Mundiales","url":"https://estadisticasmundiales.online/","inLanguage":"es","description":"Estadísticas de todos los países del mundo con series históricas, comparador y mapas por regiones, citando siempre la fuente."}</script>
 <meta name="theme-color" content="#f3f4f6">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%232563eb%22/%3E%3Cstop offset=%221%22 stop-color=%22%230e9aa7%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22url(%23g)%22/%3E%3Cg fill=%22none%22 stroke=%22%23fff%22 stroke-opacity=%22.5%22 stroke-width=%222%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2220%22/%3E%3Cellipse cx=%2232%22 cy=%2232%22 rx=%228.5%22 ry=%2220%22/%3E%3Cpath d=%22M12 32h40%22/%3E%3C/g%3E%3Crect x=%2218.5%22 y=%2236%22 width=%227.5%22 height=%2213%22 rx=%222%22 fill=%22%23fff%22/%3E%3Crect x=%2228.25%22 y=%2228%22 width=%227.5%22 height=%2221%22 rx=%222%22 fill=%22%23fbbf24%22/%3E%3Crect x=%2238%22 y=%2219%22 width=%227.5%22 height=%2230%22 rx=%222%22 fill=%22%23fff%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -294,7 +306,7 @@
 <header class="top">
   <a class="marca" href="./" aria-label="Estadísticas Mundiales, inicio">
     <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#0e9aa7"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lg)"/><g fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"><circle cx="32" cy="32" r="20"/><ellipse cx="32" cy="32" rx="8.5" ry="20"/><path d="M12 32h40"/></g><rect x="18.5" y="36" width="7.5" height="13" rx="2" fill="#fff"/><rect x="28.25" y="28" width="7.5" height="21" rx="2" fill="#fbbf24"/><rect x="38" y="19" width="7.5" height="30" rx="2" fill="#fff"/></svg>
-    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.11</span>
+    <span class="marca-t"><b>Estadísticas</b><i>Mundiales</i></span><span class="ver">v0.12</span>
   </a>
   <nav class="modos" aria-label="Secciones"><button class="on" data-modo="mipais">Mi país</button><button data-modo="paises">Comparar países</button><button data-modo="explorar">Explorar datos</button></nav>
   <div class="top-der">
@@ -707,12 +719,11 @@ const OWID_ROWS = [
   ["annual-working-hours-per-worker","Trabajo","Horas de trabajo al año","horas por trabajador","n0","","","neutral","Horas que trabaja al año, en promedio, cada persona con empleo (Penn World Table).", 1],
   ["per-capita-energy-use","Ambiente y energía","Consumo de energía por persona","kWh por persona al año","n0","","","neutral","Energía primaria que usa cada persona al año, en kilovatios hora (Energy Institute).", 1],
   ["gdp-per-capita-maddison-project-database","Economía","PIB por habitante desde 1820 (Maddison)","dólares de 2011 ajustados por precios","n0","US$ ","","good","Serie histórica larga del PIB por habitante, reconstruida por historiadores económicos (Maddison Project Database). Sirve para ver siglos de crecimiento.", 1],
-  ["democracy-index-eiu","Gobierno y deuda","Índice de Democracia","escala de 0 a 10","n2","","","good","Califica de 0 a 10 qué tan democrático es un país: elecciones, libertades civiles y funcionamiento del gobierno (Economist Intelligence Unit).", 1],
+  ["electoral-democracy-index","Gobierno y deuda","Índice de Democracia Electoral","índice de 0 a 1","n2","","","good","Mide qué tan libres, limpias y competitivas son las elecciones, y si se respetan las libertades de expresión y asociación (proyecto V-Dem, Universidad de Gotemburgo).", 1],
   ["ti-corruption-perception-index","Gobierno y deuda","Percepción de corrupción","0 = muy corrupto · 100 = muy limpio","n0","","","good","Qué tan corrupto se percibe el sector público según expertos y empresarios (Transparencia Internacional). Un número más alto es mejor.", 1],
   ["gender-inequality-index-from-the-human-development-report","Pobreza y desigualdad","Índice de Desigualdad de Género","índice de 0 a 1","n3","","","bad","Mide las brechas entre mujeres y hombres en salud reproductiva, empoderamiento y mercado laboral (PNUD). Más cerca de 0 es más igualdad.", 1],
-  ["global-gender-gap-index","Pobreza y desigualdad","Brecha global de género","0 = brecha total · 1 = igualdad","n3","","","good","Qué tan cerca está un país de la igualdad entre mujeres y hombres en economía, educación, salud y política (Foro Económico Mundial).", 1],
   ["homicide-rate-unodc","Curiosidades","Tasa de homicidios","homicidios por 100.000 habitantes","n1","","","bad","Homicidios intencionales por cada 100.000 habitantes (Oficina de la ONU contra la Droga y el Delito).", 1],
-  ["renewable-share-energy","Ambiente y energía","Energías renovables en la energía total","% de la energía primaria","n1","",""," %","good","Parte de toda la energía que consume el país (no solo electricidad) que viene de fuentes renovables (Energy Institute).", 1],
+  ["renewable-share-energy","Ambiente y energía","Energías renovables en la energía total","% de la energía primaria","n1",""," %","good","Parte de toda la energía que consume el país (no solo electricidad) que viene de fuentes renovables (Energy Institute).", 1],
   ["share-electricity-renewables","Ambiente y energía","Electricidad renovable","% de la electricidad","n1","","","good","Parte de la electricidad generada con fuentes renovables: agua, viento, sol y otras (Ember y Energy Institute).", 1],
   ["carbon-intensity-electricity","Ambiente y energía","Emisiones de la electricidad","gramos de CO₂ por kWh","n0","","","bad","Cuánto CO₂ se emite por cada kilovatio hora de electricidad generada (Ember). Menos es mejor.", 1],
   ["median-age","Población","Edad mediana","años","n1","","","neutral","Edad que divide a la población en dos mitades iguales: la mitad es más joven y la otra, mayor (ONU).", 1],
@@ -726,8 +737,8 @@ const UNESCO_ROWS = [
   ["CR.3","Educación","Finalización del bachillerato","% de jóvenes que lo terminan","n1",""," %","good","De cada 100 jóvenes en la edad de terminar el segundo ciclo de secundaria, cuántos lo completan (UNESCO).", 1],
   ["ROFST.1.CP","Educación","Niños fuera de la escuela primaria","% de niños en edad de primaria","n1",""," %","bad","Porcentaje de niños en edad de cursar primaria que no están escolarizados (UNESCO).", 1],
   ["ROFST.2.CP","Educación","Adolescentes fuera de la escuela","% de adolescentes en edad de secundaria baja","n1",""," %","bad","Porcentaje de adolescentes en edad de cursar el primer ciclo de secundaria que no están escolarizados (UNESCO).", 1],
-  ["PTRHC.1","Educación","Alumnos por docente en primaria","alumnos por docente","n1","","","bad","Cuántos alumnos hay, en promedio, por cada docente en primaria. Menos alumnos por docente permite una atención más personal (UNESCO).", 1],
-  ["PTRHC.2","Educación","Alumnos por docente en secundaria baja","alumnos por docente","n1","","","bad","Cuántos alumnos hay, en promedio, por cada docente en el primer ciclo de secundaria (UNESCO).", 1],
+  ["TRTP.1","Educación","Docentes capacitados en primaria","% de docentes con formación pedagógica","n1",""," %","good","Porcentaje de docentes de primaria que han recibido al menos la formación pedagógica mínima exigida (UNESCO).", 1],
+  ["TRTP.2","Educación","Docentes capacitados en secundaria baja","% de docentes con formación pedagógica","n1",""," %","good","Porcentaje de docentes del primer ciclo de secundaria que han recibido al menos la formación pedagógica mínima exigida (UNESCO).", 1],
   ["YEARS.FC.COMP.02","Educación","Años de educación obligatoria","años que exige la ley","n0","","","good","Número de años de escuela que la ley obliga a cursar (UNESCO).", 1],
   ["YEARS.FC.FREE.02","Curiosidades","Años de educación gratuita garantizada","años que garantiza la ley","n0","","","good","Número de años de escuela gratuita que el Estado garantiza por ley (UNESCO).", 1]
 ];
@@ -1265,11 +1276,12 @@ function guardarHash() {
     else if (modo === "paises") { p.set("m", "pais"); if (PS.sel.length) p.set("p", PS.sel.join(",")); p.set("pv", PS.vista); if (PS.evoModo !== "real") p.set("pm", PS.evoModo); }
     else { if (ind) p.set("i", ind.key); p.set("v", VISTA); if (contSel()) p.set("c", contSel()); if (sel.size) p.set("p", [...sel].join(",")); p.set("d", $("desde").value); p.set("h", $("hasta").value); }
     history.replaceState(null, "", "#" + p.toString());
+    medir(modo === "mipais" ? "/mi-pais/" + (MP.iso || "") : modo === "paises" ? "/comparar/" + PS.sel.join("-") : "/explorar/" + (ind ? ind.key : ""), document.title);
   } catch (e) {}
 }
 function leerHash() { try { return Object.fromEntries(new URLSearchParams(location.hash.slice(1))); } catch (e) { return {}; } }
 async function copiarEnlace() {
-  guardarHash(); const m = $(modo === "paises" ? "msgEnlaceP" : modo === "mipais" ? "msgEnlaceM" : "msgEnlace");
+  guardarHash(); medirEvento("copiar-enlace"); const m = $(modo === "paises" ? "msgEnlaceP" : modo === "mipais" ? "msgEnlaceM" : "msgEnlace");
   try { await navigator.clipboard.writeText(location.href); m.textContent = "Enlace copiado."; } catch (e) { m.textContent = "Copia la dirección del navegador: ya incluye esta vista."; }
   setTimeout(() => { m.textContent = ""; }, 4000);
 }
@@ -1502,6 +1514,7 @@ function pintarRadar() {
   $("avisoP").textContent = sin ? `En ${sin} de ${inds.length} ejes falta el dato de algún país; esos puntos quedan sin dibujar.` : "";
 }
 function csvPaises() {
+  medirEvento("csv-comparador");
   const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;fuente;pais;iso3;anio;valor;unidad;tipo"];
   const inds = new Map(); perfilInds().concat(CM.secs.flatMap(s => s.inds)).forEach(o => inds.set(o.key, o));
   inds.forEach(o => PS.sel.forEach(iso => {
@@ -1796,6 +1809,7 @@ function renderMiPais() {
 }
 function mpRedibujar() { MP.secs.forEach(s => { if (s.estado === "ok") mpPintarSec(s); }); }
 function csvMiPais() {
+  medirEvento("csv-mi-pais");
   const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;fuente;pais;iso3;anio;valor;unidad"], p = paisMap.get(MP.iso);
   MP.secs.forEach(s => s.inds.forEach(o => (mpHist.get(MP.iso + "|" + o.key) || []).concat(mpExtra.get(MP.iso + "|" + o.key) || []).forEach(x => L.push([q(o.name), o.id, o.src, q(p.nombre), MP.iso, x.y, String(x.v).replace(".", ","), q(o.unit || "")].join(";")))));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "mi_pais_" + MP.iso + ".csv"; document.body.appendChild(a); a.click(); a.remove();
@@ -1926,6 +1940,7 @@ async function renderRegiones(iso) {
   rgPintar();
 }
 function csvRegional() {
+  medirEvento("csv-regional");
   const {geo, dat} = RG.cur || {}; if (!geo || !dat) return;
   const q = s => `"${String(s).replace(/"/g, '""')}"`, nom = new Map(geo.r.map(r => [r.i, r.n])), L = ["indicador;fuente;pais;iso3;region;codigo_region;anio;valor;unidad"], p = paisMap.get(RG.iso);
   for (const [id, ind] of Object.entries(dat.ind)) for (const [rid, s] of Object.entries(ind.s)) for (const [y, v] of Object.entries(s))
@@ -2041,6 +2056,20 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const ANIO = new Date().getFullYear();
+// Analítica sin cookies (GoatCounter). Cuando GC_CODE tenga el nombre del sitio, empieza a medir; vacío = no mide nada.
+const GC_CODE = "";
+let gcUlt = "";
+function medir(ruta, titulo) {
+  if (!GC_CODE || ruta === gcUlt) return; gcUlt = ruta;
+  try {
+    if (!window.goatcounter) {
+      window.goatcounter = {no_onload: true};
+      const s = document.createElement("script"); s.async = true; s.src = "https://gc.zgo.at/count.js"; s.dataset.goatcounter = `https://${GC_CODE}.goatcounter.com/count`;
+      s.onload = () => { try { window.goatcounter.count({path: ruta, title: titulo || ruta}); } catch (e) {} }; document.head.appendChild(s);
+    } else if (window.goatcounter.count) window.goatcounter.count({path: ruta, title: titulo || ruta});
+  } catch (e) {}
+}
+function medirEvento(nombre) { if (!GC_CODE) return; try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: "evento/" + nombre, title: nombre, event: true}); } catch (e) {} }
 const nfs = {};
 function num(v, d) { return (nfs[d] || (nfs[d] = new Intl.NumberFormat("es-CO", {minimumFractionDigits: d, maximumFractionDigits: d}))).format(v); }
 function big(v) {                       // escala larga del español: 1 billón = 10^12
@@ -2714,6 +2743,7 @@ function eventosMapa(svg) {
 // ============================================================
 function descargarCSV() {
   if (!D) return;
+  medirEvento("csv-explorador");
   const q = s => `"${String(s).replace(/"/g, '""')}"`;
   const L = ["fuente;indicador;codigo;pais;iso3;continente;anio;valor;unidad;tipo"];
   filas.forEach(r => D.series.get(r.iso).forEach(s => L.push([q(FUENTES[ind.src].nombre), q(ind.name), q(ind.id), q(r.nombre), r.iso, q(r.cont), s.y, String(s.v).replace(".", ","), q(ind.unit || ""), s.f === "proy" ? "proyeccion" : s.f === "p" ? "provisional" : "dato"].join(";"))));

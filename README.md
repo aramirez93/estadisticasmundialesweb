@@ -53,3 +53,8 @@ Fuentes: [Banco Mundial](https://data.worldbank.org), [Eurostat](https://ec.euro
 ## v0.11 – Colores y UNESCO
 - Mapas y mapa de calor con escala divergente **rojo (peor) → amarillo claro → azul (mejor)**, apta para daltonismo; los indicadores sin «bueno/malo» (población, densidad…) siguen en una sola gama azul. Los mapas regionales aplican la misma lógica donde corresponde (PIB, empleo, paro, pobreza…).
 - Nueva fuente **UNESCO** (Instituto de Estadística): finalización de estudios, niños fuera de la escuela, alumnos por docente y años de educación obligatoria y gratuita.
+
+## v0.12 – Fase A: medir e indexar
+- `robots.txt`, `sitemap.xml`, textos para buscadores, etiqueta canónica, vista previa al compartir (`og.png`) y datos estructurados.
+- Analítica sin cookies (GoatCounter) lista: se activa poniendo el nombre del sitio en `GC_CODE` (src/app.js). Mide secciones, país/indicador visto y descargas de CSV.
+- Correcciones: años del Censo de EE. UU. dinámicos; OWID (democracia electoral V-Dem en lugar de EIU; sin «brecha de género», que daba 404); UNESCO (docentes capacitados en lugar de alumnos por docente); filas del catálogo con formato erróneo.

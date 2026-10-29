@@ -272,6 +272,7 @@ function renderMiPais() {
 }
 function mpRedibujar() { MP.secs.forEach(s => { if (s.estado === "ok") mpPintarSec(s); }); }
 function csvMiPais() {
+  medirEvento("csv-mi-pais");
   const q = s => `"${String(s).replace(/"/g, '""')}"`, L = ["indicador;codigo;fuente;pais;iso3;anio;valor;unidad"], p = paisMap.get(MP.iso);
   MP.secs.forEach(s => s.inds.forEach(o => (mpHist.get(MP.iso + "|" + o.key) || []).concat(mpExtra.get(MP.iso + "|" + o.key) || []).forEach(x => L.push([q(o.name), o.id, o.src, q(p.nombre), MP.iso, x.y, String(x.v).replace(".", ","), q(o.unit || "")].join(";")))));
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + L.join("\n")], {type: "text/csv;charset=utf-8"})); a.download = "mi_pais_" + MP.iso + ".csv"; document.body.appendChild(a); a.click(); a.remove();
