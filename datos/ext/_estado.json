@@ -1,5 +1,5 @@
 {
- "generado": "2026-11-04T13:03:39.177Z",
+ "generado": "2026-11-05T13:16:54.784Z",
  "fuentes": {
   "oms": {
    "ok": [
@@ -14,48 +14,7 @@
     "WHS6_102",
     "PHE_HHAIR_PROP_POP_CLEAN_FUELS"
    ],
-   "fallos": [
-    {
-     "id": "WHOSIS_000002",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "NCD_BMI_30A",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "NCD_BMI_25A",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "NCD_HYP_PREVALENCE_A",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "M_Est_smk_curr_std",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "UHC_INDEX_REPORTED",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "WSH_SANITATION_SAFELY_MANAGED",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "HWF_0006",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "WHS6_102",
-     "motivo": "HTTP 503"
-    },
-    {
-     "id": "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
-     "motivo": "HTTP 503"
-    }
-   ]
+   "fallos": []
   },
   "oit": {
    "ok": [
